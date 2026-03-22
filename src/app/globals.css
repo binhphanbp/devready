@@ -248,3 +248,27 @@
   background-size: 200% 200%;
   animation: gradient-shift 6s ease infinite;
 }
+
+/* ===== Custom Cursor ===== */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+:root {
+  --cursor-dot-color: #2563eb;
+}
+
+.dark {
+  --cursor-dot-color: #60a5fa;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  @media (pointer: fine) {
+    * {
+      cursor: auto !important;
+    }
+  }
+}
