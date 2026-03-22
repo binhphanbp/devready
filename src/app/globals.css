@@ -4,12 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ===== DevReady Design System ===== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+
+  /* Sidebar tokens */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -18,11 +21,15 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+
+  /* Chart tokens */
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+
+  /* Core tokens */
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,6 +46,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* DevReady brand colors */
+  --color-electric: var(--electric);
+  --color-electric-foreground: var(--electric-foreground);
+  --color-electric-muted: var(--electric-muted);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  /* Radius */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,6 +64,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Light mode - not primary, but supported */
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -55,7 +72,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.45 0.2 260);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -66,55 +83,72 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --ring: oklch(0.45 0.2 260);
+  --chart-1: oklch(0.45 0.2 260);
+  --chart-2: oklch(0.6 0.18 180);
+  --chart-3: oklch(0.7 0.15 60);
+  --chart-4: oklch(0.65 0.2 330);
+  --chart-5: oklch(0.55 0.25 30);
   --radius: 0.625rem;
+
+  /* DevReady brand */
+  --electric: oklch(0.55 0.25 260);
+  --electric-foreground: oklch(0.985 0 0);
+  --electric-muted: oklch(0.55 0.25 260 / 15%);
+  --success: oklch(0.65 0.2 145);
+  --warning: oklch(0.75 0.18 70);
+
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.45 0.2 260);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0.45 0.2 260);
 }
 
+/* Dark mode - DEFAULT for DevReady */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.13 0.01 260);
+  --foreground: oklch(0.93 0.01 260);
+  --card: oklch(0.17 0.015 260);
+  --card-foreground: oklch(0.93 0.01 260);
+  --popover: oklch(0.17 0.015 260);
+  --popover-foreground: oklch(0.93 0.01 260);
+  --primary: oklch(0.6 0.24 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.22 0.02 260);
+  --secondary-foreground: oklch(0.93 0.01 260);
+  --muted: oklch(0.22 0.02 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  --accent: oklch(0.22 0.02 260);
+  --accent-foreground: oklch(0.93 0.01 260);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.6 0.24 260);
+  --chart-1: oklch(0.6 0.24 260);
+  --chart-2: oklch(0.65 0.2 180);
+  --chart-3: oklch(0.75 0.15 60);
+  --chart-4: oklch(0.7 0.2 330);
+  --chart-5: oklch(0.6 0.25 30);
+
+  /* DevReady brand - dark */
+  --electric: oklch(0.6 0.24 260);
+  --electric-foreground: oklch(0.98 0 0);
+  --electric-muted: oklch(0.6 0.24 260 / 12%);
+  --success: oklch(0.7 0.2 145);
+  --warning: oklch(0.8 0.18 70);
+
+  --sidebar: oklch(0.15 0.015 260);
+  --sidebar-foreground: oklch(0.93 0.01 260);
+  --sidebar-primary: oklch(0.6 0.24 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.22 0.02 260);
+  --sidebar-accent-foreground: oklch(0.93 0.01 260);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.6 0.24 260);
 }
 
 @layer base {
@@ -127,4 +161,81 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ===== Custom Utilities ===== */
+
+/* Glassmorphism — theme aware */
+.glass {
+  background: oklch(0.98 0 0 / 70%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid oklch(0 0 0 / 8%);
+}
+.dark .glass {
+  background: oklch(0.13 0.01 260 / 70%);
+  border-bottom: 1px solid oklch(1 0 0 / 8%);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #0066FF, #00AAFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effect */
+.glow-blue {
+  box-shadow: 0 0 20px oklch(0.55 0.25 260 / 30%),
+    0 0 60px oklch(0.55 0.25 260 / 12%);
+}
+.glow-blue:hover {
+  box-shadow: 0 0 25px oklch(0.55 0.25 260 / 40%),
+    0 0 80px oklch(0.55 0.25 260 / 18%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0 0);
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.4 0.02 260);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0 0);
+}
+
+/* Dot grid background pattern — theme aware */
+.bg-grid {
+  background-image: radial-gradient(
+    circle,
+    oklch(0 0 0 / 6%) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+.dark .bg-grid {
+  background-image: radial-gradient(
+    circle,
+    oklch(1 0 0 / 5%) 1px,
+    transparent 1px
+  );
+}
+
+/* Animated gradient border */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
 }
