@@ -212,6 +212,15 @@
   background: oklch(0.5 0 0);
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Dot grid background pattern — theme aware */
 .bg-grid {
   background-image: radial-gradient(

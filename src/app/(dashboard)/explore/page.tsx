@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QuestionCard } from "@/components/explore/QuestionCard";
@@ -19,6 +19,8 @@ import {
   BarChart3,
   ArrowDownAZ,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -44,10 +46,10 @@ type Category = {
 };
 
 const techStacksByCategory: Record<string, string[]> = {
-  frontend: ["JavaScript", "TypeScript", "React", "Vue", "Angular", "Next.js", "HTML/CSS", "Responsive", "Hooks", "ES6", "RSC", "Performance"],
-  backend: ["Node.js", "Java", "Python", "C#", ".NET", "Spring Boot", "Express", "FastAPI", "Django", "REST", "GraphQL", "API Design", "Microservices", "Architecture", "Go"],
-  database: ["SQL", "PostgreSQL", "MySQL", "MongoDB", "Redis", "NoSQL", "Database Design", "Caching", "Transactions", "Performance"],
-  devops: ["Docker", "Kubernetes", "CI/CD", "AWS", "Cloud", "Azure", "Linux", "Git", "GitHub", "Shell", "GitHub Actions", "Workflow"],
+  frontend: ["JavaScript", "TypeScript", "React", "Vue", "Angular", "Next.js", "HTML/CSS", "TailwindCSS", "Bootstrap", "Sass/SCSS", "Responsive", "Hooks", "ES6", "RSC", "Performance"],
+  backend: ["Node.js", "Java", "Python", "PHP", "C#", ".NET", "Spring Boot", "Express", "Laravel", "FastAPI", "Django", "REST", "GraphQL", "API Design", "Microservices", "Architecture", "Go"],
+  database: ["SQL", "PostgreSQL", "MySQL", "MongoDB", "Redis", "NoSQL", "SQLite", "Database Design", "Caching", "Transactions", "Performance"],
+  devops: ["Docker", "Kubernetes", "CI/CD", "AWS", "Cloud", "Azure", "GCP", "Linux", "Git", "GitHub", "Shell", "GitHub Actions", "Terraform"],
   "soft-skills": ["Behavioral", "STAR", "Communication", "Teamwork", "Leadership", "Interview", "Time Management", "Productivity", "Agile", "Project Management"],
 };
 
@@ -72,6 +74,131 @@ const sortOptions = [
   { value: "popular", label: "Xem nhiều", icon: BarChart3 },
   { value: "bookmarked", label: "Lưu nhiều", icon: BookOpen },
 ];
+
+// ---- Tech Stack Slider Sub-component ----
+function TechStackSlider({
+  techStacks,
+  selectedTechTags,
+  toggleTechTag,
+}: {
+  techStacks: string[];
+  selectedTechTags: string[];
+  toggleTechTag: (tag: string) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    const ro = new ResizeObserver(checkScroll);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      ro.disconnect();
+    };
+  }, [checkScroll, techStacks]);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = direction === "left" ? -200 : 200;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+  };
+
+  const showArrows = canScrollLeft || canScrollRight;
+
+  return (
+    <div className="border-b border-border/30 bg-muted/10">
+      <div className="flex items-center gap-2 px-5 py-3">
+        {/* Label */}
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/70 shrink-0 pr-3 border-r border-border/50">
+          <Hash className="h-3.5 w-3.5" />
+          Tech
+        </div>
+
+        {/* Scrollable area with gradient edge */}
+        <div className="relative flex-1 min-w-0">
+          {/* Left gradient fade */}
+          {canScrollLeft && (
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted/60 to-transparent pointer-events-none z-10" />
+          )}
+
+          {/* Scrollable tech tags */}
+          <div
+            ref={scrollRef}
+            className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pr-1"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {techStacks.map((tech) => {
+              const isActive = selectedTechTags.includes(tech);
+              return (
+                <button
+                  key={tech}
+                  onClick={() => toggleTechTag(tech)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0",
+                    isActive
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-transparent text-muted-foreground border-dashed border-border/60 hover:border-primary/40 hover:text-foreground hover:bg-primary/5"
+                  )}
+                >
+                  {isActive && <span className="mr-1">✓</span>}
+                  {tech}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right gradient fade */}
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted/60 to-transparent pointer-events-none z-10" />
+          )}
+        </div>
+
+        {/* Arrow buttons grouped together */}
+        {showArrows && (
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button
+              onClick={() => scroll("left")}
+              disabled={!canScrollLeft}
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-lg border transition-all",
+                canScrollLeft
+                  ? "bg-background border-border/60 shadow-sm hover:bg-muted/80 hover:shadow-md text-foreground"
+                  : "bg-muted/30 border-border/30 text-muted-foreground/30 cursor-not-allowed"
+              )}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              disabled={!canScrollRight}
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-lg border transition-all",
+                canScrollRight
+                  ? "bg-background border-border/60 shadow-sm hover:bg-muted/80 hover:shadow-md text-foreground"
+                  : "bg-muted/30 border-border/30 text-muted-foreground/30 cursor-not-allowed"
+              )}
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function ExplorePage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -211,7 +338,7 @@ export default function ExplorePage() {
         {/* Category row */}
         <div className="px-5 py-3.5 border-b border-border/30">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 min-w-[60px]">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/70 shrink-0 pr-3 border-r border-border/50">
               <Layers className="h-3.5 w-3.5" />
               Danh mục
             </div>
@@ -255,41 +382,18 @@ export default function ExplorePage() {
 
         {/* Tech stack row (shown only when category selected) */}
         {availableTechStacks.length > 0 && (
-          <div className="px-5 py-3 border-b border-border/30 bg-muted/10">
-            <div className="flex items-start gap-3">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 min-w-[60px] pt-0.5">
-                <Hash className="h-3.5 w-3.5" />
-                Tech
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {availableTechStacks.map((tech) => {
-                  const isActive = selectedTechTags.includes(tech);
-                  return (
-                    <button
-                      key={tech}
-                      onClick={() => toggleTechTag(tech)}
-                      className={cn(
-                        "px-2.5 py-1 rounded-md text-xs font-medium border transition-all",
-                        isActive
-                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                          : "bg-transparent text-muted-foreground border-dashed border-border/60 hover:border-primary/40 hover:text-foreground hover:bg-primary/5"
-                      )}
-                    >
-                      {isActive && <span className="mr-1">✓</span>}
-                      {tech}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+          <TechStackSlider
+            techStacks={availableTechStacks}
+            selectedTechTags={selectedTechTags}
+            toggleTechTag={toggleTechTag}
+          />
         )}
 
         {/* Level + Sort row */}
         <div className="px-5 py-3 flex flex-wrap items-center justify-between gap-3">
           {/* Difficulty */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 min-w-[60px]">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/70 shrink-0 pr-3 border-r border-border/50">
               <BarChart3 className="h-3.5 w-3.5" />
               Cấp độ
             </div>

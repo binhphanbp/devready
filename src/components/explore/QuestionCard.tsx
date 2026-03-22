@@ -27,8 +27,19 @@ const difficultyConfig: Record<string, { label: string; className: string; dotCo
   senior: { label: "Senior", className: "bg-orange-500/10 text-orange-500 dark:text-orange-400 border-orange-500/20", dotColor: "bg-orange-500" },
 };
 
+const categoryColors: Record<string, string> = {
+  Frontend: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+  Backend: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  Database: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
+  DevOps: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20",
+  "Soft Skills": "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
+};
+
 export function QuestionCard({ question, onClick }: QuestionCardProps) {
   const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.intern;
+  const catColor = question.categories
+    ? categoryColors[question.categories.name] ?? "bg-muted/50 text-muted-foreground border-border/30"
+    : "";
 
   return (
     <Card
@@ -41,7 +52,7 @@ export function QuestionCard({ question, onClick }: QuestionCardProps) {
             {/* Category & Difficulty */}
             <div className="flex flex-wrap items-center gap-2 mb-2">
               {question.categories && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="outline" className={cn("text-xs font-medium", catColor)}>
                   {question.categories.name}
                 </Badge>
               )}
