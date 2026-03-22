@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { QuestionCard } from "@/components/explore/QuestionCard";
 import { QuestionDetail } from "@/components/explore/QuestionDetail";
@@ -10,13 +9,16 @@ import {
   Search,
   X,
   BookOpen,
-  SlidersHorizontal,
-  ArrowUpDown,
   Code2,
   Server,
   Database,
   Cloud,
   MessageCircle,
+  Layers,
+  Hash,
+  BarChart3,
+  ArrowDownAZ,
+  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -41,7 +43,6 @@ type Category = {
   icon: string;
 };
 
-// Tech stacks mapped to categories
 const techStacksByCategory: Record<string, string[]> = {
   frontend: ["JavaScript", "TypeScript", "React", "Vue", "Angular", "Next.js", "HTML/CSS", "Responsive", "Hooks", "ES6", "RSC", "Performance"],
   backend: ["Node.js", "Java", "Python", "C#", ".NET", "Spring Boot", "Express", "FastAPI", "Django", "REST", "GraphQL", "API Design", "Microservices", "Architecture", "Go"],
@@ -50,26 +51,26 @@ const techStacksByCategory: Record<string, string[]> = {
   "soft-skills": ["Behavioral", "STAR", "Communication", "Teamwork", "Leadership", "Interview", "Time Management", "Productivity", "Agile", "Project Management"],
 };
 
-const categoryIcons: Record<string, typeof Code2> = {
-  frontend: Code2,
-  backend: Server,
-  database: Database,
-  devops: Cloud,
-  "soft-skills": MessageCircle,
+const categoryMeta: Record<string, { icon: typeof Code2; color: string; bg: string }> = {
+  frontend: { icon: Code2, color: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/15" },
+  backend: { icon: Server, color: "text-emerald-500", bg: "bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/15" },
+  database: { icon: Database, color: "text-violet-500", bg: "bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/15" },
+  devops: { icon: Cloud, color: "text-orange-500", bg: "bg-orange-500/10 border-orange-500/20 hover:bg-orange-500/15" },
+  "soft-skills": { icon: MessageCircle, color: "text-pink-500", bg: "bg-pink-500/10 border-pink-500/20 hover:bg-pink-500/15" },
 };
 
 const difficulties = [
-  { value: "intern", label: "Intern", className: "bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20" },
-  { value: "fresher", label: "Fresher", className: "bg-teal-500/10 text-teal-500 dark:text-teal-400 border-teal-500/20" },
-  { value: "junior", label: "Junior", className: "bg-blue-500/10 text-blue-500 dark:text-blue-400 border-blue-500/20" },
-  { value: "middle", label: "Middle", className: "bg-amber-500/10 text-amber-500 dark:text-amber-400 border-amber-500/20" },
-  { value: "senior", label: "Senior", className: "bg-orange-500/10 text-orange-500 dark:text-orange-400 border-orange-500/20" },
+  { value: "intern", label: "Intern", color: "bg-emerald-500", textColor: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+  { value: "fresher", label: "Fresher", color: "bg-teal-500", textColor: "text-teal-600 dark:text-teal-400", bg: "bg-teal-500/10 border-teal-500/20" },
+  { value: "junior", label: "Junior", color: "bg-blue-500", textColor: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+  { value: "middle", label: "Middle", color: "bg-amber-500", textColor: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
+  { value: "senior", label: "Senior", color: "bg-orange-500", textColor: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
 ];
 
 const sortOptions = [
-  { value: "newest", label: "Mới nhất" },
-  { value: "popular", label: "Xem nhiều" },
-  { value: "bookmarked", label: "Lưu nhiều" },
+  { value: "newest", label: "Mới nhất", icon: Sparkles },
+  { value: "popular", label: "Xem nhiều", icon: BarChart3 },
+  { value: "bookmarked", label: "Lưu nhiều", icon: BookOpen },
 ];
 
 export default function ExplorePage() {
@@ -85,13 +86,11 @@ export default function ExplorePage() {
 
   const supabase = createClient();
 
-  // Get the selected category slug for tech stack filtering
   const selectedCategorySlug = useMemo(() => {
     if (!selectedCategory) return null;
     return categories.find((c) => c.id === selectedCategory)?.slug ?? null;
   }, [selectedCategory, categories]);
 
-  // Available tech stacks based on selected category
   const availableTechStacks = useMemo(() => {
     if (!selectedCategorySlug) return [];
     return techStacksByCategory[selectedCategorySlug] ?? [];
@@ -105,7 +104,6 @@ export default function ExplorePage() {
       .then(({ data }) => setCategories((data as Category[]) ?? []));
   }, []);
 
-  // Clear tech tags when category changes
   useEffect(() => {
     setSelectedTechTags([]);
   }, [selectedCategory]);
@@ -115,25 +113,14 @@ export default function ExplorePage() {
       setLoading(true);
       let query = supabase
         .from("questions")
-        .select(
-          "id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, categories(name, color)"
-        )
+        .select("id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, categories(name, color)")
         .eq("is_approved", true);
 
-      if (selectedCategory) {
-        query = query.eq("category_id", selectedCategory);
-      }
-      if (selectedDifficulty) {
-        query = query.eq("difficulty", selectedDifficulty);
-      }
-      if (search.trim()) {
-        query = query.ilike("title", `%${search.trim()}%`);
-      }
-      if (selectedTechTags.length > 0) {
-        query = query.overlaps("tech_tags", selectedTechTags);
-      }
+      if (selectedCategory) query = query.eq("category_id", selectedCategory);
+      if (selectedDifficulty) query = query.eq("difficulty", selectedDifficulty);
+      if (search.trim()) query = query.ilike("title", `%${search.trim()}%`);
+      if (selectedTechTags.length > 0) query = query.overlaps("tech_tags", selectedTechTags);
 
-      // Sort
       switch (sortBy) {
         case "popular":
           query = query.order("view_count", { ascending: false });
@@ -168,194 +155,187 @@ export default function ExplorePage() {
     setSearch("");
   };
 
-  const hasFilters =
-    selectedCategory || selectedDifficulty || search || selectedTechTags.length > 0 || sortBy !== "newest";
+  const hasFilters = selectedCategory || selectedDifficulty || search || selectedTechTags.length > 0 || sortBy !== "newest";
+  const activeFilterCount = [selectedCategory, selectedDifficulty, search, selectedTechTags.length > 0 ? true : null, sortBy !== "newest" ? true : null].filter(Boolean).length;
 
-  // If a question is selected, show detail panel
   if (selectedQuestion) {
-    return (
-      <QuestionDetail
-        question={selectedQuestion}
-        onBack={() => setSelectedQuestion(null)}
-      />
-    );
+    return <QuestionDetail question={selectedQuestion} onBack={() => setSelectedQuestion(null)} />;
   }
 
   return (
-    <div className="space-y-5 pt-8 lg:pt-0">
+    <div className="space-y-6 pt-8 lg:pt-0">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Khám phá <span className="text-gradient">câu hỏi phỏng vấn</span>
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          {questions.length > 0
-            ? `${questions.length} câu hỏi • Lọc theo danh mục, tech stack và cấp độ`
-            : "Tìm kiếm và luyện tập với hàng trăm câu hỏi từ các công ty IT Việt Nam."}
-        </p>
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Khám phá <span className="text-gradient">câu hỏi phỏng vấn</span>
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Tìm kiếm, lọc và luyện tập với hàng trăm câu hỏi IT thực tế
+          </p>
+        </div>
+        {hasFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="text-xs text-destructive hover:text-destructive shrink-0"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Xóa lọc ({activeFilterCount})
+          </Button>
+        )}
       </div>
 
-      {/* Search */}
+      {/* Search bar */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Tìm kiếm câu hỏi... (ví dụ: React hooks, SQL join, Docker...)"
-          className="pl-9 h-11 bg-card/50 border-border/50"
+          placeholder="Tìm câu hỏi... (React hooks, SQL join, Docker...)"
+          className="pl-10 h-12 rounded-xl bg-card/60 border-border/50 text-sm focus:ring-2 focus:ring-primary/20"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
 
-      {/* Filters */}
-      <div className="space-y-3 rounded-xl border border-border/50 bg-card/30 p-4">
-        {/* Row 1: Categories */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 w-16">
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            Danh mục
-          </span>
-          <Badge
-            variant={!selectedCategory ? "default" : "outline"}
-            className={cn(
-              "cursor-pointer transition-colors",
-              !selectedCategory
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted/50"
-            )}
-            onClick={() => setSelectedCategory(null)}
-          >
-            Tất cả
-          </Badge>
-          {categories.map((cat) => {
-            const Icon = categoryIcons[cat.slug] ?? BookOpen;
-            return (
-              <Badge
-                key={cat.id}
-                variant={selectedCategory === cat.id ? "default" : "outline"}
+      {/* ===== FILTER PANEL ===== */}
+      <div className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden">
+        {/* Category row */}
+        <div className="px-5 py-3.5 border-b border-border/30">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 min-w-[60px]">
+              <Layers className="h-3.5 w-3.5" />
+              Danh mục
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {/* All button */}
+              <button
+                onClick={() => setSelectedCategory(null)}
                 className={cn(
-                  "cursor-pointer transition-colors",
-                  selectedCategory === cat.id
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted/50"
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
+                  !selectedCategory
+                    ? "bg-foreground text-background border-foreground shadow-sm"
+                    : "bg-transparent text-muted-foreground border-border/50 hover:bg-muted/50 hover:text-foreground"
                 )}
-                onClick={() =>
-                  setSelectedCategory(
-                    selectedCategory === cat.id ? null : cat.id
-                  )
-                }
               >
-                <Icon className="h-3 w-3 mr-1" />
-                {cat.name}
-              </Badge>
-            );
-          })}
+                Tất cả
+              </button>
+              {/* Category buttons */}
+              {categories.map((cat) => {
+                const meta = categoryMeta[cat.slug] ?? { icon: BookOpen, color: "text-gray-500", bg: "bg-gray-500/10 border-gray-500/20" };
+                const Icon = meta.icon;
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(isActive ? null : cat.id)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
+                      isActive
+                        ? cn(meta.bg, meta.color, "shadow-sm")
+                        : "bg-transparent text-muted-foreground border-border/50 hover:bg-muted/50 hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="h-3 w-3" />
+                    {cat.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        {/* Row 2: Tech Stack (dynamic) */}
+        {/* Tech stack row (shown only when category selected) */}
         {availableTechStacks.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 w-16">
-              <Code2 className="h-3.5 w-3.5" />
-              Tech
-            </span>
-            {availableTechStacks.map((tech) => (
-              <Badge
-                key={tech}
-                variant={selectedTechTags.includes(tech) ? "default" : "outline"}
-                className={cn(
-                  "cursor-pointer transition-colors text-xs",
-                  selectedTechTags.includes(tech)
-                    ? "bg-[#0066FF] text-white border-[#0066FF]"
-                    : "hover:bg-muted/50 border-dashed"
-                )}
-                onClick={() => toggleTechTag(tech)}
-              >
-                {tech}
-              </Badge>
-            ))}
+          <div className="px-5 py-3 border-b border-border/30 bg-muted/10">
+            <div className="flex items-start gap-3">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 min-w-[60px] pt-0.5">
+                <Hash className="h-3.5 w-3.5" />
+                Tech
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {availableTechStacks.map((tech) => {
+                  const isActive = selectedTechTags.includes(tech);
+                  return (
+                    <button
+                      key={tech}
+                      onClick={() => toggleTechTag(tech)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-md text-xs font-medium border transition-all",
+                        isActive
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-transparent text-muted-foreground border-dashed border-border/60 hover:border-primary/40 hover:text-foreground hover:bg-primary/5"
+                      )}
+                    >
+                      {isActive && <span className="mr-1">✓</span>}
+                      {tech}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Row 3: Difficulty */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 w-16">
-            📊 Cấp độ
-          </span>
-          <Badge
-            variant={!selectedDifficulty ? "default" : "outline"}
-            className={cn(
-              "cursor-pointer transition-colors text-xs",
-              !selectedDifficulty
-                ? "bg-primary/10 text-primary border-primary/20"
-                : "hover:bg-muted/50"
-            )}
-            onClick={() => setSelectedDifficulty(null)}
-          >
-            Tất cả
-          </Badge>
-          {difficulties.map((d) => (
-            <Badge
-              key={d.value}
-              variant="outline"
-              className={cn(
-                "cursor-pointer transition-colors text-xs",
-                selectedDifficulty === d.value
-                  ? d.className + " font-medium"
-                  : "hover:bg-muted/50"
-              )}
-              onClick={() =>
-                setSelectedDifficulty(
-                  selectedDifficulty === d.value ? null : d.value
-                )
-              }
-            >
-              {d.label}
-            </Badge>
-          ))}
-        </div>
-
-        {/* Row 4: Sort + Clear */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/30">
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 w-16">
-              <ArrowUpDown className="h-3.5 w-3.5" />
-              Sắp xếp
-            </span>
-            {sortOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setSortBy(opt.value)}
-                className={cn(
-                  "text-xs px-2.5 py-1 rounded-md transition-colors",
-                  sortBy === opt.value
-                    ? "bg-muted text-foreground font-medium"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
+        {/* Level + Sort row */}
+        <div className="px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+          {/* Difficulty */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 min-w-[60px]">
+              <BarChart3 className="h-3.5 w-3.5" />
+              Cấp độ
+            </div>
+            <div className="flex items-center gap-1">
+              {difficulties.map((d) => {
+                const isActive = selectedDifficulty === d.value;
+                return (
+                  <button
+                    key={d.value}
+                    onClick={() => setSelectedDifficulty(isActive ? null : d.value)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all",
+                      isActive
+                        ? cn(d.bg, d.textColor, "border shadow-sm")
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    <span className={cn("h-2 w-2 rounded-full", d.color, !isActive && "opacity-40")} />
+                    {d.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {hasFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="text-xs h-7 px-2 text-destructive hover:text-destructive"
-            >
-              <X className="h-3 w-3 mr-1" />
-              Xóa bộ lọc
-            </Button>
-          )}
+          {/* Sort */}
+          <div className="flex items-center gap-1 rounded-lg bg-muted/40 p-0.5">
+            {sortOptions.map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => setSortBy(opt.value)}
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all",
+                    sortBy === opt.value
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="h-3 w-3" />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -371,33 +351,31 @@ export default function ExplorePage() {
             ))}
           </div>
         ) : questions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground/30 mb-3" />
-            <p className="text-muted-foreground font-medium">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4">
+              <BookOpen className="h-7 w-7 text-muted-foreground/40" />
+            </div>
+            <p className="text-base font-medium text-foreground mb-1">
               Không tìm thấy câu hỏi nào
             </p>
-            <p className="text-sm text-muted-foreground/70 mt-1">
-              Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.
+            <p className="text-sm text-muted-foreground mb-5 max-w-sm">
+              Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem thêm câu hỏi.
             </p>
             {hasFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4"
-                onClick={clearFilters}
-              >
+              <Button variant="outline" size="sm" onClick={clearFilters}>
                 Xóa bộ lọc
               </Button>
             )}
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-1">
               <p className="text-sm text-muted-foreground">
-                Hiển thị <strong>{questions.length}</strong> câu hỏi
+                <strong className="text-foreground">{questions.length}</strong> câu hỏi
                 {selectedCategory &&
                   categories.find((c) => c.id === selectedCategory) &&
                   ` trong ${categories.find((c) => c.id === selectedCategory)?.name}`}
+                {selectedTechTags.length > 0 && ` · ${selectedTechTags.join(", ")}`}
               </p>
             </div>
             {questions.map((q) => (
