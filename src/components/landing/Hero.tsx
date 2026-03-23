@@ -369,7 +369,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl !leading-[1.1]"
         >
-          Sẵn sàng cho <span className="text-gradient">buổi phỏng vấn</span>
+          Sẵn sàng cho <span className="text-gradient">buổi phỏng vấn</span>{" "}
           <br className="hidden sm:block" />
           tiếp theo của bạn
         </motion.h1>
