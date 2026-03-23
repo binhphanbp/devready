@@ -50,7 +50,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4">
+    <div className="relative flex min-h-screen items-center justify-center px-4 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-grid opacity-30" />
       <div className="absolute -top-[30%] -right-[20%] h-[600px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />

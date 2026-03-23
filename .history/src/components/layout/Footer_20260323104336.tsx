@@ -66,7 +66,8 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground flex items-center gap-1">
-            Được tạo bởi DevReady Team © {new Date().getFullYear()}
+            Được tạo với <Heart className="h-3 w-3 text-destructive" /> bởi
+            DevReady Team © {new Date().getFullYear()}
           </p>
           <div className="flex gap-4">
             <a

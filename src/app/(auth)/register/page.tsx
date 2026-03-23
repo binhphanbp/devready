@@ -65,7 +65,7 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center px-4">
+      <div className="relative flex min-h-screen items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-30" />
         <Card className="relative w-full max-w-md border-border/50 bg-card/80 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
@@ -87,7 +87,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-8">
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-8 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-grid opacity-30" />
       <div className="absolute -bottom-[30%] -left-[20%] h-[600px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />
