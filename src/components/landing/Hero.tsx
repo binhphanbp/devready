@@ -68,21 +68,79 @@ const features = [
 ];
 
 const interviewQuestions = [
-  { q: "Giải thích sự khác nhau giữa let, const và var?", tag: "JavaScript", difficulty: "Easy", color: "text-emerald-400" },
-  { q: "React Virtual DOM hoạt động như thế nào?", tag: "React", difficulty: "Medium", color: "text-amber-400" },
-  { q: "REST API và GraphQL khác nhau ở điểm nào?", tag: "Backend", difficulty: "Medium", color: "text-amber-400" },
-  { q: "Database indexing cải thiện performance ra sao?", tag: "Database", difficulty: "Hard", color: "text-red-400" },
+  {
+    q: "Giải thích sự khác nhau giữa let, const và var trong JavaScript?",
+    tag: "JavaScript",
+    difficulty: "Easy",
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-400/10",
+    hint: "// Scope, hoisting, và reassignment",
+    code: `let x = 1;    // block-scoped, reassignable
+const y = 2;  // block-scoped, immutable ref
+var z = 3;    // function-scoped, hoisted`,
+  },
+  {
+    q: "React Virtual DOM hoạt động như thế nào?",
+    tag: "React",
+    difficulty: "Medium",
+    color: "text-amber-400",
+    bgColor: "bg-amber-400/10",
+    hint: "// Reconciliation & Diffing Algorithm",
+    code: `// 1. State changes → new Virtual DOM
+// 2. Diff old vs new VDOM (O(n))
+// 3. Batch update real DOM`,
+  },
+  {
+    q: "REST API và GraphQL khác nhau ở điểm nào?",
+    tag: "Backend",
+    difficulty: "Medium",
+    color: "text-amber-400",
+    bgColor: "bg-amber-400/10",
+    hint: "// Data fetching approach",
+    code: `// REST: Multiple endpoints, fixed data
+// GraphQL: Single endpoint, flexible
+//   → No over/under-fetching`,
+  },
+  {
+    q: "Indexing trong Database cải thiện performance ra sao?",
+    tag: "Database",
+    difficulty: "Hard",
+    color: "text-red-400",
+    bgColor: "bg-red-400/10",
+    hint: "// B-Tree, Hash Index, Composite",
+    code: `CREATE INDEX idx_user_email
+  ON users(email);
+-- O(n) → O(log n) lookup time`,
+  },
+];
+
+const topicSidebar = [
+  { label: "JavaScript", count: 120, active: true },
+  { label: "React", count: 95 },
+  { label: "Node.js", count: 78 },
+  { label: "SQL", count: 65 },
+  { label: "System Design", count: 42 },
 ];
 
 function InterviewPreview() {
   const [currentQ, setCurrentQ] = useState(0);
+  const [showCode, setShowCode] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentQ((prev) => (prev + 1) % interviewQuestions.length);
-    }, 3500);
+      setShowCode(false);
+      setTimeout(() => {
+        setCurrentQ((prev) => (prev + 1) % interviewQuestions.length);
+      }, 100);
+    }, 4500);
     return () => clearInterval(interval);
   }, []);
+
+  // Show code hint after 1.5s of each question
+  useEffect(() => {
+    const timer = setTimeout(() => setShowCode(true), 1500);
+    return () => clearTimeout(timer);
+  }, [currentQ]);
 
   const question = interviewQuestions[currentQ];
 
@@ -91,60 +149,140 @@ function InterviewPreview() {
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
-      className="mt-8 mx-auto max-w-xl"
+      className="mt-10 mx-auto max-w-4xl"
     >
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-xl shadow-black/5 dark:shadow-black/20 overflow-hidden">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/8 dark:shadow-black/25 overflow-hidden">
         {/* Window chrome */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40 bg-muted/20">
-          <div className="flex gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
-            <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/40 bg-muted/20">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+              <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
+              <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
+            </div>
+            <span className="ml-2 text-[11px] text-muted-foreground font-mono">
+              devready — interview-session
+            </span>
           </div>
-          <span className="ml-2 text-[11px] text-muted-foreground font-mono">
-            interview-session.ts
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] text-emerald-400/80 font-medium">Live</span>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="px-5 py-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[10px] font-mono text-muted-foreground/50">Q{currentQ + 1}/{interviewQuestions.length}</span>
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-              {question.tag}
-            </span>
-            <span className={`inline-flex items-center rounded-full bg-background/80 border border-border/50 px-2 py-0.5 text-[10px] font-semibold ${question.color}`}>
-              {question.difficulty}
-            </span>
-          </div>
-
-          <div className="h-[28px] relative overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={currentQ}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.35 }}
-                className="text-sm sm:text-[15px] font-medium text-foreground leading-snug"
+        <div className="flex">
+          {/* Sidebar — topics */}
+          <div className="hidden sm:flex flex-col w-[140px] border-r border-border/30 bg-muted/10 py-2">
+            {topicSidebar.map((topic) => (
+              <div
+                key={topic.label}
+                className={`flex items-center justify-between px-3 py-1.5 text-[11px] transition-colors ${
+                  topic.active
+                    ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                {question.q}
-                <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 animate-pulse align-text-bottom" />
-              </motion.p>
-            </AnimatePresence>
+                <span>{topic.label}</span>
+                <span className="text-[9px] text-muted-foreground/60">{topic.count}</span>
+              </div>
+            ))}
           </div>
-        </div>
 
-        {/* Progress dots */}
-        <div className="flex justify-center gap-1.5 pb-3">
-          {interviewQuestions.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 rounded-full transition-all duration-300 ${
-                i === currentQ ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/20"
-              }`}
-            />
-          ))}
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            {/* Question area */}
+            <div className="px-5 pt-4 pb-3">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[10px] font-mono text-muted-foreground/50">
+                  Q{currentQ + 1}/{interviewQuestions.length}
+                </span>
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                  {question.tag}
+                </span>
+                <span
+                  className={`inline-flex items-center rounded-full ${question.bgColor} px-2 py-0.5 text-[10px] font-semibold ${question.color}`}
+                >
+                  {question.difficulty}
+                </span>
+              </div>
+
+              <div className="min-h-[28px] relative overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={`q-${currentQ}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35 }}
+                    className="text-sm sm:text-[15px] font-semibold text-foreground leading-snug"
+                  >
+                    {question.q}
+                    <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Code hint area — fixed height to prevent layout shift */}
+            <div className="px-5 pb-4">
+              <div className="h-[90px] relative">
+                <AnimatePresence>
+                  {showCode && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0"
+                    >
+                      <div className="rounded-lg bg-muted/40 border border-border/30 p-3">
+                        <p className="text-[10px] text-muted-foreground/60 font-mono mb-1.5">
+                          {question.hint}
+                        </p>
+                        <pre className="text-[11px] sm:text-xs font-mono text-muted-foreground leading-relaxed">
+                          {question.code.split("\n").map((line, i) => (
+                            <motion.div
+                              key={`${currentQ}-${i}`}
+                              initial={{ opacity: 0, x: 8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.1, duration: 0.2 }}
+                            >
+                              {line}
+                            </motion.div>
+                          ))}
+                        </pre>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Bottom toolbar */}
+            <div className="flex items-center justify-between px-5 py-2.5 border-t border-border/30 bg-muted/10">
+              <div className="flex items-center gap-1.5">
+                {interviewQuestions.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1 rounded-full transition-all duration-300 ${
+                      i === currentQ ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/20"
+                    }`}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-medium">
+                  Xem đáp án
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-muted/60 text-muted-foreground font-medium">
+                  Flashcard
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-muted/60 text-muted-foreground font-medium">
+                  Tiếp →
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -229,31 +367,15 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl !leading-[1.08]"
+          className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl !leading-[1.1]"
         >
-          Sẵn sàng cho{" "}
-          <br className="hidden sm:block" />
-          <span className="text-gradient">buổi phỏng vấn</span>{" "}
+          Sẵn sàng cho <span className="text-gradient">buổi phỏng vấn</span>
           <br className="hidden sm:block" />
           tiếp theo của bạn
         </motion.h1>
 
         {/* Interactive Interview Preview */}
         <InterviewPreview />
-
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-6 max-w-2xl mx-auto text-base text-muted-foreground leading-relaxed sm:text-lg"
-        >
-          Luyện tập phỏng vấn IT với{" "}
-          <strong className="text-foreground">1000+ câu hỏi thực tế</strong>,
-          Flashcard thông minh (SRS), và AI Mentor hỗ trợ 24/7.
-          <br className="hidden sm:block" />
-          Được thiết kế riêng cho thị trường IT Việt Nam.
-        </motion.p>
 
         {/* CTA Buttons */}
         <motion.div
