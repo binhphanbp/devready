@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -65,6 +66,90 @@ const features = [
     floatDelay: 1.6,
   },
 ];
+
+const interviewQuestions = [
+  { q: "Giải thích sự khác nhau giữa let, const và var?", tag: "JavaScript", difficulty: "Easy", color: "text-emerald-400" },
+  { q: "React Virtual DOM hoạt động như thế nào?", tag: "React", difficulty: "Medium", color: "text-amber-400" },
+  { q: "REST API và GraphQL khác nhau ở điểm nào?", tag: "Backend", difficulty: "Medium", color: "text-amber-400" },
+  { q: "Database indexing cải thiện performance ra sao?", tag: "Database", difficulty: "Hard", color: "text-red-400" },
+];
+
+function InterviewPreview() {
+  const [currentQ, setCurrentQ] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQ((prev) => (prev + 1) % interviewQuestions.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const question = interviewQuestions[currentQ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.25 }}
+      className="mt-8 mx-auto max-w-xl"
+    >
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-xl shadow-black/5 dark:shadow-black/20 overflow-hidden">
+        {/* Window chrome */}
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40 bg-muted/20">
+          <div className="flex gap-1.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
+          </div>
+          <span className="ml-2 text-[11px] text-muted-foreground font-mono">
+            interview-session.ts
+          </span>
+        </div>
+
+        {/* Content */}
+        <div className="px-5 py-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[10px] font-mono text-muted-foreground/50">Q{currentQ + 1}/{interviewQuestions.length}</span>
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+              {question.tag}
+            </span>
+            <span className={`inline-flex items-center rounded-full bg-background/80 border border-border/50 px-2 py-0.5 text-[10px] font-semibold ${question.color}`}>
+              {question.difficulty}
+            </span>
+          </div>
+
+          <div className="h-[28px] relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={currentQ}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.35 }}
+                className="text-sm sm:text-[15px] font-medium text-foreground leading-snug"
+              >
+                {question.q}
+                <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+              </motion.p>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Progress dots */}
+        <div className="flex justify-center gap-1.5 pb-3">
+          {interviewQuestions.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                i === currentQ ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/20"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function Hero() {
   return (
@@ -152,6 +237,9 @@ export function Hero() {
           <br className="hidden sm:block" />
           tiếp theo của bạn
         </motion.h1>
+
+        {/* Interactive Interview Preview */}
+        <InterviewPreview />
 
         {/* Subtitle */}
         <motion.p
