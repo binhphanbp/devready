@@ -149,41 +149,41 @@ function InterviewPreview() {
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
-      className="mt-10 mx-auto max-w-5xl w-full"
+      className="mt-10 mx-auto w-full"
     >
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/8 dark:shadow-black/25 overflow-hidden">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/10 dark:shadow-black/30 overflow-hidden">
         {/* Window chrome */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border/40 bg-muted/20">
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-border/40 bg-muted/20">
           <div className="flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-              <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
-              <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
+            <div className="flex gap-2">
+              <div className="h-3 w-3 rounded-full bg-red-400/70" />
+              <div className="h-3 w-3 rounded-full bg-yellow-400/70" />
+              <div className="h-3 w-3 rounded-full bg-green-400/70" />
             </div>
-            <span className="ml-2 text-[11px] text-muted-foreground font-mono">
+            <span className="ml-3 text-xs text-muted-foreground font-mono">
               devready — interview-session
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] text-emerald-400/80 font-medium">Live</span>
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs text-emerald-400/80 font-medium">Live</span>
           </div>
         </div>
 
         <div className="flex">
           {/* Sidebar — topics */}
-          <div className="hidden sm:flex flex-col w-[140px] border-r border-border/30 bg-muted/10 py-2">
+          <div className="hidden sm:flex flex-col w-[160px] border-r border-border/30 bg-muted/10 py-3">
             {topicSidebar.map((topic) => (
               <div
                 key={topic.label}
-                className={`flex items-center justify-between px-3 py-1.5 text-[11px] transition-colors ${
+                className={`flex items-center justify-between px-4 py-2 text-xs transition-colors ${
                   topic.active
                     ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span>{topic.label}</span>
-                <span className="text-[9px] text-muted-foreground/60">{topic.count}</span>
+                <span className="text-[10px] text-muted-foreground/60">{topic.count}</span>
               </div>
             ))}
           </div>
@@ -191,22 +191,22 @@ function InterviewPreview() {
           {/* Main content */}
           <div className="flex-1 min-w-0">
             {/* Question area */}
-            <div className="px-6 pt-5 pb-3">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] font-mono text-muted-foreground/50">
+            <div className="px-7 pt-6 pb-4">
+              <div className="flex items-center gap-2.5 mb-4">
+                <span className="text-xs font-mono text-muted-foreground/50">
                   Q{currentQ + 1}/{interviewQuestions.length}
                 </span>
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                   {question.tag}
                 </span>
                 <span
-                  className={`inline-flex items-center rounded-full ${question.bgColor} px-2 py-0.5 text-[10px] font-semibold ${question.color}`}
+                  className={`inline-flex items-center rounded-full ${question.bgColor} px-2.5 py-0.5 text-xs font-semibold ${question.color}`}
                 >
                   {question.difficulty}
                 </span>
               </div>
 
-              <div className="min-h-[28px] relative overflow-hidden">
+              <div className="min-h-[32px] relative overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={`q-${currentQ}`}
@@ -214,18 +214,18 @@ function InterviewPreview() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.35 }}
-                    className="text-sm sm:text-base font-semibold text-foreground leading-snug"
+                    className="text-base sm:text-lg font-semibold text-foreground leading-snug"
                   >
                     {question.q}
-                    <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+                    <span className="inline-block w-[2px] h-5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
                   </motion.p>
                 </AnimatePresence>
               </div>
             </div>
 
             {/* Code hint area — fixed height to prevent layout shift */}
-            <div className="px-6 pb-5">
-              <div className="h-[100px] relative">
+            <div className="px-7 pb-6">
+              <div className="h-[120px] relative">
                 <AnimatePresence>
                   {showCode && (
                     <motion.div
@@ -235,11 +235,11 @@ function InterviewPreview() {
                       transition={{ duration: 0.3 }}
                       className="absolute inset-0"
                     >
-                      <div className="rounded-lg bg-muted/40 border border-border/30 p-3">
-                        <p className="text-[10px] text-muted-foreground/60 font-mono mb-1.5">
+                      <div className="rounded-lg bg-muted/40 border border-border/30 p-4">
+                        <p className="text-xs text-muted-foreground/60 font-mono mb-2">
                           {question.hint}
                         </p>
-                        <pre className="text-[11px] sm:text-xs font-mono text-muted-foreground leading-relaxed">
+                        <pre className="text-xs sm:text-sm font-mono text-muted-foreground leading-relaxed">
                           {question.code.split("\n").map((line, i) => (
                             <motion.div
                               key={`${currentQ}-${i}`}
@@ -259,25 +259,25 @@ function InterviewPreview() {
             </div>
 
             {/* Bottom toolbar */}
-            <div className="flex items-center justify-between px-5 py-2.5 border-t border-border/30 bg-muted/10">
+            <div className="flex items-center justify-between px-6 py-3 border-t border-border/30 bg-muted/10">
               <div className="flex items-center gap-1.5">
                 {interviewQuestions.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1 rounded-full transition-all duration-300 ${
-                      i === currentQ ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/20"
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === currentQ ? "w-6 bg-primary" : "w-2 bg-muted-foreground/20"
                     }`}
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-medium">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs px-3 py-1 rounded-md bg-primary/10 text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors">
                   Xem đáp án
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-muted/60 text-muted-foreground font-medium">
+                <span className="text-xs px-3 py-1 rounded-md bg-muted/60 text-muted-foreground font-medium cursor-pointer hover:bg-muted transition-colors">
                   Flashcard
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-muted/60 text-muted-foreground font-medium">
+                <span className="text-xs px-3 py-1 rounded-md bg-muted/60 text-muted-foreground font-medium cursor-pointer hover:bg-muted transition-colors">
                   Tiếp →
                 </span>
               </div>

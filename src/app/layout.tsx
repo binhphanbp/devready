@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import CustomCursor from "@/components/CustomCursor";
+import { BackToTop } from "@/components/layout/BackToTop";
 import "./globals.css";
 
 const inter = Inter({
@@ -80,6 +81,7 @@ export default function RootLayout({
         >
           <CustomCursor />
           {children}
+          <BackToTop />
         </ThemeProvider>
       </body>
     </html>
