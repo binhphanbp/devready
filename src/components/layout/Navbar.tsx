@@ -17,6 +17,7 @@ import {
   LayoutDashboard,
   Sun,
   Moon,
+  Monitor,
   LogOut,
   User,
 } from "lucide-react";
@@ -36,8 +37,28 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const cycleTheme = () => {
+    if (theme === "light") setTheme("dark");
+    else if (theme === "dark") setTheme("system");
+    else setTheme("light");
+  };
+
+  // Before mount, default to "system" to avoid hydration mismatch
+  const currentTheme = mounted ? (theme ?? "system") : "system";
+  const themeLabel = currentTheme === "dark" ? "Tối" : currentTheme === "light" ? "Sáng" : "Tự động";
+
+  const themeOptions = [
+    { value: "light", label: "Sáng", icon: Sun },
+    { value: "dark", label: "Tối", icon: Moon },
+    { value: "system", label: "Tự động", icon: Monitor },
+  ] as const;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -154,15 +175,61 @@ export function Navbar() {
 
           {/* Desktop Right — Auth + Theme (hidden below lg/1024px) */}
           <div className="hidden lg:flex items-center gap-2 shrink-0">
-            {/* Theme toggle */}
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              aria-label="Chuyển chế độ sáng/tối"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </button>
+            {/* Theme toggle with dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setThemeMenuOpen(!themeMenuOpen)}
+                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                aria-label={`Chế độ: ${themeLabel}`}
+                title={`Chế độ: ${themeLabel}`}
+              >
+                <Sun className={cn("h-4 w-4 absolute transition-all", currentTheme === "light" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0")} />
+                <Moon className={cn("h-4 w-4 absolute transition-all", currentTheme === "dark" ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-0 opacity-0")} />
+                <Monitor className={cn("h-4 w-4 absolute transition-all", currentTheme === "system" ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-0 opacity-0")} />
+              </button>
+
+              <AnimatePresence>
+                {themeMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setThemeMenuOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-36 rounded-xl border border-border/50 bg-card shadow-xl overflow-hidden z-50"
+                    >
+                      <div className="py-1">
+                        {themeOptions.map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => {
+                              setTheme(opt.value);
+                              setThemeMenuOpen(false);
+                            }}
+                            className={cn(
+                              "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors",
+                              currentTheme === opt.value
+                                ? "text-primary bg-primary/5 font-medium"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            )}
+                          >
+                            <opt.icon className="h-4 w-4" />
+                            {opt.label}
+                            {currentTheme === opt.value && (
+                              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
 
             {user ? (
               /* Logged in */
@@ -262,14 +329,59 @@ export function Navbar() {
 
           {/* Mobile/Tablet Right — Theme + Hamburger (visible below lg/1024px) */}
           <div className="flex lg:hidden items-center gap-1">
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              aria-label="Chuyển chế độ sáng/tối"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setThemeMenuOpen(!themeMenuOpen)}
+                className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                aria-label={`Chế độ: ${themeLabel}`}
+              >
+                <Sun className={cn("h-4 w-4 absolute top-2 left-2 transition-all", currentTheme === "light" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0")} />
+                <Moon className={cn("h-4 w-4 absolute top-2 left-2 transition-all", currentTheme === "dark" ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-0 opacity-0")} />
+                <Monitor className={cn("h-4 w-4 transition-all", currentTheme === "system" ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-0 opacity-0")} />
+              </button>
+
+              <AnimatePresence>
+                {themeMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setThemeMenuOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-36 rounded-xl border border-border/50 bg-card shadow-xl overflow-hidden z-50"
+                    >
+                      <div className="py-1">
+                        {themeOptions.map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => {
+                              setTheme(opt.value);
+                              setThemeMenuOpen(false);
+                            }}
+                            className={cn(
+                              "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors",
+                              currentTheme === opt.value
+                                ? "text-primary bg-primary/5 font-medium"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            )}
+                          >
+                            <opt.icon className="h-4 w-4" />
+                            {opt.label}
+                            {currentTheme === opt.value && (
+                              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"

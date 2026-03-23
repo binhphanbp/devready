@@ -149,11 +149,11 @@ function InterviewPreview() {
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
-      className="mt-10 mx-auto max-w-4xl"
+      className="mt-10 mx-auto max-w-5xl w-full"
     >
       <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/8 dark:shadow-black/25 overflow-hidden">
         {/* Window chrome */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/40 bg-muted/20">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border/40 bg-muted/20">
           <div className="flex items-center gap-2">
             <div className="flex gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
@@ -191,7 +191,7 @@ function InterviewPreview() {
           {/* Main content */}
           <div className="flex-1 min-w-0">
             {/* Question area */}
-            <div className="px-5 pt-4 pb-3">
+            <div className="px-6 pt-5 pb-3">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[10px] font-mono text-muted-foreground/50">
                   Q{currentQ + 1}/{interviewQuestions.length}
@@ -214,7 +214,7 @@ function InterviewPreview() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.35 }}
-                    className="text-sm sm:text-[15px] font-semibold text-foreground leading-snug"
+                    className="text-sm sm:text-base font-semibold text-foreground leading-snug"
                   >
                     {question.q}
                     <span className="inline-block w-[2px] h-4 bg-primary ml-0.5 animate-pulse align-text-bottom" />
@@ -224,8 +224,8 @@ function InterviewPreview() {
             </div>
 
             {/* Code hint area — fixed height to prevent layout shift */}
-            <div className="px-5 pb-4">
-              <div className="h-[90px] relative">
+            <div className="px-6 pb-5">
+              <div className="h-[100px] relative">
                 <AnimatePresence>
                   {showCode && (
                     <motion.div
