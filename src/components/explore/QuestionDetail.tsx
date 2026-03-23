@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -20,11 +20,14 @@ import {
   Clock,
   MessageSquareText,
   Zap,
+  Brain,
+  BookmarkCheck,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { AddToFlashcardDialog } from "./AddToFlashcardDialog";
 
 interface QuestionDetailProps {
   question: {
@@ -213,12 +216,17 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [showAnswer, setShowAnswer] = useState(false);
   const [loadingAnswers, setLoadingAnswers] = useState(true);
+  const [flashcardOpen, setFlashcardOpen] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [viewRecorded, setViewRecorded] = useState(false);
 
   const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.intern;
 
   useEffect(() => {
-    const fetchAnswers = async () => {
+    const fetchData = async () => {
       const supabase = createClient();
+      // Fetch answers
       const { data } = await supabase
         .from("answers")
         .select("*")
@@ -227,9 +235,51 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         .order("upvote_count", { ascending: false });
       setAnswers((data as Answer[]) ?? []);
       setLoadingAnswers(false);
+
+      // Check bookmark status
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: bm } = await supabase
+          .from("bookmarks")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("question_id", question.id)
+          .maybeSingle();
+        setIsBookmarked(!!bm);
+      }
     };
-    fetchAnswers();
+    fetchData();
   }, [question.id]);
+
+  // Record view + update streak when user views the answer
+  const recordView = useCallback(async () => {
+    if (viewRecorded) return;
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.rpc("record_question_view", { p_question_id: question.id });
+    setViewRecorded(true);
+  }, [question.id, viewRecorded]);
+
+  // Toggle bookmark
+  const toggleBookmark = async () => {
+    setBookmarkLoading(true);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setBookmarkLoading(false); return; }
+
+    if (isBookmarked) {
+      await supabase.from("bookmarks").delete()
+        .eq("user_id", user.id).eq("question_id", question.id);
+      setIsBookmarked(false);
+    } else {
+      await supabase.from("bookmarks").insert({
+        user_id: user.id, question_id: question.id,
+      });
+      setIsBookmarked(true);
+    }
+    setBookmarkLoading(false);
+  };
 
   const officialAnswer = answers.find((a) => a.is_official);
 
@@ -262,9 +312,28 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           Quay lại danh sách
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8">
-            <BookmarkIcon className="h-3.5 w-3.5 mr-1.5" />
-            Lưu
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn("h-8", isBookmarked && "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400")}
+            onClick={toggleBookmark}
+            disabled={bookmarkLoading}
+          >
+            {isBookmarked ? (
+              <BookmarkCheck className="h-3.5 w-3.5 mr-1.5" />
+            ) : (
+              <BookmarkIcon className="h-3.5 w-3.5 mr-1.5" />
+            )}
+            {isBookmarked ? "Đã lưu" : "Lưu"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-purple-600 dark:text-purple-400 border-purple-500/30 hover:bg-purple-500/10"
+            onClick={() => setFlashcardOpen(true)}
+          >
+            <Brain className="h-3.5 w-3.5 mr-1.5" />
+            Flashcard
           </Button>
           <Button variant="outline" size="sm" className="h-8">
             <Share2 className="h-3.5 w-3.5 mr-1.5" />
@@ -392,7 +461,10 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
 
       {/* ===== ANSWER TOGGLE ===== */}
       <button
-        onClick={() => setShowAnswer(!showAnswer)}
+        onClick={() => {
+          if (!showAnswer) recordView();
+          setShowAnswer(!showAnswer);
+        }}
         className={cn(
           "w-full flex items-center justify-between rounded-2xl border-2 p-5 transition-all duration-300",
           showAnswer
@@ -509,6 +581,14 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           Hỏi ReadyBot về câu hỏi này
         </Button>
       </div>
+
+      {/* AddToFlashcard Dialog */}
+      <AddToFlashcardDialog
+        open={flashcardOpen}
+        onOpenChange={setFlashcardOpen}
+        questionTitle={question.title}
+        answerContent={officialAnswer?.content ?? ""}
+      />
     </div>
   );
 }

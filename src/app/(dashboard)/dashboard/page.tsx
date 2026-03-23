@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -29,10 +30,10 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .single();
 
-  const { count: questionCount } = await supabase
-    .from("questions")
+  const { count: viewedCount } = await supabase
+    .from("question_views")
     .select("*", { count: "exact", head: true })
-    .eq("is_approved", true);
+    .eq("user_id", user.id);
 
   const { count: bookmarkCount } = await supabase
     .from("bookmarks")
@@ -46,8 +47,8 @@ export default async function DashboardPage() {
 
   const stats = [
     {
-      title: "Tổng câu hỏi",
-      value: questionCount ?? 0,
+      title: "Đã xem",
+      value: viewedCount ?? 0,
       icon: BookOpen,
       color: "text-blue-400",
       bg: "bg-blue-500/10",
@@ -141,6 +142,13 @@ export default async function DashboardPage() {
         ))}
       </div>
 
+      {/* Activity Heatmap */}
+      <ActivityHeatmap
+        userId={user.id}
+        streakCount={profile?.streak_count ?? 0}
+        lastActiveDate={profile?.last_active_date ?? null}
+      />
+
       {/* Quick Actions */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Bắt đầu nhanh</h2>
@@ -164,27 +172,7 @@ export default async function DashboardPage() {
           ))}
         </div>
       </div>
-
-      {/* Recent Activity Placeholder */}
-      <Card className="border-border/50 bg-card/50">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Clock className="h-5 w-5 text-muted-foreground" />
-            Hoạt động gần đây
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <BookOpen className="h-10 w-10 text-muted-foreground/50 mb-3" />
-            <p className="text-sm text-muted-foreground">
-              Chưa có hoạt động nào. Hãy bắt đầu khám phá câu hỏi!
-            </p>
-            <Button variant="outline" size="sm" className="mt-4" render={<Link href="/explore" />}>
-              Khám phá ngay
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
+
