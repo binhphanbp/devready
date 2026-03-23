@@ -18,7 +18,7 @@ const features = [
       "1000+ câu hỏi phỏng vấn thực tế, phân loại theo FE, BE, Database, DevOps. Hỗ trợ Markdown & Syntax Highlighting.",
     gradient: "from-blue-500/20 to-cyan-500/20",
     iconColor: "text-blue-400",
-    span: "md:col-span-2",
+    span: "sm:col-span-2 md:col-span-2",
   },
   {
     icon: Brain,
@@ -27,7 +27,7 @@ const features = [
       "Hệ thống lặp lại ngắt quãng giúp ghi nhớ lâu dài. Thuật toán SM-2 tối ưu.",
     gradient: "from-purple-500/20 to-pink-500/20",
     iconColor: "text-purple-400",
-    span: "md:col-span-1",
+    span: "sm:col-span-1 md:col-span-1",
   },
   {
     icon: MessageSquareCode,
@@ -36,7 +36,7 @@ const features = [
       "Chatbot AI giải thích code, luyện kỹ năng trả lời, tips phỏng vấn 24/7.",
     gradient: "from-emerald-500/20 to-teal-500/20",
     iconColor: "text-emerald-400",
-    span: "md:col-span-1",
+    span: "sm:col-span-1 md:col-span-1",
   },
   {
     icon: Users,
@@ -45,7 +45,7 @@ const features = [
       "Chia sẻ trải nghiệm phỏng vấn thực tế. Đọc review từ các công ty IT Việt Nam.",
     gradient: "from-orange-500/20 to-amber-500/20",
     iconColor: "text-orange-400",
-    span: "md:col-span-2",
+    span: "sm:col-span-2 md:col-span-2",
   },
   {
     icon: TrendingUp,
@@ -54,7 +54,7 @@ const features = [
       "Dashboard cá nhân hiển thị streak, tiến độ học, và chủ đề cần cải thiện.",
     gradient: "from-rose-500/20 to-red-500/20",
     iconColor: "text-rose-400",
-    span: "md:col-span-1",
+    span: "sm:col-span-1 md:col-span-1",
   },
   {
     icon: Sparkles,
@@ -63,7 +63,7 @@ const features = [
       "Phân cấp Intern → Junior → Senior. Phù hợp với mọi giai đoạn sự nghiệp.",
     gradient: "from-indigo-500/20 to-violet-500/20",
     iconColor: "text-indigo-400",
-    span: "md:col-span-1",
+    span: "sm:col-span-1 md:col-span-1",
   },
 ];
 
@@ -122,7 +122,7 @@ export function FeaturesGrid() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
+          className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
         >
           {features.map((feature) => (
             <motion.div

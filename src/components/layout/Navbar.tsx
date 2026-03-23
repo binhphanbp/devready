@@ -100,7 +100,8 @@ export function Navbar() {
         {/* Glass pill background — only visual changes, no width animation */}
         <div
           className={cn(
-            "mx-auto max-w-5xl transition-all duration-500 ease-out",
+            "mx-auto transition-all duration-500 ease-out",
+            scrolled ? "max-w-5xl" : "max-w-full",
             scrolled
               ? "rounded-2xl bg-background/80 backdrop-blur-xl border border-border/50 shadow-lg shadow-black/5 dark:shadow-black/20"
               : "rounded-none bg-transparent border border-transparent shadow-none"
