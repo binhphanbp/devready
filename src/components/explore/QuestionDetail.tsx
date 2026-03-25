@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.min.css";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { AddToFlashcardDialog } from "./AddToFlashcardDialog";
@@ -405,6 +407,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           <div className="pl-9">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
               components={markdownComponents}
             >
               {question.content}
@@ -543,6 +546,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               <div className="px-6 py-5">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
                   components={markdownComponents}
                 >
                   {officialAnswer.content}

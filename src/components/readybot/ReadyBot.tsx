@@ -16,6 +16,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.min.css";
 
 type Message = {
   role: "user" | "assistant";
@@ -221,7 +223,7 @@ export function ReadyBot() {
                     >
                       {msg.role === "assistant" ? (
                         <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground prose-p:my-1 prose-headings:text-foreground prose-headings:my-2 prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted/80 prose-pre:text-xs prose-ul:my-1 prose-li:my-0">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
                             {msg.content}
                           </ReactMarkdown>
                         </div>
