@@ -159,15 +159,19 @@ const markdownComponents = {
         </code>
       );
     }
+    // Code inside <pre> — force light text on dark bg
     return (
-      <code className={cn("text-[13px] font-mono", className)} {...props}>
+      <code
+        className={cn("text-[13px] font-mono text-[#e6edf3]", className)}
+        {...props}
+      >
         {children}
       </code>
     );
   },
   pre: ({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
-      className="mb-4 rounded-xl border border-border/50 bg-[#0d1117] dark:bg-[#0d1117] p-4 overflow-x-auto text-[13px] leading-relaxed"
+      className="mb-4 rounded-xl border border-border/50 bg-[#0d1117] p-4 overflow-x-auto text-[13px] leading-relaxed text-[#e6edf3] [&_code]:text-[#e6edf3] [&_.hljs-comment]:text-[#8b949e] [&_.hljs-keyword]:text-[#ff7b72] [&_.hljs-string]:text-[#a5d6ff] [&_.hljs-number]:text-[#79c0ff] [&_.hljs-function]:text-[#d2a8ff]"
       {...props}
     >
       {children}
