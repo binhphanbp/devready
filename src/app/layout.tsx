@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import CustomCursor from "@/components/CustomCursor";
+import { ClickSound } from "@/components/ClickSound";
 import { BackToTop } from "@/components/layout/BackToTop";
 import "./globals.css";
 
@@ -80,6 +81,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <CustomCursor />
+          <ClickSound />
           {children}
           <BackToTop />
         </ThemeProvider>
