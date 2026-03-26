@@ -338,8 +338,6 @@ export default function ExplorePage() {
     null,
   );
 
-  const supabase = createClient();
-
   const selectedCategorySlug = useMemo(() => {
     if (!selectedCategory) return null;
     return categories.find((c) => c.id === selectedCategory)?.slug ?? null;
@@ -351,12 +349,12 @@ export default function ExplorePage() {
   }, [selectedCategorySlug]);
 
   useEffect(() => {
+    const supabase = createClient();
     supabase
       .from('categories')
       .select('id, name, slug, color, icon')
       .order('sort_order')
       .then(({ data }) => setCategories((data as Category[]) ?? []));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- supabase client is stable
   }, []);
 
   // Reset tech tags when category changes
@@ -371,6 +369,7 @@ export default function ExplorePage() {
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
+      const supabase = createClient();
       let query = supabase
         .from('questions')
         .select(
@@ -403,7 +402,6 @@ export default function ExplorePage() {
 
     const debounce = setTimeout(fetchQuestions, 300);
     return () => clearTimeout(debounce);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- supabase client is stable
   }, [search, selectedCategory, selectedDifficulty, selectedTechTags, sortBy]);
 
   const toggleTechTag = (tag: string) => {

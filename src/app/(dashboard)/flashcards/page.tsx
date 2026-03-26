@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Brain,
   Plus,
@@ -13,13 +13,13 @@ import {
   ArrowLeft,
   Trash2,
   MoreVertical,
-} from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { CreateDeckDialog } from "@/components/flashcards/CreateDeckDialog";
-import { AddCardDialog } from "@/components/flashcards/AddCardDialog";
-import { StudyMode } from "@/components/flashcards/StudyMode";
-import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+} from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { CreateDeckDialog } from '@/components/flashcards/CreateDeckDialog';
+import { AddCardDialog } from '@/components/flashcards/AddCardDialog';
+import { StudyMode } from '@/components/flashcards/StudyMode';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 type Deck = {
   id: string;
@@ -39,22 +39,20 @@ type FlashcardData = {
   next_review: string;
 };
 
-type ViewMode = "list" | "detail" | "study";
+type ViewMode = 'list' | 'detail' | 'study';
 
 export default function FlashcardsPage() {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null);
   const [cards, setCards] = useState<FlashcardData[]>([]);
   const [dueCards, setDueCards] = useState<FlashcardData[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
-  const supabase = createClient();
-
   // Fetch decks
   useEffect(() => {
     const fetchDecks = async () => {
+      const supabase = createClient();
       setLoading(true);
       const {
         data: { user },
@@ -62,10 +60,10 @@ export default function FlashcardsPage() {
       if (!user) return;
 
       const { data } = await supabase
-        .from("flashcard_decks")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .from('flashcard_decks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       setDecks(data ?? []);
       setLoading(false);
@@ -76,13 +74,15 @@ export default function FlashcardsPage() {
   // Fetch cards when a deck is selected
   const openDeck = async (deck: Deck) => {
     setSelectedDeck(deck);
-    setViewMode("detail");
+    setViewMode('detail');
+
+    const supabase = createClient();
 
     const { data } = await supabase
-      .from("flashcards")
-      .select("*")
-      .eq("deck_id", deck.id)
-      .order("created_at", { ascending: true });
+      .from('flashcards')
+      .select('*')
+      .eq('deck_id', deck.id)
+      .order('created_at', { ascending: true });
 
     const allCards = (data ?? []) as FlashcardData[];
     setCards(allCards);
@@ -94,28 +94,30 @@ export default function FlashcardsPage() {
 
   const startStudy = () => {
     if (dueCards.length > 0) {
-      setViewMode("study");
+      setViewMode('study');
     }
   };
 
   const handleDeleteDeck = async (deckId: string) => {
-    if (!confirm("Xóa bộ flashcard này? Tất cả thẻ sẽ bị xóa.")) return;
-    await supabase.from("flashcard_decks").delete().eq("id", deckId);
+    if (!confirm('Xóa bộ flashcard này? Tất cả thẻ sẽ bị xóa.')) return;
+    const supabase = createClient();
+    await supabase.from('flashcard_decks').delete().eq('id', deckId);
     setDecks(decks.filter((d) => d.id !== deckId));
     if (selectedDeck?.id === deckId) {
       setSelectedDeck(null);
-      setViewMode("list");
+      setViewMode('list');
     }
   };
 
   const handleDeleteCard = async (cardId: string) => {
-    await supabase.from("flashcards").delete().eq("id", cardId);
+    const supabase = createClient();
+    await supabase.from('flashcards').delete().eq('id', cardId);
     setCards(cards.filter((c) => c.id !== cardId));
     setDueCards(dueCards.filter((c) => c.id !== cardId));
   };
 
   // ============ LIST VIEW ============
-  if (viewMode === "list") {
+  if (viewMode === 'list') {
     return (
       <div className="space-y-6 pt-8 lg:pt-0">
         <div className="flex items-center justify-between">
@@ -177,7 +179,9 @@ export default function FlashcardsPage() {
                           {deck.card_count} thẻ
                         </Badge>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(deck.created_at).toLocaleDateString("vi-VN")}
+                          {new Date(deck.created_at).toLocaleDateString(
+                            'vi-VN',
+                          )}
                         </span>
                       </div>
                     </div>
@@ -203,14 +207,14 @@ export default function FlashcardsPage() {
   }
 
   // ============ STUDY MODE ============
-  if (viewMode === "study" && selectedDeck) {
+  if (viewMode === 'study' && selectedDeck) {
     return (
       <div className="space-y-6 pt-8 lg:pt-0 max-w-2xl mx-auto">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => {
-            setViewMode("detail");
+            setViewMode('detail');
             openDeck(selectedDeck);
           }}
           className="gap-1"
@@ -222,7 +226,7 @@ export default function FlashcardsPage() {
           cards={dueCards}
           deckTitle={selectedDeck.title}
           onComplete={() => {
-            setViewMode("detail");
+            setViewMode('detail');
             openDeck(selectedDeck);
           }}
         />
@@ -231,15 +235,11 @@ export default function FlashcardsPage() {
   }
 
   // ============ DETAIL VIEW ============
-  if (viewMode === "detail" && selectedDeck) {
+  if (viewMode === 'detail' && selectedDeck) {
     return (
       <div className="space-y-6 pt-8 lg:pt-0">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setViewMode("list")}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setViewMode('list')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1">

@@ -70,8 +70,6 @@ export default function CommunityPage() {
   const [difficulty, setDifficulty] = useState('medium');
   const [content, setContent] = useState('');
 
-  const supabase = createClient();
-
   useEffect(() => {
     let cancelled = false;
     const supabase = createClient();
@@ -113,6 +111,8 @@ export default function CommunityPage() {
     e.preventDefault();
     setCreating(true);
 
+    const supabase = createClient();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -148,6 +148,7 @@ export default function CommunityPage() {
   };
 
   const handleUpvote = async (reviewId: string) => {
+    const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
