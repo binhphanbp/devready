@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { useState, useEffect, useCallback } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft,
   BookmarkIcon,
@@ -17,19 +17,18 @@ import {
   CheckCircle2,
   Bot,
   Bookmark,
-  Clock,
   MessageSquareText,
   Zap,
   Brain,
   BookmarkCheck,
-} from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.min.css";
-import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
-import { AddToFlashcardDialog } from "./AddToFlashcardDialog";
+} from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.min.css';
+import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
+import { AddToFlashcardDialog } from './AddToFlashcardDialog';
 
 interface QuestionDetailProps {
   question: {
@@ -60,33 +59,33 @@ const difficultyConfig: Record<
   { label: string; className: string; bgClassName: string; level: number }
 > = {
   intern: {
-    label: "Intern",
-    className: "text-emerald-500 dark:text-emerald-400",
-    bgClassName: "bg-emerald-500/10 border-emerald-500/20",
+    label: 'Intern',
+    className: 'text-emerald-500 dark:text-emerald-400',
+    bgClassName: 'bg-emerald-500/10 border-emerald-500/20',
     level: 1,
   },
   fresher: {
-    label: "Fresher",
-    className: "text-teal-500 dark:text-teal-400",
-    bgClassName: "bg-teal-500/10 border-teal-500/20",
+    label: 'Fresher',
+    className: 'text-teal-500 dark:text-teal-400',
+    bgClassName: 'bg-teal-500/10 border-teal-500/20',
     level: 2,
   },
   junior: {
-    label: "Junior",
-    className: "text-blue-500 dark:text-blue-400",
-    bgClassName: "bg-blue-500/10 border-blue-500/20",
+    label: 'Junior',
+    className: 'text-blue-500 dark:text-blue-400',
+    bgClassName: 'bg-blue-500/10 border-blue-500/20',
     level: 3,
   },
   middle: {
-    label: "Middle",
-    className: "text-amber-500 dark:text-amber-400",
-    bgClassName: "bg-amber-500/10 border-amber-500/20",
+    label: 'Middle',
+    className: 'text-amber-500 dark:text-amber-400',
+    bgClassName: 'bg-amber-500/10 border-amber-500/20',
     level: 4,
   },
   senior: {
-    label: "Senior",
-    className: "text-orange-500 dark:text-orange-400",
-    bgClassName: "bg-orange-500/10 border-orange-500/20",
+    label: 'Senior',
+    className: 'text-orange-500 dark:text-orange-400',
+    bgClassName: 'bg-orange-500/10 border-orange-500/20',
     level: 5,
   },
 };
@@ -119,7 +118,10 @@ const markdownComponents = {
     </h3>
   ),
   p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className="text-sm leading-relaxed text-muted-foreground mb-3" {...props}>
+    <p
+      className="text-sm leading-relaxed text-muted-foreground mb-3"
+      {...props}
+    >
       {children}
     </p>
   ),
@@ -164,7 +166,7 @@ const markdownComponents = {
     // Code inside <pre> — force light text on dark bg
     return (
       <code
-        className={cn("text-[13px] font-mono text-[#e6edf3]", className)}
+        className={cn('text-[13px] font-mono text-[#e6edf3]', className)}
         {...props}
       >
         {children}
@@ -179,13 +181,15 @@ const markdownComponents = {
       {children}
     </pre>
   ),
-  strong: ({
+  strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+    <strong className="font-semibold text-foreground" {...props}>
+      {children}
+    </strong>
+  ),
+  blockquote: ({
     children,
     ...props
-  }: React.HTMLAttributes<HTMLElement>) => (
-    <strong className="font-semibold text-foreground" {...props}>{children}</strong>
-  ),
-  blockquote: ({ children, ...props }: React.HTMLAttributes<HTMLQuoteElement>) => (
+  }: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
       className="border-l-3 border-primary/40 pl-4 py-1 my-3 bg-primary/5 rounded-r-lg"
       {...props}
@@ -234,22 +238,24 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
       const supabase = createClient();
       // Fetch answers
       const { data } = await supabase
-        .from("answers")
-        .select("*")
-        .eq("question_id", question.id)
-        .order("is_official", { ascending: false })
-        .order("upvote_count", { ascending: false });
+        .from('answers')
+        .select('*')
+        .eq('question_id', question.id)
+        .order('is_official', { ascending: false })
+        .order('upvote_count', { ascending: false });
       setAnswers((data as Answer[]) ?? []);
       setLoadingAnswers(false);
 
       // Check bookmark status
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         const { data: bm } = await supabase
-          .from("bookmarks")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("question_id", question.id)
+          .from('bookmarks')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('question_id', question.id)
           .maybeSingle();
         setIsBookmarked(!!bm);
       }
@@ -261,9 +267,11 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const recordView = useCallback(async () => {
     if (viewRecorded) return;
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.rpc("record_question_view", { p_question_id: question.id });
+    await supabase.rpc('record_question_view', { p_question_id: question.id });
     setViewRecorded(true);
   }, [question.id, viewRecorded]);
 
@@ -271,16 +279,25 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const toggleBookmark = async () => {
     setBookmarkLoading(true);
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setBookmarkLoading(false); return; }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setBookmarkLoading(false);
+      return;
+    }
 
     if (isBookmarked) {
-      await supabase.from("bookmarks").delete()
-        .eq("user_id", user.id).eq("question_id", question.id);
+      await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('question_id', question.id);
       setIsBookmarked(false);
     } else {
-      await supabase.from("bookmarks").insert({
-        user_id: user.id, question_id: question.id,
+      await supabase.from('bookmarks').insert({
+        user_id: user.id,
+        question_id: question.id,
       });
       setIsBookmarked(true);
     }
@@ -290,14 +307,14 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const officialAnswer = answers.find((a) => a.is_official);
 
   // Difficulty level bar
-  const DifficultyBar = () => (
+  const difficultyBar = (
     <div className="flex items-center gap-1.5">
       {[1, 2, 3, 4, 5].map((i) => (
         <div
           key={i}
           className={cn(
-            "h-1.5 w-5 rounded-full transition-colors",
-            i <= diff.level ? "bg-current" : "bg-muted/50"
+            'h-1.5 w-5 rounded-full transition-colors',
+            i <= diff.level ? 'bg-current' : 'bg-muted/50',
           )}
         />
       ))}
@@ -321,7 +338,11 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           <Button
             variant="outline"
             size="sm"
-            className={cn("h-8", isBookmarked && "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400")}
+            className={cn(
+              'h-8',
+              isBookmarked &&
+                'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400',
+            )}
             onClick={toggleBookmark}
             disabled={bookmarkLoading}
           >
@@ -330,7 +351,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
             ) : (
               <BookmarkIcon className="h-3.5 w-3.5 mr-1.5" />
             )}
-            {isBookmarked ? "Đã lưu" : "Lưu"}
+            {isBookmarked ? 'Đã lưu' : 'Lưu'}
           </Button>
           <Button
             variant="outline"
@@ -353,21 +374,27 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         {/* Question header bar */}
         <div className="flex flex-wrap items-center gap-3 px-6 py-3.5 bg-muted/30 border-b border-border/40">
           {question.categories && (
-            <Badge
-              variant="secondary"
-              className="font-medium"
-            >
+            <Badge variant="secondary" className="font-medium">
               {question.categories.name}
             </Badge>
           )}
-          <div className={cn("flex items-center gap-2 text-xs font-medium", diff.className)}>
+          <div
+            className={cn(
+              'flex items-center gap-2 text-xs font-medium',
+              diff.className,
+            )}
+          >
             <Badge
               variant="outline"
-              className={cn("text-xs font-medium", diff.bgClassName, diff.className)}
+              className={cn(
+                'text-xs font-medium',
+                diff.bgClassName,
+                diff.className,
+              )}
             >
               {diff.label}
             </Badge>
-            <DifficultyBar />
+            {difficultyBar}
           </div>
           <Separator orientation="vertical" className="h-4 hidden sm:block" />
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -459,8 +486,9 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               💡 Mẹo luyện tập
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Hãy tự trả lời câu hỏi bằng cách nói to hoặc viết ra trước khi xem đáp án.
-              Điều này giúp bạn nhớ lâu hơn và phát hiện lỗ hổng kiến thức.
+              Hãy tự trả lời câu hỏi bằng cách nói to hoặc viết ra trước khi xem
+              đáp án. Điều này giúp bạn nhớ lâu hơn và phát hiện lỗ hổng kiến
+              thức.
             </p>
           </div>
         </div>
@@ -473,17 +501,17 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           setShowAnswer(!showAnswer);
         }}
         className={cn(
-          "w-full flex items-center justify-between rounded-2xl border-2 p-5 transition-all duration-300",
+          'w-full flex items-center justify-between rounded-2xl border-2 p-5 transition-all duration-300',
           showAnswer
-            ? "border-emerald-500/30 bg-emerald-500/5"
-            : "border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+            ? 'border-emerald-500/30 bg-emerald-500/5'
+            : 'border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5',
         )}
       >
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
-              showAnswer ? "bg-emerald-500/10" : "bg-primary/10"
+              'flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
+              showAnswer ? 'bg-emerald-500/10' : 'bg-primary/10',
             )}
           >
             {showAnswer ? (
@@ -494,19 +522,19 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           </div>
           <div className="text-left">
             <p className="font-semibold text-sm">
-              {showAnswer ? "Câu trả lời mẫu" : "Xem câu trả lời mẫu"}
+              {showAnswer ? 'Câu trả lời mẫu' : 'Xem câu trả lời mẫu'}
             </p>
             <p className="text-xs text-muted-foreground">
               {showAnswer
-                ? "So sánh với câu trả lời của bạn"
-                : "Bấm để hiện đáp án chi tiết"}
+                ? 'So sánh với câu trả lời của bạn'
+                : 'Bấm để hiện đáp án chi tiết'}
             </p>
           </div>
         </div>
         <div
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-lg",
-            showAnswer ? "bg-emerald-500/10" : "bg-primary/10"
+            'flex h-8 w-8 items-center justify-center rounded-lg',
+            showAnswer ? 'bg-emerald-500/10' : 'bg-primary/10',
           )}
         >
           {showAnswer ? (
@@ -595,7 +623,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         open={flashcardOpen}
         onOpenChange={setFlashcardOpen}
         questionTitle={question.title}
-        answerContent={officialAnswer?.content ?? ""}
+        answerContent={officialAnswer?.content ?? ''}
       />
     </div>
   );

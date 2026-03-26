@@ -1,33 +1,25 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Bot,
-  X,
-  Send,
-  Loader2,
-  Sparkles,
-  Minimize2,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.min.css";
+import { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Bot, X, Send, Loader2, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.min.css';
 
 type Message = {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
 };
 
 export function ReadyBot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,16 +42,16 @@ export function ReadyBot() {
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
-    setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    setInput('');
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, { role: "user", content: userMessage }],
+          messages: [...messages, { role: 'user', content: userMessage }],
         }),
       });
 
@@ -68,14 +60,14 @@ export function ReadyBot() {
       if (data.reply) {
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: data.reply },
+          { role: 'assistant', content: data.reply },
         ]);
       } else {
         setMessages((prev) => [
           ...prev,
           {
-            role: "assistant",
-            content: "Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!",
+            role: 'assistant',
+            content: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!',
           },
         ]);
       }
@@ -83,8 +75,8 @@ export function ReadyBot() {
       setMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
-          content: "Không thể kết nối. Vui lòng kiểm tra mạng và thử lại!",
+          role: 'assistant',
+          content: 'Không thể kết nối. Vui lòng kiểm tra mạng và thử lại!',
         },
       ]);
     }
@@ -93,10 +85,10 @@ export function ReadyBot() {
   };
 
   const quickPrompts = [
-    "Giải thích React hooks",
-    "Tips phỏng vấn Frontend",
-    "SQL JOIN là gì?",
-    "REST vs GraphQL",
+    'Giải thích React hooks',
+    'Tips phỏng vấn Frontend',
+    'SQL JOIN là gì?',
+    'REST vs GraphQL',
   ];
 
   return (
@@ -126,7 +118,7 @@ export function ReadyBot() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-6 right-6 z-50 w-[380px] max-h-[560px] flex flex-col rounded-2xl border border-border/50 bg-card shadow-2xl overflow-hidden"
           >
             {/* Header */}
@@ -187,7 +179,7 @@ export function ReadyBot() {
                           setInput(prompt);
                           setTimeout(() => {
                             const form = document.getElementById(
-                              "chatbot-form"
+                              'chatbot-form',
                             ) as HTMLFormElement;
                             form?.requestSubmit();
                           }, 50);
@@ -204,26 +196,29 @@ export function ReadyBot() {
                   <div
                     key={i}
                     className={cn(
-                      "flex gap-2.5",
-                      msg.role === "user" && "justify-end"
+                      'flex gap-2.5',
+                      msg.role === 'user' && 'justify-end',
                     )}
                   >
-                    {msg.role === "assistant" && (
+                    {msg.role === 'assistant' && (
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
                         <Bot className="h-3.5 w-3.5 text-primary" />
                       </div>
                     )}
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground rounded-tr-md"
-                          : "bg-muted/50 rounded-tl-md"
+                        'max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
+                        msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-tr-md'
+                          : 'bg-muted/50 rounded-tl-md',
                       )}
                     >
-                      {msg.role === "assistant" ? (
+                      {msg.role === 'assistant' ? (
                         <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground prose-p:my-1 prose-headings:text-foreground prose-headings:my-2 prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted/80 prose-pre:text-xs prose-ul:my-1 prose-li:my-0">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeHighlight]}
+                          >
                             {msg.content}
                           </ReactMarkdown>
                         </div>

@@ -1,20 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   BookOpen,
   Brain,
   Flame,
   Target,
   TrendingUp,
-  Clock,
   Star,
   ArrowRight,
-} from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
+} from 'lucide-react';
+import Link from 'next/link';
+import { ActivityHeatmap } from '@/components/dashboard/ActivityHeatmap';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -22,81 +19,81 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect('/login');
 
   const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
     .single();
 
   const { count: viewedCount } = await supabase
-    .from("question_views")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    .from('question_views')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
 
   const { count: bookmarkCount } = await supabase
-    .from("bookmarks")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    .from('bookmarks')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
 
   const { count: deckCount } = await supabase
-    .from("flashcard_decks")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    .from('flashcard_decks')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
 
   const stats = [
     {
-      title: "Đã xem",
+      title: 'Đã xem',
       value: viewedCount ?? 0,
       icon: BookOpen,
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
+      color: 'text-blue-400',
+      bg: 'bg-blue-500/10',
     },
     {
-      title: "Đã lưu",
+      title: 'Đã lưu',
       value: bookmarkCount ?? 0,
       icon: Star,
-      color: "text-amber-400",
-      bg: "bg-amber-500/10",
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
     },
     {
-      title: "Bộ Flashcard",
+      title: 'Bộ Flashcard',
       value: deckCount ?? 0,
       icon: Brain,
-      color: "text-purple-400",
-      bg: "bg-purple-500/10",
+      color: 'text-purple-400',
+      bg: 'bg-purple-500/10',
     },
     {
-      title: "Streak",
+      title: 'Streak',
       value: `${profile?.streak_count ?? 0} ngày`,
       icon: Flame,
-      color: "text-orange-400",
-      bg: "bg-orange-500/10",
+      color: 'text-orange-400',
+      bg: 'bg-orange-500/10',
     },
   ];
 
   const quickActions = [
     {
-      title: "Luyện phỏng vấn",
-      description: "Bắt đầu với câu hỏi ngẫu nhiên",
-      href: "/explore",
+      title: 'Luyện phỏng vấn',
+      description: 'Bắt đầu với câu hỏi ngẫu nhiên',
+      href: '/explore',
       icon: Target,
-      gradient: "from-blue-500/20 to-cyan-500/20",
+      gradient: 'from-blue-500/20 to-cyan-500/20',
     },
     {
-      title: "Flashcard hôm nay",
-      description: "Ôn tập theo lịch SRS",
-      href: "/flashcards",
+      title: 'Flashcard hôm nay',
+      description: 'Ôn tập theo lịch SRS',
+      href: '/flashcards',
       icon: Brain,
-      gradient: "from-purple-500/20 to-pink-500/20",
+      gradient: 'from-purple-500/20 to-pink-500/20',
     },
     {
-      title: "Đọc review",
-      description: "Trải nghiệm phỏng vấn thực tế",
-      href: "/community",
+      title: 'Đọc review',
+      description: 'Trải nghiệm phỏng vấn thực tế',
+      href: '/community',
       icon: TrendingUp,
-      gradient: "from-emerald-500/20 to-teal-500/20",
+      gradient: 'from-emerald-500/20 to-teal-500/20',
     },
   ];
 
@@ -105,9 +102,9 @@ export default async function DashboardPage() {
       {/* Welcome */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Xin chào,{" "}
+          Xin chào,{' '}
           <span className="text-gradient">
-            {profile?.full_name || user.email?.split("@")[0]}
+            {profile?.full_name || user.email?.split('@')[0]}
           </span>
           ! 👋
         </h1>
@@ -175,4 +172,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-

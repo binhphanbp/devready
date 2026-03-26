@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Brain, Loader2, Plus, Check, FolderPlus } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dialog';
+import { Brain, Loader2, Plus, Check, FolderPlus } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 
 interface AddToFlashcardDialogProps {
   open: boolean;
@@ -38,27 +38,30 @@ export function AddToFlashcardDialog({
   const [loading, setLoading] = useState(false);
   const [loadingDecks, setLoadingDecks] = useState(true);
   const [showNewDeck, setShowNewDeck] = useState(false);
-  const [newDeckTitle, setNewDeckTitle] = useState("");
+  const [newDeckTitle, setNewDeckTitle] = useState('');
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (!open) return;
-    setSuccess(false);
+    // Reset form state when dialog opens — intentional synchronization
+    setSuccess(false); // eslint-disable-line react-hooks/set-state-in-effect -- intentional form reset on dialog open
     setSelectedDeckId(null);
     setShowNewDeck(false);
-    setNewDeckTitle("");
+    setNewDeckTitle('');
 
     const fetchDecks = async () => {
       setLoadingDecks(true);
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data } = await supabase
-        .from("flashcard_decks")
-        .select("id, title, card_count")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .from('flashcard_decks')
+        .select('id, title, card_count')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       setDecks((data as Deck[]) ?? []);
       setLoadingDecks(false);
@@ -73,11 +76,12 @@ export function AddToFlashcardDialog({
     const supabase = createClient();
 
     // Truncate answer for flashcard back (keep first 500 chars of markdown)
-    const truncatedAnswer = answerContent.length > 500
-      ? answerContent.slice(0, 500) + "\n\n..."
-      : answerContent;
+    const truncatedAnswer =
+      answerContent.length > 500
+        ? answerContent.slice(0, 500) + '\n\n...'
+        : answerContent;
 
-    const { error } = await supabase.from("flashcards").insert({
+    const { error } = await supabase.from('flashcards').insert({
       deck_id: selectedDeckId,
       front: questionTitle,
       back: truncatedAnswer,
@@ -85,12 +89,12 @@ export function AddToFlashcardDialog({
 
     if (!error) {
       // Update card count
-      const deck = decks.find(d => d.id === selectedDeckId);
+      const deck = decks.find((d) => d.id === selectedDeckId);
       if (deck) {
         await supabase
-          .from("flashcard_decks")
+          .from('flashcard_decks')
           .update({ card_count: (deck.card_count || 0) + 1 })
-          .eq("id", selectedDeckId);
+          .eq('id', selectedDeckId);
       }
       setSuccess(true);
       setTimeout(() => onOpenChange(false), 1200);
@@ -103,23 +107,25 @@ export function AddToFlashcardDialog({
     setLoading(true);
 
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
 
     const { data, error } = await supabase
-      .from("flashcard_decks")
+      .from('flashcard_decks')
       .insert({
         user_id: user.id,
         title: newDeckTitle.trim(),
       })
-      .select("id, title, card_count")
+      .select('id, title, card_count')
       .single();
 
     if (!error && data) {
-      setDecks(prev => [data as Deck, ...prev]);
+      setDecks((prev) => [data as Deck, ...prev]);
       setSelectedDeckId((data as Deck).id);
       setShowNewDeck(false);
-      setNewDeckTitle("");
+      setNewDeckTitle('');
     }
     setLoading(false);
   };
@@ -172,17 +178,21 @@ export function AddToFlashcardDialog({
                       key={deck.id}
                       onClick={() => setSelectedDeckId(deck.id)}
                       className={cn(
-                        "w-full flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-left transition-all",
+                        'w-full flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-left transition-all',
                         selectedDeckId === deck.id
-                          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-                          : "border-border/50 hover:border-primary/30 hover:bg-muted/30"
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                          : 'border-border/50 hover:border-primary/30 hover:bg-muted/30',
                       )}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Brain className={cn(
-                          "h-4 w-4 shrink-0",
-                          selectedDeckId === deck.id ? "text-primary" : "text-muted-foreground"
-                        )} />
+                        <Brain
+                          className={cn(
+                            'h-4 w-4 shrink-0',
+                            selectedDeckId === deck.id
+                              ? 'text-primary'
+                              : 'text-muted-foreground',
+                          )}
+                        />
                         <div>
                           <p className="text-sm font-medium">{deck.title}</p>
                           <p className="text-xs text-muted-foreground">
@@ -212,7 +222,7 @@ export function AddToFlashcardDialog({
                   placeholder="Tên bộ flashcard mới..."
                   value={newDeckTitle}
                   onChange={(e) => setNewDeckTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCreateDeck()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreateDeck()}
                   autoFocus
                   className="h-9"
                 />
@@ -222,7 +232,11 @@ export function AddToFlashcardDialog({
                   disabled={!newDeckTitle.trim() || loading}
                   className="shrink-0 h-9"
                 >
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Tạo"}
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Tạo'
+                  )}
                 </Button>
               </div>
             ) : (

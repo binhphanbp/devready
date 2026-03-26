@@ -1,13 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   PenLine,
   MessageSquare,
@@ -23,11 +22,10 @@ import {
   Building2,
   Briefcase,
   Loader2,
-  Filter,
-} from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+} from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 type Review = {
   id: string;
@@ -42,9 +40,21 @@ type Review = {
 };
 
 const difficultyOptions = [
-  { value: "easy", label: "Dễ", className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-  { value: "medium", label: "Trung bình", className: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
-  { value: "hard", label: "Khó", className: "bg-red-500/10 text-red-400 border-red-500/20" },
+  {
+    value: 'easy',
+    label: 'Dễ',
+    className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  },
+  {
+    value: 'medium',
+    label: 'Trung bình',
+    className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+  },
+  {
+    value: 'hard',
+    label: 'Khó',
+    className: 'bg-red-500/10 text-red-400 border-red-500/20',
+  },
 ];
 
 export default function CommunityPage() {
@@ -55,46 +65,49 @@ export default function CommunityPage() {
   const [upvotedIds, setUpvotedIds] = useState<Set<string>>(new Set());
 
   // Form state
-  const [company, setCompany] = useState("");
-  const [role, setRole] = useState("");
-  const [difficulty, setDifficulty] = useState("medium");
-  const [content, setContent] = useState("");
+  const [company, setCompany] = useState('');
+  const [role, setRole] = useState('');
+  const [difficulty, setDifficulty] = useState('medium');
+  const [content, setContent] = useState('');
 
   const supabase = createClient();
 
   useEffect(() => {
-    fetchReviews();
-    fetchUserUpvotes();
-  }, []);
+    let cancelled = false;
+    const supabase = createClient();
 
-  const fetchReviews = async () => {
-    setLoading(true);
-    const { data } = await supabase
-      .from("community_reviews")
-      .select("*, profiles(full_name, username, avatar_url)")
-      .eq("is_approved", true)
-      .order("created_at", { ascending: false })
-      .limit(50);
+    async function loadData() {
+      const [reviewsRes, userRes] = await Promise.all([
+        supabase
+          .from('community_reviews')
+          .select('*, profiles(full_name, username, avatar_url)')
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false })
+          .limit(50),
+        supabase.auth.getUser(),
+      ]);
 
-    setReviews((data as unknown as Review[]) ?? []);
-    setLoading(false);
-  };
+      if (cancelled) return;
+      setReviews((reviewsRes.data as unknown as Review[]) ?? []);
+      setLoading(false);
 
-  const fetchUserUpvotes = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("upvotes")
-      .select("review_id")
-      .eq("user_id", user.id);
-
-    if (data) {
-      setUpvotedIds(new Set(data.map((u) => u.review_id)));
+      const user = userRes.data.user;
+      if (user) {
+        const { data } = await supabase
+          .from('upvotes')
+          .select('review_id')
+          .eq('user_id', user.id);
+        if (!cancelled && data) {
+          setUpvotedIds(new Set(data.map((u) => u.review_id)));
+        }
+      }
     }
-  };
+
+    loadData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleCreateReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +121,7 @@ export default function CommunityPage() {
       return;
     }
 
-    const { error } = await supabase.from("community_reviews").insert({
+    const { error } = await supabase.from('community_reviews').insert({
       author_id: user.id,
       company: company.trim(),
       role: role.trim(),
@@ -117,12 +130,19 @@ export default function CommunityPage() {
     });
 
     if (!error) {
-      setCompany("");
-      setRole("");
-      setDifficulty("medium");
-      setContent("");
+      setCompany('');
+      setRole('');
+      setDifficulty('medium');
+      setContent('');
       setDialogOpen(false);
-      fetchReviews();
+      // Reload reviews
+      const { data } = await supabase
+        .from('community_reviews')
+        .select('*, profiles(full_name, username, avatar_url)')
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      setReviews((data as unknown as Review[]) ?? []);
     }
     setCreating(false);
   };
@@ -136,10 +156,10 @@ export default function CommunityPage() {
     if (upvotedIds.has(reviewId)) {
       // Remove upvote
       await supabase
-        .from("upvotes")
+        .from('upvotes')
         .delete()
-        .eq("user_id", user.id)
-        .eq("review_id", reviewId);
+        .eq('user_id', user.id)
+        .eq('review_id', reviewId);
 
       setUpvotedIds((prev) => {
         const next = new Set(prev);
@@ -148,12 +168,12 @@ export default function CommunityPage() {
       });
       setReviews(
         reviews.map((r) =>
-          r.id === reviewId ? { ...r, upvote_count: r.upvote_count - 1 } : r
-        )
+          r.id === reviewId ? { ...r, upvote_count: r.upvote_count - 1 } : r,
+        ),
       );
     } else {
       // Add upvote
-      await supabase.from("upvotes").insert({
+      await supabase.from('upvotes').insert({
         user_id: user.id,
         review_id: reviewId,
       });
@@ -161,8 +181,8 @@ export default function CommunityPage() {
       setUpvotedIds((prev) => new Set(prev).add(reviewId));
       setReviews(
         reviews.map((r) =>
-          r.id === reviewId ? { ...r, upvote_count: r.upvote_count + 1 } : r
-        )
+          r.id === reviewId ? { ...r, upvote_count: r.upvote_count + 1 } : r,
+        ),
       );
     }
   };
@@ -228,10 +248,10 @@ export default function CommunityPage() {
                       key={d.value}
                       variant="outline"
                       className={cn(
-                        "cursor-pointer transition-all",
+                        'cursor-pointer transition-all',
                         difficulty === d.value
-                          ? d.className + " font-medium"
-                          : "hover:bg-muted/50"
+                          ? d.className + ' font-medium'
+                          : 'hover:bg-muted/50',
                       )}
                       onClick={() => setDifficulty(d.value)}
                     >
@@ -241,9 +261,7 @@ export default function CommunityPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Nội dung chia sẻ
-                </label>
+                <label className="text-sm font-medium">Nội dung chia sẻ</label>
                 <Textarea
                   placeholder="Chia sẻ quy trình phỏng vấn, câu hỏi được hỏi, tips cho bạn đọc..."
                   value={content}
@@ -304,16 +322,16 @@ export default function CommunityPage() {
         <div className="space-y-4">
           {reviews.map((review, idx) => {
             const diff = difficultyOptions.find(
-              (d) => d.value === review.difficulty
+              (d) => d.value === review.difficulty,
             );
             const initials = (
               review.profiles?.full_name ||
               review.profiles?.username ||
-              "U"
+              'U'
             )
-              .split(" ")
+              .split(' ')
               .map((n) => n[0])
-              .join("")
+              .join('')
               .toUpperCase()
               .slice(0, 2);
 
@@ -337,12 +355,12 @@ export default function CommunityPage() {
                         <span className="text-sm font-medium">
                           {review.profiles?.full_name ||
                             review.profiles?.username ||
-                            "Ẩn danh"}
+                            'Ẩn danh'}
                         </span>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>
                             {new Date(review.created_at).toLocaleDateString(
-                              "vi-VN"
+                              'vi-VN',
                             )}
                           </span>
                         </div>
@@ -351,24 +369,18 @@ export default function CommunityPage() {
 
                     {/* Company & role */}
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <Badge
-                        variant="secondary"
-                        className="text-xs gap-1"
-                      >
+                      <Badge variant="secondary" className="text-xs gap-1">
                         <Building2 className="h-3 w-3" />
                         {review.company}
                       </Badge>
-                      <Badge
-                        variant="outline"
-                        className="text-xs gap-1"
-                      >
+                      <Badge variant="outline" className="text-xs gap-1">
                         <Briefcase className="h-3 w-3" />
                         {review.role}
                       </Badge>
                       {diff && (
                         <Badge
                           variant="outline"
-                          className={cn("text-xs", diff.className)}
+                          className={cn('text-xs', diff.className)}
                         >
                           {diff.label}
                         </Badge>
@@ -386,16 +398,15 @@ export default function CommunityPage() {
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "gap-1.5 text-xs h-8",
-                          upvotedIds.has(review.id) &&
-                            "text-primary"
+                          'gap-1.5 text-xs h-8',
+                          upvotedIds.has(review.id) && 'text-primary',
                         )}
                         onClick={() => handleUpvote(review.id)}
                       >
                         <ThumbsUp
                           className={cn(
-                            "h-3.5 w-3.5",
-                            upvotedIds.has(review.id) && "fill-primary"
+                            'h-3.5 w-3.5',
+                            upvotedIds.has(review.id) && 'fill-primary',
                           )}
                         />
                         {review.upvote_count} Hữu ích
