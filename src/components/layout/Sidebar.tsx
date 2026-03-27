@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  Shield,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -34,11 +35,13 @@ function SidebarContent({
   collapsed,
   onNavClick,
   onLogout,
+  isAdmin,
 }: {
   pathname: string;
   collapsed: boolean;
   onNavClick: () => void;
   onLogout: () => void;
+  isAdmin: boolean;
 }) {
   return (
     <div className="flex h-full flex-col">
@@ -79,6 +82,24 @@ function SidebarContent({
             </Link>
           );
         })}
+        {isAdmin && (
+          <>
+            <div className="my-2 h-px bg-border/30" />
+            <Link
+              href="/admin"
+              onClick={onNavClick}
+              className={cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all',
+                pathname.startsWith('/admin')
+                  ? 'bg-red-500/10 text-red-400 font-medium'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+              )}
+            >
+              <Shield className="h-4 w-4 shrink-0" />
+              {!collapsed && <span>Admin</span>}
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* Bottom section */}
@@ -101,6 +122,25 @@ export function Sidebar() {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (data?.role === 'admin') setIsAdmin(true);
+      }
+    }
+    checkAdmin();
+  }, []);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -123,6 +163,7 @@ export function Sidebar() {
           collapsed={collapsed}
           onNavClick={() => setMobileOpen(false)}
           onLogout={handleLogout}
+          isAdmin={isAdmin}
         />
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -179,6 +220,7 @@ export function Sidebar() {
                 collapsed={false}
                 onNavClick={() => setMobileOpen(false)}
                 onLogout={handleLogout}
+                isAdmin={isAdmin}
               />
             </motion.aside>
           </>
