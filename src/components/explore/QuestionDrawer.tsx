@@ -46,8 +46,8 @@ export function QuestionDrawer({ question, open, onClose }: QuestionDrawerProps)
 
   return (
     <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="text-left px-6">
+      <DrawerContent className="max-h-[92dvh] sm:max-h-[90vh]">
+        <DrawerHeader className="text-left px-4 sm:px-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             {question.categories && (
               <Badge variant="secondary">{question.categories.name}</Badge>
@@ -71,7 +71,7 @@ export function QuestionDrawer({ question, open, onClose }: QuestionDrawerProps)
 
         <Separator />
 
-        <ScrollArea className="flex-1 px-6 py-4 overflow-y-auto max-h-[60vh]">
+        <ScrollArea className="flex-1 px-4 sm:px-6 py-4 overflow-y-auto max-h-[55dvh] sm:max-h-[60vh]">
           {/* Tags */}
           {(question.tech_tags?.length > 0 || question.company_tags?.length > 0) && (
             <div className="mb-6 space-y-3">
@@ -114,18 +114,18 @@ export function QuestionDrawer({ question, open, onClose }: QuestionDrawerProps)
 
         <Separator />
 
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0">
               <BookmarkIcon className="mr-1 h-3.5 w-3.5" />
               Lưu lại
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="min-h-[44px] sm:min-h-0">
               <Share2 className="mr-1 h-3.5 w-3.5" />
               Chia sẻ
             </Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose} className="min-h-[44px] sm:min-h-0">
             Đóng
           </Button>
         </div>

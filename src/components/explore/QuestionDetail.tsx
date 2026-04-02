@@ -322,24 +322,24 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   );
 
   return (
-    <div className="space-y-5 pt-8 lg:pt-0 pb-8 max-w-4xl">
+    <div className="space-y-4 sm:space-y-5 pt-6 sm:pt-8 lg:pt-0 pb-6 sm:pb-8 max-w-4xl">
       {/* Top bar navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="gap-1.5 text-muted-foreground hover:text-foreground -ml-2"
+          className="gap-1.5 text-muted-foreground hover:text-foreground -ml-2 min-h-[44px] sm:min-h-0 self-start active:scale-95 transition-transform"
         >
           <ArrowLeft className="h-4 w-4" />
           Quay lại danh sách
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto touch-scroll-x sm:overflow-x-visible">
           <Button
             variant="outline"
             size="sm"
             className={cn(
-              'h-8',
+              'h-9 sm:h-8 shrink-0',
               isBookmarked &&
                 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400',
             )}
@@ -356,13 +356,13 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 text-purple-600 dark:text-purple-400 border-purple-500/30 hover:bg-purple-500/10"
+            className="h-9 sm:h-8 shrink-0 text-purple-600 dark:text-purple-400 border-purple-500/30 hover:bg-purple-500/10"
             onClick={() => setFlashcardOpen(true)}
           >
             <Brain className="h-3.5 w-3.5 mr-1.5" />
             Flashcard
           </Button>
-          <Button variant="outline" size="sm" className="h-8">
+          <Button variant="outline" size="sm" className="h-9 sm:h-8 shrink-0">
             <Share2 className="h-3.5 w-3.5 mr-1.5" />
             Chia sẻ
           </Button>
@@ -372,7 +372,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
       {/* ===== QUESTION CARD ===== */}
       <div className="rounded-2xl border border-border/50 bg-card/80 overflow-hidden">
         {/* Question header bar */}
-        <div className="flex flex-wrap items-center gap-3 px-6 py-3.5 bg-muted/30 border-b border-border/40">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-3.5 bg-muted/30 border-b border-border/40">
           {question.categories && (
             <Badge variant="secondary" className="font-medium">
               {question.categories.name}
@@ -413,7 +413,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         </div>
 
         {/* Question title */}
-        <div className="px-6 pt-5 pb-4">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4">
           <h1 className="text-xl sm:text-2xl font-bold leading-snug tracking-tight">
             {question.title}
           </h1>
@@ -422,7 +422,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         <Separator />
 
         {/* Question body — structured content */}
-        <div className="px-6 py-5">
+        <div className="px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
               <MessageSquareText className="h-3.5 w-3.5 text-primary" />
@@ -431,7 +431,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               Nội dung câu hỏi
             </h2>
           </div>
-          <div className="pl-9">
+          <div className="pl-0 sm:pl-9">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
@@ -445,7 +445,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         <Separator />
 
         {/* Tags & companies */}
-        <div className="px-6 py-4 space-y-3 bg-muted/20">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 space-y-3 bg-muted/20">
           {question.tech_tags?.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               <Tag className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -560,7 +560,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           ) : officialAnswer ? (
             <div className="rounded-2xl border border-emerald-500/20 bg-card/80 overflow-hidden">
               {/* Answer header */}
-              <div className="flex items-center gap-2 px-6 py-3.5 bg-emerald-500/5 border-b border-emerald-500/15">
+              <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-emerald-500/5 border-b border-emerald-500/15">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                 <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                   Câu trả lời mẫu (Official Answer)
@@ -571,7 +571,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
                 </span>
               </div>
               {/* Answer body */}
-              <div className="px-6 py-5">
+              <div className="px-4 sm:px-6 py-4 sm:py-5">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
@@ -602,17 +602,17 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
       )}
 
       {/* ===== BOTTOM ACTION BAR ===== */}
-      <div className="flex items-center justify-between rounded-2xl border border-border/50 bg-card/30 px-5 py-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 rounded-xl sm:rounded-2xl border border-border/50 bg-card/30 px-4 sm:px-5 py-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="text-muted-foreground"
+          className="text-muted-foreground min-h-[44px] sm:min-h-0"
         >
           <ArrowLeft className="h-4 w-4 mr-1.5" />
           Câu hỏi trước
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0">
           <Bot className="h-4 w-4 mr-1.5" />
           Hỏi ReadyBot về câu hỏi này
         </Button>

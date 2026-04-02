@@ -199,16 +199,16 @@ export default function CommunityPage() {
   ];
 
   return (
-    <div className="space-y-6 pt-8 lg:pt-0">
+    <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-linear-to-br from-primary/5 via-card to-card p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-linear-to-br from-primary/5 via-card to-card p-4 sm:p-6 md:p-8">
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
                 Dev<span className="text-gradient">Community</span>
               </h1>
-              <p className="mt-1.5 text-muted-foreground text-sm sm:text-base max-w-lg">
+              <p className="mt-1 sm:mt-1.5 text-muted-foreground text-xs sm:text-sm md:text-base max-w-lg">
                 Cộng đồng chia sẻ câu hỏi phỏng vấn thực tế từ các developer có
                 kinh nghiệm. Được kiểm duyệt bởi admin.
               </p>
@@ -217,28 +217,28 @@ export default function CommunityPage() {
           </div>
 
           {/* Stats */}
-          <div className="mt-6 grid grid-cols-3 gap-3 sm:gap-4">
-            <div className="rounded-xl border border-border/30 bg-card/50 px-4 py-3 text-center">
+          <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+            <div className="rounded-lg sm:rounded-xl border border-border/30 bg-card/50 px-2 sm:px-4 py-2 sm:py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-primary mb-1">
                 <HelpCircle className="h-4 w-4" />
               </div>
-              <p className="text-lg font-bold">{stats.total}</p>
-              <p className="text-[11px] text-muted-foreground">Câu hỏi</p>
+              <p className="text-base sm:text-lg font-bold">{stats.total}</p>
+              <p className="text-[10px] sm:text-[11px] text-muted-foreground">Câu hỏi</p>
             </div>
-            <div className="rounded-xl border border-border/30 bg-card/50 px-4 py-3 text-center">
+            <div className="rounded-lg sm:rounded-xl border border-border/30 bg-card/50 px-2 sm:px-4 py-2 sm:py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-emerald-400 mb-1">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
-              <p className="text-lg font-bold">{stats.approved}</p>
-              <p className="text-[11px] text-muted-foreground">Đã duyệt</p>
+              <p className="text-base sm:text-lg font-bold">{stats.approved}</p>
+              <p className="text-[10px] sm:text-[11px] text-muted-foreground">Đã duyệt</p>
             </div>
-            <div className="rounded-xl border border-border/30 bg-card/50 px-4 py-3 text-center">
+            <div className="rounded-lg sm:rounded-xl border border-border/30 bg-card/50 px-2 sm:px-4 py-2 sm:py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-orange-400 mb-1">
                 <Users className="h-4 w-4" />
               </div>
-              <p className="text-lg font-bold">{stats.contributors}</p>
-              <p className="text-[11px] text-muted-foreground">
-                Người đóng góp
+              <p className="text-base sm:text-lg font-bold">{stats.contributors}</p>
+              <p className="text-[10px] sm:text-[11px] text-muted-foreground">
+                Đóng góp
               </p>
             </div>
           </div>
@@ -291,7 +291,7 @@ export default function CommunityPage() {
         </div>
 
         {/* Category + Difficulty filters */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
 
           {/* Categories */}
@@ -372,7 +372,7 @@ export default function CommunityPage() {
                 index={idx}
               />
               {/* Inline comment section */}
-              <div className="ml-5 mt-1 mb-2">
+              <div className="ml-0 sm:ml-5 mt-1 mb-2">
                 <CommentSection
                   reviewId={review.id}
                   commentCount={review.comment_count}

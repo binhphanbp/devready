@@ -119,13 +119,13 @@ export default function FlashcardsPage() {
   // ============ LIST VIEW ============
   if (viewMode === 'list') {
     return (
-      <div className="space-y-6 pt-8 lg:pt-0">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
               <span className="text-gradient">Flashcards</span>
             </h1>
-            <p className="mt-1 text-muted-foreground">
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
               Ôn tập với hệ thống Spaced Repetition thông minh.
             </p>
           </div>
@@ -157,10 +157,10 @@ export default function FlashcardsPage() {
             {decks.map((deck) => (
               <Card
                 key={deck.id}
-                className="group cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/30 hover:shadow-md hover:shadow-primary/5"
+                className="group cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 active:scale-[0.99]"
                 onClick={() => openDeck(deck)}
               >
-                <CardContent className="p-5 flex items-center justify-between">
+                <CardContent className="p-3.5 sm:p-5 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/10 shrink-0">
                       <Layers className="h-5 w-5 text-purple-400" />
@@ -189,7 +189,7 @@ export default function FlashcardsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                    className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive min-h-[44px] sm:min-h-0"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteDeck(deck.id);
@@ -209,7 +209,7 @@ export default function FlashcardsPage() {
   // ============ STUDY MODE ============
   if (viewMode === 'study' && selectedDeck) {
     return (
-      <div className="space-y-6 pt-8 lg:pt-0 max-w-2xl mx-auto">
+      <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0 max-w-2xl mx-auto">
         <Button
           variant="ghost"
           size="sm"
@@ -237,13 +237,13 @@ export default function FlashcardsPage() {
   // ============ DETAIL VIEW ============
   if (viewMode === 'detail' && selectedDeck) {
     return (
-      <div className="space-y-6 pt-8 lg:pt-0">
+      <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => setViewMode('list')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight">
               {selectedDeck.title}
             </h1>
             {selectedDeck.description && (

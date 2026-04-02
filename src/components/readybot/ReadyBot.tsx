@@ -101,7 +101,7 @@ export function ReadyBot() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-[#0066FF] to-[#0055DD] text-white shadow-lg shadow-[#0066FF]/25 hover:shadow-xl hover:shadow-[#0066FF]/30 transition-shadow"
+            className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-4 sm:right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-[#0066FF] to-[#0055DD] text-white shadow-lg shadow-[#0066FF]/25 hover:shadow-xl hover:shadow-[#0066FF]/30 transition-shadow active:scale-95"
             aria-label="Mở ReadyBot"
           >
             <Bot className="h-6 w-6" />
@@ -119,10 +119,10 @@ export function ReadyBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-6 right-6 z-50 w-[380px] max-h-[560px] flex flex-col rounded-2xl border border-border/50 bg-card shadow-2xl overflow-hidden"
+            className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 sm:w-[380px] sm:max-h-[560px] flex flex-col sm:rounded-2xl border-0 sm:border border-border/50 bg-card shadow-2xl overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-gradient-to-r from-[#0066FF]/10 to-transparent">
+            <div className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] border-b border-border/50 bg-gradient-to-r from-[#0066FF]/10 to-transparent">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#0066FF] to-[#0055DD]">
                   <Bot className="h-4 w-4 text-white" />
@@ -141,16 +141,16 @@ export function ReadyBot() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setOpen(false)}
-                className="h-7 w-7 p-0"
+                className="h-9 w-9 sm:h-7 sm:w-7 p-0"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5 sm:h-4 sm:w-4" />
               </Button>
             </div>
 
             {/* Messages */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-[300px] max-h-[380px]"
+              className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0 sm:min-h-[300px] sm:max-h-[380px]"
             >
               {messages.length === 0 ? (
                 <div className="space-y-4">
@@ -171,7 +171,7 @@ export function ReadyBot() {
                   </div>
 
                   {/* Quick prompts */}
-                  <div className="flex flex-wrap gap-1.5 pl-9">
+                  <div className="flex flex-wrap gap-1.5 pl-0 sm:pl-9">
                     {quickPrompts.map((prompt) => (
                       <button
                         key={prompt}
@@ -184,7 +184,7 @@ export function ReadyBot() {
                             form?.requestSubmit();
                           }, 50);
                         }}
-                        className="rounded-full border border-border/50 bg-background px-3 py-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                        className="rounded-full border border-border/50 bg-background px-3 py-1.5 sm:py-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors active:scale-95"
                       >
                         {prompt}
                       </button>
@@ -247,7 +247,7 @@ export function ReadyBot() {
             </div>
 
             {/* Input */}
-            <div className="border-t border-border/50 px-3 py-3">
+            <div className="border-t border-border/50 px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               <form
                 id="chatbot-form"
                 onSubmit={sendMessage}
@@ -258,13 +258,13 @@ export function ReadyBot() {
                   placeholder="Hỏi ReadyBot..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className="h-9 text-sm bg-muted/30 border-border/50"
+                  className="h-10 sm:h-9 text-sm bg-muted/30 border-border/50"
                   disabled={loading}
                 />
                 <Button
                   type="submit"
                   size="sm"
-                  className="h-9 w-9 p-0 shrink-0"
+                  className="h-10 w-10 sm:h-9 sm:w-9 p-0 shrink-0"
                   disabled={!input.trim() || loading}
                 >
                   {loading ? (

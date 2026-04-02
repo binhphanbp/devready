@@ -243,7 +243,7 @@ function TechStackSlider({
 
   return (
     <div className="border-b border-border/30 bg-muted/10">
-      <div className="flex items-center gap-2 px-5 py-3">
+      <div className="flex items-center gap-2 px-3 sm:px-5 py-2.5 sm:py-3">
         {/* Label */}
         <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/70 shrink-0 pr-3 border-r border-border/50">
           <Hash className="h-3.5 w-3.5" />
@@ -260,7 +260,7 @@ function TechStackSlider({
           {/* Scrollable tech tags */}
           <div
             ref={scrollRef}
-            className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pr-1"
+            className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pr-1 touch-scroll-x"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {techStacks.map((tech) => {
@@ -270,7 +270,7 @@ function TechStackSlider({
                   key={tech}
                   onClick={() => toggleTechTag(tech)}
                   className={cn(
-                    'px-2.5 py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0',
+                    'px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0 min-h-[32px] sm:min-h-0',
                     isActive
                       ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                       : 'bg-transparent text-muted-foreground border-dashed border-border/60 hover:border-primary/40 hover:text-foreground hover:bg-primary/5',
@@ -291,7 +291,7 @@ function TechStackSlider({
 
         {/* Arrow buttons grouped together */}
         {showArrows && (
-          <div className="flex items-center gap-0.5 shrink-0">
+          <div className="hidden sm:flex items-center gap-0.5 shrink-0">
             <button
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
@@ -442,14 +442,14 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="space-y-6 pt-8 lg:pt-0">
+    <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0">
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
             Khám phá <span className="text-gradient">câu hỏi phỏng vấn</span>
           </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm text-muted-foreground">
             Tìm kiếm, lọc và luyện tập với hàng trăm câu hỏi IT thực tế
           </p>
         </div>
@@ -471,7 +471,7 @@ export default function ExplorePage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Tìm câu hỏi... (React hooks, SQL join, Docker...)"
-          className="pl-10 h-12 rounded-xl bg-card/60 border-border/50 text-sm focus:ring-2 focus:ring-primary/20"
+          className="pl-10 h-11 sm:h-12 rounded-xl bg-card/60 border-border/50 text-sm focus:ring-2 focus:ring-primary/20"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -486,15 +486,15 @@ export default function ExplorePage() {
       </div>
 
       {/* ===== FILTER PANEL ===== */}
-      <div className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden">
         {/* Category row */}
-        <div className="px-5 py-3.5 border-b border-border/30">
-          <div className="flex items-center gap-3">
+        <div className="px-3 sm:px-5 py-3 sm:py-3.5 border-b border-border/30">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/70 shrink-0 pr-3 border-r border-border/50">
               <Layers className="h-3.5 w-3.5" />
               Danh mục
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto touch-scroll-x sm:overflow-x-visible">
               {/* All button */}
               <button
                 onClick={() => setSelectedCategory(null)}
@@ -548,14 +548,14 @@ export default function ExplorePage() {
         )}
 
         {/* Level + Sort row */}
-        <div className="px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-3 sm:px-5 py-3 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
           {/* Difficulty */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/70 shrink-0 pr-3 border-r border-border/50">
               <BarChart3 className="h-3.5 w-3.5" />
               Cấp độ
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 overflow-x-auto touch-scroll-x sm:overflow-x-visible">
               {difficulties.map((d) => {
                 const isActive = selectedDifficulty === d.value;
                 return (

@@ -61,23 +61,23 @@ export default async function ProfilePage() {
   ];
 
   return (
-    <div className="space-y-6 pt-8 lg:pt-0 max-w-2xl">
-      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+    <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0 max-w-2xl">
+      <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
         Hồ sơ <span className="text-gradient">cá nhân</span>
       </h1>
 
       {/* Profile card */}
       <Card className="border-border/50 bg-card/50 overflow-hidden">
         <div className="h-20 bg-gradient-to-r from-[#0066FF]/20 to-purple-500/20" />
-        <CardContent className="p-6 -mt-10">
-          <div className="flex items-end gap-4">
-            <Avatar className="h-20 w-20 border-4 border-card shadow-lg">
-              <AvatarFallback className="bg-gradient-to-br from-[#0066FF] to-[#0055DD] text-white text-xl font-bold">
+        <CardContent className="p-4 sm:p-6 -mt-10">
+          <div className="flex items-end gap-3 sm:gap-4">
+            <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-4 border-card shadow-lg">
+              <AvatarFallback className="bg-gradient-to-br from-[#0066FF] to-[#0055DD] text-white text-base sm:text-xl font-bold">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 pb-1">
-              <h2 className="text-xl font-bold">
+              <h2 className="text-base sm:text-xl font-bold">
                 {profile?.full_name || "Chưa cập nhật tên"}
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -92,15 +92,15 @@ export default async function ProfilePage() {
       </Card>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {stats.map((stat) => (
           <Card key={stat.label} className="border-border/50 bg-card/50">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${stat.bg} shrink-0`}>
+            <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+              <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${stat.bg} shrink-0`}>
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </div>
               <div>
-                <div className="text-lg font-bold">{stat.value}</div>
+                <div className="text-base sm:text-lg font-bold">{stat.value}</div>
                 <div className="text-xs text-muted-foreground">{stat.label}</div>
               </div>
             </CardContent>
@@ -139,12 +139,12 @@ export default async function ProfilePage() {
       </Card>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button variant="outline" className="h-auto py-3 flex-col gap-1" render={<Link href="/flashcards" />}>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <Button variant="outline" className="h-auto py-3 flex-col gap-1 min-h-[60px]" render={<Link href="/flashcards" />}>
           <Brain className="h-5 w-5 text-purple-400" />
           <span className="text-xs">Flashcards</span>
         </Button>
-        <Button variant="outline" className="h-auto py-3 flex-col gap-1" render={<Link href="/explore" />}>
+        <Button variant="outline" className="h-auto py-3 flex-col gap-1 min-h-[60px]" render={<Link href="/explore" />}>
           <BookOpen className="h-5 w-5 text-blue-400" />
           <span className="text-xs">Khám phá</span>
         </Button>

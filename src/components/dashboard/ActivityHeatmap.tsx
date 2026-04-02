@@ -128,16 +128,16 @@ export function ActivityHeatmap({ userId, streakCount, lastActiveDate }: Activit
   return (
     <div className="space-y-4">
       {/* Streak + Stats bar */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
         {/* Streak card */}
-        <div className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 via-card/80 to-amber-500/5 p-4">
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 via-card/80 to-amber-500/5 p-3 sm:p-4">
           <div className="flex items-center gap-3">
             <div className="relative flex h-11 w-11 items-center justify-center">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 animate-pulse" />
               <Flame className="relative h-5.5 w-5.5 text-orange-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground leading-none">
+              <p className="text-xl sm:text-2xl font-bold text-foreground leading-none">
                 {streakCount}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5 font-medium">
@@ -153,13 +153,13 @@ export function ActivityHeatmap({ userId, streakCount, lastActiveDate }: Activit
         </div>
 
         {/* Views card */}
-        <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-card/80 to-cyan-500/5 p-4">
+        <div className="rounded-xl sm:rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-card/80 to-cyan-500/5 p-3 sm:p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10">
               <Eye className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground leading-none">
+              <p className="text-xl sm:text-2xl font-bold text-foreground leading-none">
                 {totalViews}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5 font-medium">
@@ -170,13 +170,13 @@ export function ActivityHeatmap({ userId, streakCount, lastActiveDate }: Activit
         </div>
 
         {/* Active days card */}
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-card/80 to-teal-500/5 p-4">
+        <div className="rounded-xl sm:rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-card/80 to-teal-500/5 p-3 sm:p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10">
               <CalendarDays className="h-5 w-5 text-emerald-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground leading-none">
+              <p className="text-xl sm:text-2xl font-bold text-foreground leading-none">
                 {totalActiveDays}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5 font-medium">
@@ -188,9 +188,9 @@ export function ActivityHeatmap({ userId, streakCount, lastActiveDate }: Activit
       </div>
 
       {/* Heatmap card */}
-      <div className="rounded-2xl border border-border/50 bg-card/50 overflow-hidden">
+      <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-card/50 overflow-hidden">
         {/* Header */}
-        <div className="px-5 py-3.5 border-b border-border/40 flex items-center justify-between">
+        <div className="px-3 sm:px-5 py-3 sm:py-3.5 border-b border-border/40 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-blue-500" />
             <h3 className="text-sm font-semibold text-foreground">
@@ -210,7 +210,7 @@ export function ActivityHeatmap({ userId, streakCount, lastActiveDate }: Activit
         </div>
 
         {/* Grid */}
-        <div className="px-5 py-4 heatmap-grid relative overflow-x-auto">
+        <div className="px-3 sm:px-5 py-3 sm:py-4 heatmap-grid relative overflow-x-auto touch-scroll-x">
           {/* Month labels */}
           <div className="relative h-4 ml-7 mb-1">
             {monthLabels.map((m, i) => (

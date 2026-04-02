@@ -98,23 +98,23 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8 pt-8 lg:pt-0">
+    <div className="space-y-5 sm:space-y-8 pt-6 sm:pt-8 lg:pt-0">
       {/* Welcome */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
           Xin chào,{' '}
           <span className="text-gradient">
             {profile?.full_name || user.email?.split('@')[0]}
           </span>
           ! 👋
         </h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
           Hãy tiếp tục luyện tập và chinh phục buổi phỏng vấn IT tiếp theo.
         </p>
       </div>
 
       {/* Stats Grid (Bento) */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card
             key={stat.title}
@@ -126,7 +126,7 @@ export default async function DashboardPage() {
                   <p className="text-xs text-muted-foreground sm:text-sm">
                     {stat.title}
                   </p>
-                  <p className="mt-1 text-2xl font-bold">{stat.value}</p>
+                  <p className="mt-1 text-lg sm:text-2xl font-bold">{stat.value}</p>
                 </div>
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-lg ${stat.bg}`}
@@ -149,14 +149,14 @@ export default async function DashboardPage() {
       {/* Quick Actions */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Bắt đầu nhanh</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
           {quickActions.map((action) => (
             <Link key={action.href} href={action.href}>
-              <Card className="group relative overflow-hidden border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 h-full">
+              <Card className="group relative overflow-hidden border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.98] h-full">
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
-                <CardContent className="relative p-6">
+                <CardContent className="relative p-4 sm:p-6">
                   <action.icon className="h-8 w-8 text-primary mb-3" />
                   <h3 className="font-semibold">{action.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
