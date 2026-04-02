@@ -86,6 +86,27 @@ export default function AdminUsersPage() {
   }, [fetchUsers]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
+    const user = users.find((u) => u.id === userId);
+    const oldRole = user?.role || 'user';
+    if (oldRole === newRole) return;
+
+    const roleLabels: Record<string, string> = {
+      user: 'Người dùng',
+      moderator: 'Kiểm duyệt',
+      admin: 'Quản trị viên',
+    };
+
+    const confirmMsg =
+      newRole === 'admin'
+        ? `⚠️ Bạn có chắc muốn cấp quyền QUẢN TRỊ VIÊN cho "${user?.full_name || 'Ẩn danh'}"?\n\nQuản trị viên có toàn quyền trên hệ thống.`
+        : `Đổi vai trò của "${user?.full_name || 'Ẩn danh'}" từ ${roleLabels[oldRole]} sang ${roleLabels[newRole]}?`;
+
+    if (!confirm(confirmMsg)) {
+      // Reset the select to old value by re-rendering
+      setUsers((prev) => [...prev]);
+      return;
+    }
+
     setChangingRole(userId);
     const supabase = createClient();
     const { error } = await supabase

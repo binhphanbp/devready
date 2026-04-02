@@ -71,13 +71,13 @@ function SidebarContent({
               href={link.href}
               onClick={onNavClick}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all',
+                'flex items-center gap-3 rounded-lg px-3 py-3 lg:py-2.5 text-sm transition-all min-h-[44px]',
                 isActive
                   ? 'bg-primary/10 text-primary font-medium'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
               )}
             >
-              <link.icon className="h-4 w-4 shrink-0" />
+              <link.icon className="h-5 w-5 lg:h-4 lg:w-4 shrink-0" />
               {!collapsed && <span>{link.label}</span>}
             </Link>
           );
@@ -89,13 +89,13 @@ function SidebarContent({
               href="/admin"
               onClick={onNavClick}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all',
+                'flex items-center gap-3 rounded-lg px-3 py-3 lg:py-2.5 text-sm transition-all min-h-[44px]',
                 pathname.startsWith('/admin')
                   ? 'bg-red-500/10 text-red-400 font-medium'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
               )}
             >
-              <Shield className="h-4 w-4 shrink-0" />
+              <Shield className="h-5 w-5 lg:h-4 lg:w-4 shrink-0" />
               {!collapsed && <span>Admin</span>}
             </Link>
           </>
@@ -103,13 +103,13 @@ function SidebarContent({
       </nav>
 
       {/* Bottom section */}
-      <div className="px-3 pb-4">
+      <div className="px-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <Separator className="mb-3 opacity-50" />
         <button
           onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 lg:py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors min-h-[44px]"
         >
-          <LogOut className="h-4 w-4 shrink-0" />
+          <LogOut className="h-5 w-5 lg:h-4 lg:w-4 shrink-0" />
           {!collapsed && <span>Đăng xuất</span>}
         </button>
       </div>
@@ -186,9 +186,10 @@ export function Sidebar() {
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 flex h-9 w-9 items-center justify-center rounded-lg border border-border/50 bg-card/80 backdrop-blur-sm text-muted-foreground"
+        className="lg:hidden fixed top-3 left-3 z-50 flex h-11 w-11 items-center justify-center rounded-xl border border-border/50 bg-card/80 backdrop-blur-md text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-sm"
+        aria-label="Mở menu"
       >
-        <Menu className="h-4 w-4" />
+        <Menu className="h-5 w-5" />
       </button>
 
       {/* Mobile overlay */}
@@ -200,20 +201,21 @@ export function Sidebar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="lg:hidden fixed inset-0 z-40 bg-black/60"
+              className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
             />
             <motion.aside
-              initial={{ x: -280 }}
+              initial={{ x: -300 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="lg:hidden fixed inset-y-0 left-0 z-50 w-64 border-r border-border/50 bg-card"
+              exit={{ x: -300 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="lg:hidden fixed inset-y-0 left-0 z-50 w-[min(80vw,280px)] border-r border-border/50 bg-card shadow-2xl"
             >
               <button
                 onClick={() => setMobileOpen(false)}
-                className="absolute right-3 top-4 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 active:scale-95 transition-all"
+                aria-label="Đóng menu"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
               <SidebarContent
                 pathname={pathname}

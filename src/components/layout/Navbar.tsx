@@ -346,12 +346,12 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setThemeMenuOpen(!themeMenuOpen)}
-                  className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  className="relative flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 active:scale-95 transition-all"
                   aria-label={`Chế độ: ${themeLabel}`}
                 >
                   <Sun
                     className={cn(
-                      'h-4 w-4 absolute top-2 left-2 transition-all',
+                      'h-5 w-5 absolute top-3 left-3 transition-all',
                       currentTheme === 'light'
                         ? 'rotate-0 scale-100 opacity-100'
                         : '-rotate-90 scale-0 opacity-0',
@@ -359,7 +359,7 @@ export function Navbar() {
                   />
                   <Moon
                     className={cn(
-                      'h-4 w-4 absolute top-2 left-2 transition-all',
+                      'h-5 w-5 absolute top-3 left-3 transition-all',
                       currentTheme === 'dark'
                         ? 'rotate-0 scale-100 opacity-100'
                         : 'rotate-90 scale-0 opacity-0',
@@ -367,7 +367,7 @@ export function Navbar() {
                   />
                   <Monitor
                     className={cn(
-                      'h-4 w-4 transition-all',
+                      'h-5 w-5 transition-all',
                       currentTheme === 'system'
                         ? 'rotate-0 scale-100 opacity-100'
                         : 'rotate-90 scale-0 opacity-0',
@@ -419,7 +419,7 @@ export function Navbar() {
               </div>
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 active:scale-95 transition-all"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? (
@@ -464,9 +464,9 @@ export function Navbar() {
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+                      className="flex items-center gap-3 px-3 py-3.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors min-h-[48px] active:bg-muted/70"
                     >
-                      <link.icon className="h-4 w-4" />
+                      <link.icon className="h-5 w-5" />
                       {link.label}
                     </Link>
                   ))}
