@@ -82,8 +82,8 @@ const itemVariants = {
 
 export function FeaturesGrid() {
   return (
-    <section className="relative py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative py-16 sm:py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center">
           <motion.span
@@ -99,7 +99,7 @@ export function FeaturesGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl"
+            className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl"
           >
             Mọi thứ bạn cần để{" "}
             <span className="text-gradient">ace phỏng vấn</span>
@@ -109,7 +109,7 @@ export function FeaturesGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mt-4 text-muted-foreground max-w-2xl mx-auto"
+            className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto"
           >
             Từ ngân hàng câu hỏi khổng lồ đến AI mentor cá nhân — DevReady là
             bạn đồng hành hoàn hảo cho hành trình phỏng vấn IT.
@@ -122,13 +122,13 @@ export function FeaturesGrid() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
+          className="mt-10 sm:mt-16 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3"
         >
           {features.map((feature) => (
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className={`group relative overflow-hidden rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 ${feature.span}`}
+              className={`group relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card/50 p-4 sm:p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 ${feature.span}`}
             >
               {/* Gradient bg */}
               <div
@@ -139,7 +139,7 @@ export function FeaturesGrid() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/50">
                   <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">{feature.title}</h3>
+                <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-semibold">{feature.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>

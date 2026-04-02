@@ -149,11 +149,11 @@ function InterviewPreview() {
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
-      className="mt-10 mx-auto w-full"
+      className="mt-6 sm:mt-10 mx-auto w-full"
     >
       <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/10 dark:shadow-black/30 overflow-hidden">
         {/* Window chrome */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-border/40 bg-muted/20">
+        <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3.5 border-b border-border/40 bg-muted/20">
           <div className="flex items-center gap-2">
             <div className="flex gap-2">
               <div className="h-3 w-3 rounded-full bg-red-400/70" />
@@ -191,7 +191,7 @@ function InterviewPreview() {
           {/* Main content */}
           <div className="flex-1 min-w-0">
             {/* Question area */}
-            <div className="px-7 pt-6 pb-4">
+            <div className="px-4 pt-4 pb-3 sm:px-7 sm:pt-6 sm:pb-4">
               <div className="flex items-center gap-2.5 mb-4">
                 <span className="text-xs font-mono text-muted-foreground/50">
                   Q{currentQ + 1}/{interviewQuestions.length}
@@ -224,8 +224,8 @@ function InterviewPreview() {
             </div>
 
             {/* Code hint area — fixed height to prevent layout shift */}
-            <div className="px-7 pb-6">
-              <div className="h-[120px] relative">
+            <div className="px-4 pb-4 sm:px-7 sm:pb-6">
+              <div className="h-[100px] sm:h-[120px] relative">
                 <AnimatePresence>
                   {showCode && (
                     <motion.div
@@ -259,7 +259,7 @@ function InterviewPreview() {
             </div>
 
             {/* Bottom toolbar */}
-            <div className="flex items-center justify-between px-6 py-3 border-t border-border/30 bg-muted/10">
+            <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3 border-t border-border/30 bg-muted/10">
               <div className="flex items-center gap-1.5">
                 {interviewQuestions.map((_, i) => (
                   <div
@@ -291,12 +291,12 @@ function InterviewPreview() {
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-10">
+    <section className="relative min-h-[calc(100dvh-2rem)] sm:min-h-screen flex items-center justify-center overflow-hidden pt-16 pb-8 sm:pt-20 sm:pb-10">
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[5%] left-1/2 -translate-x-1/2 h-[700px] w-[900px] rounded-full bg-[#0066FF]/[0.06] blur-[140px]" />
-        <div className="absolute bottom-[10%] left-[20%] h-[300px] w-[400px] rounded-full bg-purple-500/[0.04] blur-[100px]" />
-        <div className="absolute top-[30%] right-[10%] h-[250px] w-[250px] rounded-full bg-[#00AAFF]/[0.04] blur-[80px]" />
+        <div className="absolute top-[5%] left-1/2 -translate-x-1/2 h-[350px] w-[450px] sm:h-[700px] sm:w-[900px] rounded-full bg-[#0066FF]/[0.06] blur-[80px] sm:blur-[140px]" />
+        <div className="absolute bottom-[10%] left-[20%] h-[150px] w-[200px] sm:h-[300px] sm:w-[400px] rounded-full bg-purple-500/[0.04] blur-[60px] sm:blur-[100px]" />
+        <div className="absolute top-[30%] right-[10%] h-[120px] w-[120px] sm:h-[250px] sm:w-[250px] rounded-full bg-[#00AAFF]/[0.04] blur-[50px] sm:blur-[80px]" />
       </div>
 
       {/* Grid pattern */}
@@ -349,7 +349,7 @@ export function Hero() {
       ))}
 
       {/* Main content — centered */}
-      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 text-center">
+      <div className="relative mx-auto max-w-4xl px-3 sm:px-6 text-center">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -367,7 +367,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl !leading-[1.1]"
+          className="mt-4 sm:mt-6 text-[1.75rem] font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl !leading-[1.1]"
         >
           Sẵn sàng cho <span className="text-gradient">buổi phỏng vấn</span>{" "}
           <br className="hidden sm:block" />
@@ -382,11 +382,11 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+          className="mt-6 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center w-full sm:w-auto"
         >
           <Button
             size="lg"
-            className="glow-blue bg-gradient-to-r from-[#0066FF] to-[#0055DD] hover:from-[#0055DD] hover:to-[#0044CC] text-white border-0 text-base px-8 h-12 font-semibold shadow-lg shadow-[#0066FF]/20"
+            className="w-full sm:w-auto glow-blue bg-gradient-to-r from-[#0066FF] to-[#0055DD] hover:from-[#0055DD] hover:to-[#0044CC] text-white border-0 text-base px-8 h-12 font-semibold shadow-lg shadow-[#0066FF]/20 active:scale-[0.98] transition-transform"
             render={<Link href="/register" />}
           >
             Bắt đầu miễn phí
@@ -395,7 +395,7 @@ export function Hero() {
           <Button
             variant="outline"
             size="lg"
-            className="text-base px-8 h-12 font-medium"
+            className="w-full sm:w-auto text-base px-8 h-12 font-medium active:scale-[0.98] transition-transform"
             render={<Link href="/explore" />}
           >
             Khám phá câu hỏi
@@ -407,7 +407,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-16 inline-flex items-center gap-6 sm:gap-10 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm px-8 py-4 shadow-sm"
+          className="mt-10 sm:mt-16 inline-flex items-center gap-4 sm:gap-6 md:gap-10 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm px-4 py-3 sm:px-8 sm:py-4 shadow-sm"
         >
           {[
             { value: "1000+", label: "Câu hỏi" },
@@ -417,7 +417,7 @@ export function Hero() {
             <div key={stat.label} className="flex items-center gap-4">
               {i > 0 && <div className="h-8 w-px bg-border/50" />}
               <div className={i > 0 ? "pl-2" : ""}>
-                <div className="text-xl sm:text-2xl font-bold text-gradient">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-gradient">
                   {stat.value}
                 </div>
                 <div className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
