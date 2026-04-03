@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import CustomCursor from "@/components/CustomCursor";
 import { ClickSound } from "@/components/ClickSound";
 import { BackToTop } from "@/components/layout/BackToTop";
@@ -85,6 +87,8 @@ export default function RootLayout({
           <ClickSound />
           {children}
           <BackToTop />
+          <Analytics />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
