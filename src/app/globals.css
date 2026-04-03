@@ -162,7 +162,7 @@
   }
   html {
     @apply font-sans;
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth is now handled via data-scroll-behavior attr on <html> */
     /* Prevent pull-to-refresh / overscroll navigation on mobile */
     overscroll-behavior: none;
   }
