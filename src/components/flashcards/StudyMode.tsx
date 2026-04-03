@@ -5,13 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import {
   calculateSRS,
   qualityLabels,
   type ReviewQuality,
-  type SRSCard,
 } from "@/lib/srs";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -81,7 +80,7 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
 
   if (isComplete) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center space-y-6">
+      <div className="flex flex-col items-center justify-center py-10 sm:py-16 text-center space-y-5 sm:space-y-6">
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -90,30 +89,30 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
           🎉
         </motion.div>
         <div>
-          <h2 className="text-2xl font-bold">Hoàn thành!</h2>
+          <h2 className="text-xl sm:text-2xl font-bold">Hoàn thành!</h2>
           <p className="mt-2 text-muted-foreground">
             Bạn đã ôn tập <strong>{reviewed}</strong> thẻ
           </p>
         </div>
-        <div className="flex gap-6">
+        <div className="flex gap-4 sm:gap-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-400">{correct}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-400">{correct}</div>
             <div className="text-xs text-muted-foreground">Đúng</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-red-400">
+            <div className="text-2xl sm:text-3xl font-bold text-red-400">
               {reviewed - correct}
             </div>
             <div className="text-xs text-muted-foreground">Cần ôn lại</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-gradient">
+            <div className="text-2xl sm:text-3xl font-bold text-gradient">
               {reviewed > 0 ? Math.round((correct / reviewed) * 100) : 0}%
             </div>
             <div className="text-xs text-muted-foreground">Chính xác</div>
           </div>
         </div>
-        <Button onClick={onComplete} variant="outline">
+        <Button onClick={onComplete} variant="outline" className="w-full sm:w-auto h-10 sm:h-9">
           Quay lại
         </Button>
       </div>
@@ -121,11 +120,11 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Progress */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">{deckTitle}</h2>
+          <h2 className="text-base sm:text-lg font-semibold truncate">{deckTitle}</h2>
           <p className="text-sm text-muted-foreground">
             Thẻ {currentIndex + 1} / {cards.length}
           </p>
@@ -148,9 +147,9 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
       </div>
 
       {/* Flashcard */}
-      <div className="perspective-1000 mx-auto max-w-lg">
+      <div className="perspective-1000 mx-auto sm:max-w-lg">
         <motion.div
-          className="relative cursor-pointer min-h-[300px]"
+          className="relative cursor-pointer min-h-[220px] sm:min-h-[300px]"
           onClick={() => setFlipped(!flipped)}
           style={{ transformStyle: "preserve-3d" }}
         >
@@ -162,8 +161,8 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
               exit={{ rotateY: flipped ? 90 : -90, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="border-border/50 bg-card/80 backdrop-blur-sm min-h-[300px]">
-                <CardContent className="p-8 flex flex-col items-center justify-center text-center min-h-[300px]">
+              <Card className="border-border/50 bg-card/80 backdrop-blur-sm min-h-[220px] sm:min-h-[300px]">
+                <CardContent className="p-5 sm:p-8 flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[300px]">
                   <Badge
                     variant="outline"
                     className="mb-4 text-xs"
@@ -199,22 +198,23 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
             <p className="text-center text-sm text-muted-foreground">
               Bạn nhớ câu trả lời tốt thế nào?
             </p>
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-center gap-2">
               {([0, 1, 2, 3, 4, 5] as ReviewQuality[]).map((q) => {
                 const { label, emoji } = qualityLabels[q];
                 return (
                   <Button
                     key={q}
                     variant={q >= 3 ? "default" : "outline"}
-                    size="sm"
+                    size="default"
                     onClick={() => handleRate(q)}
-                    className={
+                    className={cn(
+                      "h-9 sm:h-8 text-xs sm:text-sm px-2 sm:px-3",
                       q >= 3
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white border-0"
                         : q <= 1
                         ? "border-red-500/30 text-red-400 hover:bg-red-500/10"
                         : ""
-                    }
+                    )}
                   >
                     {emoji} {label}
                   </Button>

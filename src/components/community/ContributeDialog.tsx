@@ -201,9 +201,9 @@ export default function ContributeDialog({
         <PenLine className="mr-1.5 h-4 w-4" />
         Đóng góp câu hỏi
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-full sm:max-w-xl h-dvh sm:h-auto max-h-dvh sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-lg p-4 sm:p-6">
         {success ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="flex flex-col items-center justify-center py-6 sm:py-8 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 mb-4">
               <CheckCircle2 className="h-8 w-8 text-emerald-400" />
             </div>
@@ -231,14 +231,14 @@ export default function ContributeDialog({
             </DialogHeader>
 
             {/* Step indicator */}
-            <div className="flex items-center gap-1 py-3">
+            <div className="flex items-center gap-0.5 sm:gap-1 py-2 sm:py-3">
               {STEPS.map((s, i) => {
                 const Icon = s.icon;
                 return (
                   <div
                     key={i}
                     className={cn(
-                      'flex flex-1 items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-all',
+                      'flex flex-1 items-center justify-center sm:justify-start gap-1 sm:gap-1.5 rounded-lg px-1.5 sm:px-2.5 py-2 text-[11px] sm:text-xs font-medium transition-all',
                       i === step
                         ? 'bg-primary/10 text-primary'
                         : i < step
@@ -256,7 +256,7 @@ export default function ContributeDialog({
             {/* Step 0: Info */}
             {step === 0 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Công ty *</label>
                     <Input
@@ -284,7 +284,7 @@ export default function ContributeDialog({
                         type="button"
                         onClick={() => setCategoryId(cat.id)}
                         className={cn(
-                          'rounded-xl border px-3 py-2.5 text-left text-sm transition-all',
+                          'rounded-xl border px-3 py-3 sm:py-2.5 text-left text-sm transition-all active:scale-[0.97]',
                           categoryId === cat.id
                             ? 'border-primary/50 bg-primary/5 shadow-sm'
                             : 'border-border/50 hover:border-border hover:bg-muted/30',
@@ -305,7 +305,7 @@ export default function ContributeDialog({
                         type="button"
                         onClick={() => setDifficulty(d.value)}
                         className={cn(
-                          'rounded-xl border p-3 text-center transition-all',
+                          'rounded-xl border p-3 sm:p-3 text-center transition-all active:scale-[0.97]',
                           difficulty === d.value
                             ? d.className + ' shadow-sm'
                             : 'border-border/50 text-muted-foreground hover:border-border',
@@ -518,11 +518,12 @@ export default function ContributeDialog({
             )}
 
             {/* Navigation */}
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between pt-3 sm:pt-2 mt-auto">
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="default"
+                className="sm:size-sm h-10 sm:h-9 text-sm"
                 onClick={() =>
                   step > 0 ? setStep(step - 1) : handleOpenChange(false)
                 }
@@ -534,7 +535,8 @@ export default function ContributeDialog({
               {step < 3 ? (
                 <Button
                   type="button"
-                  size="sm"
+                  size="default"
+                  className="h-10 sm:h-9 text-sm"
                   onClick={() => setStep(step + 1)}
                   disabled={!canProceed(step)}
                 >
@@ -543,7 +545,8 @@ export default function ContributeDialog({
                 </Button>
               ) : (
                 <Button
-                  size="sm"
+                  size="default"
+                  className="h-10 sm:h-9 text-sm"
                   onClick={handleSubmit}
                   disabled={creating || !questionText.trim()}
                 >

@@ -157,9 +157,14 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+    /* Prevent pull-to-refresh / overscroll navigation on mobile */
+    overscroll-behavior: none;
   }
 }
 
@@ -338,5 +343,65 @@
 @media (pointer: coarse) {
   .tap-highlight {
     -webkit-tap-highlight-color: oklch(0.6 0.24 260 / 15%);
+  }
+}
+
+/* ===== Mobile-specific Polish ===== */
+
+/* Ensure all interactive elements meet 44px minimum touch target on mobile */
+@media (pointer: coarse) {
+  button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* Mobile input focus: prevent zoom on iOS when focusing inputs with font-size < 16px */
+@media (max-width: 639px) {
+  input, select, textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Perspective utility for flashcard 3D flip */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Mobile dialog full-screen override for shadcn dialogs */
+@media (max-width: 639px) {
+  [role="dialog"][data-state="open"] {
+    border-radius: 0 !important;
+  }
+}
+
+/* Touch-friendly spacing for mobile lists and grids */
+@media (max-width: 639px) {
+  .prose {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+  .prose pre {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    padding: 1rem;
+  }
+  .prose code {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Smooth momentum scrolling for overflow containers on mobile */
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text selection on interactive UI elements for cleaner mobile experience */
+@media (pointer: coarse) {
+  button, [role="button"], .select-none {
+    -webkit-user-select: none;
+    user-select: none;
   }
 }
