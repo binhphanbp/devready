@@ -3,8 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import CustomCursor from "@/components/CustomCursor";
-import { ClickSound } from "@/components/ClickSound";
+import { ClientEnhancements } from "@/components/ClientEnhancements";
 import { BackToTop } from "@/components/layout/BackToTop";
 import "./globals.css";
 
@@ -12,12 +11,14 @@ const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
   display: "swap",
+  preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin"],
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -83,8 +84,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CustomCursor />
-          <ClickSound />
+          <ClientEnhancements />
           {children}
           <BackToTop />
           <Analytics />

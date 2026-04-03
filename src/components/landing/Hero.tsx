@@ -1,71 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   Zap,
-  Terminal,
-  Braces,
-  Database,
-  Globe,
   BookOpen,
   Brain,
   MessageSquare,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-
-const floatingIcons = [
-  { icon: Terminal, x: "8%", y: "25%", delay: 0, color: "text-blue-400/20" },
-  { icon: Braces, x: "88%", y: "18%", delay: 0.5, color: "text-purple-400/20" },
-  { icon: Database, x: "82%", y: "72%", delay: 1, color: "text-emerald-400/20" },
-  { icon: Globe, x: "12%", y: "75%", delay: 1.5, color: "text-orange-400/20" },
-];
-
-const features = [
-  {
-    icon: BookOpen,
-    title: "1000+ câu hỏi",
-    desc: "Thực tế từ phỏng vấn",
-    gradient: "from-blue-500/10 to-cyan-500/10",
-    border: "border-blue-500/20",
-    iconColor: "text-blue-500",
-    position: "left-[2%] top-[30%] lg:left-[5%]",
-    floatDelay: 0,
-  },
-  {
-    icon: Brain,
-    title: "Flashcard SRS",
-    desc: "Ôn tập thông minh",
-    gradient: "from-purple-500/10 to-pink-500/10",
-    border: "border-purple-500/20",
-    iconColor: "text-purple-500",
-    position: "right-[2%] top-[25%] lg:right-[5%]",
-    floatDelay: 0.8,
-  },
-  {
-    icon: MessageSquare,
-    title: "AI Mentor",
-    desc: "Hỗ trợ 24/7",
-    gradient: "from-emerald-500/10 to-teal-500/10",
-    border: "border-emerald-500/20",
-    iconColor: "text-emerald-500",
-    position: "left-[5%] bottom-[18%] lg:left-[10%]",
-    floatDelay: 1.2,
-  },
-  {
-    icon: Sparkles,
-    title: "50+ công ty",
-    desc: "Câu hỏi thực tế",
-    gradient: "from-amber-500/10 to-orange-500/10",
-    border: "border-amber-500/20",
-    iconColor: "text-amber-500",
-    position: "right-[5%] bottom-[22%] lg:right-[10%]",
-    floatDelay: 1.6,
-  },
-];
 
 const interviewQuestions = [
   {
@@ -122,7 +68,51 @@ const topicSidebar = [
   { label: "System Design", count: 42 },
 ];
 
-function InterviewPreview() {
+const features = [
+  {
+    icon: BookOpen,
+    title: "1000+ câu hỏi",
+    desc: "Thực tế từ phỏng vấn",
+    gradient: "from-blue-500/10 to-cyan-500/10",
+    border: "border-blue-500/20",
+    iconColor: "text-blue-500",
+    position: "left-[2%] top-[30%] lg:left-[5%]",
+    floatDelay: 0,
+  },
+  {
+    icon: Brain,
+    title: "Flashcard SRS",
+    desc: "Ôn tập thông minh",
+    gradient: "from-purple-500/10 to-pink-500/10",
+    border: "border-purple-500/20",
+    iconColor: "text-purple-500",
+    position: "right-[2%] top-[25%] lg:right-[5%]",
+    floatDelay: 0.8,
+  },
+  {
+    icon: MessageSquare,
+    title: "AI Mentor",
+    desc: "Hỗ trợ 24/7",
+    gradient: "from-emerald-500/10 to-teal-500/10",
+    border: "border-emerald-500/20",
+    iconColor: "text-emerald-500",
+    position: "left-[5%] bottom-[18%] lg:left-[10%]",
+    floatDelay: 1.2,
+  },
+  {
+    icon: Sparkles,
+    title: "50+ công ty",
+    desc: "Câu hỏi thực tế",
+    gradient: "from-amber-500/10 to-orange-500/10",
+    border: "border-amber-500/20",
+    iconColor: "text-amber-500",
+    position: "right-[5%] bottom-[22%] lg:right-[10%]",
+    floatDelay: 1.6,
+  },
+];
+
+// Memoize the interview preview to prevent unnecessary re-renders
+const InterviewPreview = memo(function InterviewPreview() {
   const [currentQ, setCurrentQ] = useState(0);
   const [showCode, setShowCode] = useState(false);
 
@@ -145,12 +135,7 @@ function InterviewPreview() {
   const question = interviewQuestions[currentQ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 25 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.25 }}
-      className="mt-6 sm:mt-10 mx-auto w-full"
-    >
+    <div className="mt-6 sm:mt-10 mx-auto w-full">
       <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/10 dark:shadow-black/30 overflow-hidden">
         {/* Window chrome */}
         <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3.5 border-b border-border/40 bg-muted/20">
@@ -166,7 +151,9 @@ function InterviewPreview() {
           </div>
           <div className="flex items-center gap-1.5">
             <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-emerald-400/80 font-medium">Live</span>
+            <span className="text-xs text-emerald-400/80 font-medium">
+              Live
+            </span>
           </div>
         </div>
 
@@ -183,7 +170,9 @@ function InterviewPreview() {
                 }`}
               >
                 <span>{topic.label}</span>
-                <span className="text-[10px] text-muted-foreground/60">{topic.count}</span>
+                <span className="text-[10px] text-muted-foreground/60">
+                  {topic.count}
+                </span>
               </div>
             ))}
           </div>
@@ -206,7 +195,8 @@ function InterviewPreview() {
                 </span>
               </div>
 
-              <div className="min-h-[32px] relative overflow-hidden">
+              {/* Fixed height container to prevent CLS */}
+              <div className="min-h-[48px] sm:min-h-[32px] relative overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={`q-${currentQ}`}
@@ -265,7 +255,9 @@ function InterviewPreview() {
                   <div
                     key={i}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === currentQ ? "w-6 bg-primary" : "w-2 bg-muted-foreground/20"
+                      i === currentQ
+                        ? "w-6 bg-primary"
+                        : "w-2 bg-muted-foreground/20"
                     }`}
                   />
                 ))}
@@ -285,14 +277,14 @@ function InterviewPreview() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
-}
+});
 
 export function Hero() {
   return (
     <section className="relative min-h-[calc(100dvh-2rem)] sm:min-h-screen flex items-center justify-center overflow-hidden pt-16 pb-8 sm:pt-20 sm:pb-10">
-      {/* Background effects */}
+      {/* Background effects — use CSS only, no motion */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[5%] left-1/2 -translate-x-1/2 h-[350px] w-[450px] sm:h-[700px] sm:w-[900px] rounded-full bg-[#0066FF]/[0.06] blur-[80px] sm:blur-[140px]" />
         <div className="absolute bottom-[10%] left-[20%] h-[150px] w-[200px] sm:h-[300px] sm:w-[400px] rounded-full bg-purple-500/[0.04] blur-[60px] sm:blur-[100px]" />
@@ -302,38 +294,19 @@ export function Hero() {
       {/* Grid pattern */}
       <div className="absolute inset-0 bg-grid opacity-40" />
 
-      {/* Floating tech icons */}
-      {floatingIcons.map(({ icon: Icon, x, y, delay, color }) => (
-        <motion.div
-          key={color}
-          className={`absolute hidden lg:block ${color}`}
-          style={{ left: x, top: y }}
-          animate={{ y: [0, -12, 0], rotate: [0, 5, -5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, delay, ease: "easeInOut" }}
-        >
-          <Icon className="h-7 w-7" />
-        </motion.div>
-      ))}
-
-      {/* Floating feature cards */}
+      {/* Floating feature cards — desktop only, render lazily with CSS animation instead of framer-motion */}
       {features.map((feature) => (
-        <motion.div
+        <div
           key={feature.title}
-          className={`absolute hidden lg:flex ${feature.position}`}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 + feature.floatDelay }}
+          className={`absolute hidden lg:flex ${feature.position} animate-float`}
+          style={{ animationDelay: `${feature.floatDelay}s` }}
         >
-          <motion.div
-            animate={{ y: [0, -6, 0] }}
-            transition={{
-              duration: 4 + feature.floatDelay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+          <div
             className={`flex items-center gap-3 rounded-2xl border ${feature.border} bg-gradient-to-br ${feature.gradient} backdrop-blur-md px-4 py-3 shadow-lg`}
           >
-            <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-background/60 ${feature.iconColor}`}>
+            <div
+              className={`flex h-9 w-9 items-center justify-center rounded-xl bg-background/60 ${feature.iconColor}`}
+            >
               <feature.icon className="h-4.5 w-4.5" />
             </div>
             <div>
@@ -344,46 +317,32 @@ export function Hero() {
                 {feature.desc}
               </p>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       ))}
 
       {/* Main content — centered */}
       <div className="relative mx-auto max-w-4xl px-3 sm:px-6 text-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        {/* Badge — render immediately, no animation delay */}
+        <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#0066FF]/20 bg-[#0066FF]/5 px-4 py-1.5 text-xs font-semibold text-[#0066FF] dark:text-[#4D9FFF]">
             <Zap className="h-3 w-3" />
             Miễn phí cho sinh viên
           </span>
-        </motion.div>
+        </div>
 
-        {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="mt-4 sm:mt-6 text-[1.75rem] font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl !leading-[1.1]"
-        >
+        {/* Headline — LCP element, render immediately without animation */}
+        <h1 className="mt-4 sm:mt-6 text-[1.75rem] font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl !leading-[1.1]">
           Sẵn sàng cho <span className="text-gradient">buổi phỏng vấn</span>{" "}
           <br className="hidden sm:block" />
           tiếp theo của bạn
-        </motion.h1>
+        </h1>
 
         {/* Interactive Interview Preview */}
         <InterviewPreview />
 
         {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center w-full sm:w-auto"
-        >
+        <div className="mt-6 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center w-full sm:w-auto">
           <Button
             size="lg"
             className="w-full sm:w-auto glow-blue bg-gradient-to-r from-[#0066FF] to-[#0055DD] hover:from-[#0055DD] hover:to-[#0044CC] text-white border-0 text-base px-8 h-12 font-semibold shadow-lg shadow-[#0066FF]/20 active:scale-[0.98] transition-transform"
@@ -400,15 +359,10 @@ export function Hero() {
           >
             Khám phá câu hỏi
           </Button>
-        </motion.div>
+        </div>
 
         {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-10 sm:mt-16 inline-flex items-center gap-4 sm:gap-6 md:gap-10 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm px-4 py-3 sm:px-8 sm:py-4 shadow-sm"
-        >
+        <div className="mt-10 sm:mt-16 inline-flex items-center gap-4 sm:gap-6 md:gap-10 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm px-4 py-3 sm:px-8 sm:py-4 shadow-sm">
           {[
             { value: "1000+", label: "Câu hỏi" },
             { value: "6", label: "Chủ đề" },
@@ -426,7 +380,7 @@ export function Hero() {
               </div>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom gradient fade */}

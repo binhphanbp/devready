@@ -254,6 +254,17 @@
   animation: gradient-shift 6s ease infinite;
 }
 
+/* Float animation for hero feature cards — CSS-only, GPU-accelerated */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* ===== Custom Cursor ===== */
 @media (pointer: fine) {
   * {
