@@ -337,6 +337,7 @@ export default function ExplorePage() {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
     null,
   );
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const selectedCategorySlug = useMemo(() => {
     if (!selectedCategory) return null;
@@ -402,7 +403,7 @@ export default function ExplorePage() {
 
     const debounce = setTimeout(fetchQuestions, 300);
     return () => clearTimeout(debounce);
-  }, [search, selectedCategory, selectedDifficulty, selectedTechTags, sortBy]);
+  }, [search, selectedCategory, selectedDifficulty, selectedTechTags, sortBy, refreshTrigger]);
 
   const toggleTechTag = (tag: string) => {
     setSelectedTechTags((prev) =>
@@ -436,7 +437,10 @@ export default function ExplorePage() {
     return (
       <QuestionDetail
         question={selectedQuestion}
-        onBack={() => setSelectedQuestion(null)}
+        onBack={() => {
+          setSelectedQuestion(null);
+          setRefreshTrigger(prev => prev + 1);
+        }}
       />
     );
   }

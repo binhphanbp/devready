@@ -23,7 +23,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn, getDisplayViewCount } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 /* ─────────────────────────── types ─────────────────────────── */
 interface Stats {
@@ -250,7 +250,7 @@ export default function AdminOverviewClient() {
     let totalViews = 0;
     ((allQuestions as unknown as { id: string; difficulty: string; view_count: number }[]) ?? []).forEach((q) => {
       diffCounts[q.difficulty] = (diffCounts[q.difficulty] || 0) + 1;
-      totalViews += getDisplayViewCount(q.id, q.view_count);
+      totalViews += q.view_count || 0;
     });
     const difficultyDist = ['intern', 'fresher', 'junior', 'middle', 'senior']
       .map((d) => ({ difficulty: d, count: diffCounts[d] || 0 }))
@@ -359,6 +359,26 @@ export default function AdminOverviewClient() {
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  // Auto-refresh data when user navigates back to this page (throttled to every 10s)
+  useEffect(() => {
+    const throttledRefresh = () => {
+      if (!lastUpdated || Date.now() - lastUpdated.getTime() > 10_000) {
+        fetchStats();
+      }
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        throttledRefresh();
+      }
+    };
+    window.addEventListener('focus', throttledRefresh);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('focus', throttledRefresh);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [fetchStats, lastUpdated]);
 
   // ─── growth chart (useMemo — recomputes when range changes) ───
   const growthData = useMemo(() => {
@@ -1086,7 +1106,7 @@ export default function AdminOverviewClient() {
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-sm font-semibold text-white">
-                    {getDisplayViewCount(q.id, q.view_count).toLocaleString('vi-VN')}
+                    {q.view_count.toLocaleString('vi-VN')}
                   </p>
                   <p className="text-[10px] text-zinc-500">lượt xem</p>
                 </div>

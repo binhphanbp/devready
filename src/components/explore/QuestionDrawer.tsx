@@ -16,7 +16,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.min.css";
-import { cn, getDisplayViewCount } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface QuestionDrawerProps {
   question: {
@@ -41,6 +41,7 @@ const difficultyConfig: Record<string, { label: string; className: string }> = {
 };
 
 export function QuestionDrawer({ question, open, onClose }: QuestionDrawerProps) {
+
   if (!question) return null;
   const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.intern;
 
@@ -61,7 +62,7 @@ export function QuestionDrawer({ question, open, onClose }: QuestionDrawerProps)
           </DrawerTitle>
           <DrawerDescription className="flex items-center gap-4 text-xs mt-2">
             <span className="flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {getDisplayViewCount(question.id, question.view_count).toLocaleString()} lượt xem
+              <Eye className="h-3 w-3" /> {question.view_count.toLocaleString()} lượt xem
             </span>
             <span className="flex items-center gap-1">
               <BookmarkIcon className="h-3 w-3" /> {question.bookmark_count} đã lưu

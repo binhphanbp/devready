@@ -13,7 +13,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn, getDisplayViewCount } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface Question {
   id: string;
@@ -236,7 +236,7 @@ export default function AdminQuestionsClient() {
                       </td>
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
-                          <Eye className="h-3 w-3" /> {getDisplayViewCount(q.id, q.view_count).toLocaleString()}
+                          <Eye className="h-3 w-3" /> {q.view_count.toLocaleString()}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-center">

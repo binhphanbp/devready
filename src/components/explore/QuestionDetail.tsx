@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -27,7 +27,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.min.css';
 import { createClient } from '@/lib/supabase/client';
-import { cn, getDisplayViewCount } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { AddToFlashcardDialog } from './AddToFlashcardDialog';
 
 interface QuestionDetailProps {
@@ -230,6 +230,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const [viewRecorded, setViewRecorded] = useState(false);
+  const viewCountedRef = useRef<string | null>(null);
 
   const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.intern;
 
@@ -258,6 +259,13 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           .eq('question_id', question.id)
           .maybeSingle();
         setIsBookmarked(!!bm);
+      }
+      
+      // Increment global view count (guard against StrictMode double-mount)
+      if (viewCountedRef.current !== question.id) {
+        viewCountedRef.current = question.id;
+        const { error: viewError } = await supabase.rpc('increment_question_view_count', { q_id: question.id });
+        if (viewError) console.error('[ViewCount] increment failed:', viewError);
       }
     };
     fetchData();
@@ -399,7 +407,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           <Separator orientation="vertical" className="h-4 hidden sm:block" />
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {getDisplayViewCount(question.id, question.view_count).toLocaleString()}
+              <Eye className="h-3 w-3" /> {question.view_count.toLocaleString()}
             </span>
             <span className="flex items-center gap-1">
               <Bookmark className="h-3 w-3" /> {question.bookmark_count}
