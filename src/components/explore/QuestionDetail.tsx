@@ -27,7 +27,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.min.css';
 import { createClient } from '@/lib/supabase/client';
-import { cn } from '@/lib/utils';
+import { cn, getDisplayViewCount } from '@/lib/utils';
 import { AddToFlashcardDialog } from './AddToFlashcardDialog';
 
 interface QuestionDetailProps {
@@ -399,7 +399,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           <Separator orientation="vertical" className="h-4 hidden sm:block" />
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {question.view_count.toLocaleString()}
+              <Eye className="h-3 w-3" /> {getDisplayViewCount(question.id, question.view_count).toLocaleString()}
             </span>
             <span className="flex items-center gap-1">
               <Bookmark className="h-3 w-3" /> {question.bookmark_count}

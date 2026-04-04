@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookmarkIcon, Eye, ChevronRight, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayViewCount } from "@/lib/utils";
 
 interface QuestionCardProps {
   question: {
@@ -88,7 +88,7 @@ export function QuestionCard({ question, onClick }: QuestionCardProps) {
             <div className="mt-2.5 flex items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Eye className="h-3 w-3" />
-                {question.view_count.toLocaleString()}
+                {getDisplayViewCount(question.id, question.view_count).toLocaleString()}
               </span>
               <span className="flex items-center gap-1">
                 <BookmarkIcon className="h-3 w-3" />
