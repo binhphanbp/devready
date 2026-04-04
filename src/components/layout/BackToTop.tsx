@@ -41,7 +41,7 @@ export function BackToTop() {
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 group cursor-pointer"
+          className="fixed bottom-24 right-6 z-40 group cursor-pointer"
           aria-label="Lên đầu trang"
           title="Lên đầu trang"
         >
