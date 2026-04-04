@@ -115,7 +115,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-5 border-t border-border/50 pt-6 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-5 border-t border-border/50 pt-6 sm:flex-row overflow-hidden">
           <div className="flex items-center gap-3">
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               DevReady được tạo bởi
