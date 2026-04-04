@@ -9,6 +9,8 @@ import {
   TrendingUp,
   Star,
   ArrowRight,
+  Zap,
+  Clock,
 } from 'lucide-react';
 import Link from 'next/link';
 import { ActivityHeatmap } from '@/components/dashboard/ActivityHeatmap';
@@ -49,6 +51,8 @@ export default async function DashboardPage() {
       icon: BookOpen,
       color: 'text-blue-400',
       bg: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
+      gradient: 'from-blue-500/5 to-cyan-500/5',
     },
     {
       title: 'Đã lưu',
@@ -56,6 +60,8 @@ export default async function DashboardPage() {
       icon: Star,
       color: 'text-amber-400',
       bg: 'bg-amber-500/10',
+      borderColor: 'border-amber-500/20',
+      gradient: 'from-amber-500/5 to-orange-500/5',
     },
     {
       title: 'Bộ Flashcard',
@@ -63,6 +69,8 @@ export default async function DashboardPage() {
       icon: Brain,
       color: 'text-purple-400',
       bg: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20',
+      gradient: 'from-purple-500/5 to-pink-500/5',
     },
     {
       title: 'Streak',
@@ -70,6 +78,8 @@ export default async function DashboardPage() {
       icon: Flame,
       color: 'text-orange-400',
       bg: 'bg-orange-500/10',
+      borderColor: 'border-orange-500/20',
+      gradient: 'from-orange-500/5 to-red-500/5',
     },
   ];
 
@@ -80,6 +90,7 @@ export default async function DashboardPage() {
       href: '/explore',
       icon: Target,
       gradient: 'from-blue-500/20 to-cyan-500/20',
+      iconColor: 'text-blue-400',
     },
     {
       title: 'Flashcard hôm nay',
@@ -87,6 +98,7 @@ export default async function DashboardPage() {
       href: '/flashcards',
       icon: Brain,
       gradient: 'from-purple-500/20 to-pink-500/20',
+      iconColor: 'text-purple-400',
     },
     {
       title: 'Đọc review',
@@ -94,42 +106,57 @@ export default async function DashboardPage() {
       href: '/community',
       icon: TrendingUp,
       gradient: 'from-emerald-500/20 to-teal-500/20',
+      iconColor: 'text-emerald-400',
     },
   ];
 
+  // Get time of day for greeting
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12
+      ? 'Chào buổi sáng'
+      : hour < 18
+        ? 'Chào buổi chiều'
+        : 'Chào buổi tối';
+
   return (
     <div className="space-y-5 sm:space-y-8 pt-6 sm:pt-8 lg:pt-0">
-      {/* Welcome */}
-      <div>
-        <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
-          Xin chào,{' '}
-          <span className="text-gradient">
-            {profile?.full_name || user.email?.split('@')[0]}
-          </span>
-          ! 👋
-        </h1>
-        <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-          Hãy tiếp tục luyện tập và chinh phục buổi phỏng vấn IT tiếp theo.
-        </p>
+      {/* Welcome Section */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
+            {greeting},{' '}
+            <span className="text-gradient">
+              {profile?.full_name || user.email?.split('@')[0]}
+            </span>
+            ! 👋
+          </h1>
+          <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
+            <Zap className="h-3.5 w-3.5 text-primary" />
+            Hãy tiếp tục luyện tập và chinh phục buổi phỏng vấn IT tiếp theo.
+          </p>
+        </div>
       </div>
 
-      {/* Stats Grid (Bento) */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card
             key={stat.title}
-            className="border-border/50 bg-card/50 hover:border-primary/20 transition-colors"
+            className={`relative overflow-hidden border-border/50 ${stat.borderColor} bg-gradient-to-br ${stat.gradient} via-card/80 hover:border-opacity-60 transition-all duration-300`}
           >
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground sm:text-sm">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">
                     {stat.title}
                   </p>
-                  <p className="mt-1 text-lg sm:text-2xl font-bold">{stat.value}</p>
+                  <p className="mt-1.5 text-xl sm:text-2xl font-bold tracking-tight">
+                    {stat.value}
+                  </p>
                 </div>
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${stat.bg}`}
+                  className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl ${stat.bg}`}
                 >
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
@@ -148,7 +175,10 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Bắt đầu nhanh</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <Clock className="h-4 w-4 text-primary" />
+          <h2 className="text-base sm:text-lg font-semibold">Bắt đầu nhanh</h2>
+        </div>
         <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
           {quickActions.map((action) => (
             <Link key={action.href} href={action.href}>
@@ -156,10 +186,12 @@ export default async function DashboardPage() {
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
-                <CardContent className="relative p-4 sm:p-6">
-                  <action.icon className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold">{action.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                <CardContent className="relative p-4 sm:p-5">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.gradient} mb-3`}>
+                    <action.icon className={`h-5 w-5 ${action.iconColor}`} />
+                  </div>
+                  <h3 className="font-semibold text-sm sm:text-base">{action.title}</h3>
+                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                     {action.description}
                   </p>
                   <ArrowRight className="mt-3 h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />

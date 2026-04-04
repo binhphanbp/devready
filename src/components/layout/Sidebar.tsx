@@ -46,23 +46,25 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-4 py-4">
+      <div className="flex items-center gap-2.5 px-4 py-5">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <Code2 className="h-4 w-4 text-primary" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10">
+            <Code2 className="h-4.5 w-4.5 text-primary" />
           </div>
           {!collapsed && (
-            <span className="text-lg font-bold">
+            <span className="text-lg font-bold tracking-tight">
               Dev<span className="text-gradient">Ready</span>
             </span>
           )}
         </Link>
       </div>
 
-      <Separator className="opacity-50" />
+      <div className="px-4 pb-2">
+        <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+      </div>
 
       {/* Nav links */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 px-3 py-2">
         {sidebarLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
@@ -71,31 +73,45 @@ function SidebarContent({
               href={link.href}
               onClick={onNavClick}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-3 lg:py-2.5 text-sm transition-all min-h-[44px]',
+                'group flex items-center gap-3 rounded-xl px-3 py-3 lg:py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px] relative',
                 isActive
-                  ? 'bg-primary/10 text-primary font-medium'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                  ? 'bg-primary/10 text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',
               )}
             >
-              <link.icon className="h-5 w-5 lg:h-4 lg:w-4 shrink-0" />
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-primary" />
+              )}
+              <link.icon
+                className={cn(
+                  'h-[18px] w-[18px] shrink-0 transition-colors',
+                  isActive ? 'text-primary' : 'group-hover:text-foreground',
+                )}
+              />
               {!collapsed && <span>{link.label}</span>}
             </Link>
           );
         })}
+
         {isAdmin && (
           <>
-            <div className="my-2 h-px bg-border/30" />
+            <div className="my-3 px-3">
+              <div className="h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
+            </div>
             <Link
               href="/admin"
               onClick={onNavClick}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-3 lg:py-2.5 text-sm transition-all min-h-[44px]',
+                'group flex items-center gap-3 rounded-xl px-3 py-3 lg:py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px] relative',
                 pathname.startsWith('/admin')
-                  ? 'bg-red-500/10 text-red-400 font-medium'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                  ? 'bg-red-500/10 text-red-400 shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',
               )}
             >
-              <Shield className="h-5 w-5 lg:h-4 lg:w-4 shrink-0" />
+              {pathname.startsWith('/admin') && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-red-400" />
+              )}
+              <Shield className="h-[18px] w-[18px] shrink-0" />
               {!collapsed && <span>Admin</span>}
             </Link>
           </>
@@ -104,12 +120,12 @@ function SidebarContent({
 
       {/* Bottom section */}
       <div className="px-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <Separator className="mb-3 opacity-50" />
+        <div className="mx-3 mb-3 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
         <button
           onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 lg:py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors min-h-[44px]"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 lg:py-2.5 text-sm font-medium text-muted-foreground hover:text-red-400 hover:bg-red-500/5 transition-all duration-200 min-h-[44px]"
         >
-          <LogOut className="h-5 w-5 lg:h-4 lg:w-4 shrink-0" />
+          <LogOut className="h-[18px] w-[18px] shrink-0" />
           {!collapsed && <span>Đăng xuất</span>}
         </button>
       </div>
@@ -154,7 +170,7 @@ export function Sidebar() {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-border/50 bg-card/30 transition-all duration-300 shrink-0',
+          'hidden lg:flex flex-col border-r border-border/40 bg-card/20 backdrop-blur-sm transition-all duration-300 shrink-0 relative',
           collapsed ? 'w-16' : 'w-60',
         )}
       >
@@ -167,16 +183,11 @@ export function Sidebar() {
         />
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute left-[calc(var(--sidebar-width)-12px)] top-6 z-10 hidden lg:flex h-6 w-6 items-center justify-center rounded-full border border-border/50 bg-card text-muted-foreground hover:text-foreground transition-colors"
-          style={
-            {
-              '--sidebar-width': collapsed ? '4rem' : '15rem',
-            } as React.CSSProperties
-          }
+          className="absolute -right-3 top-7 z-10 hidden lg:flex h-6 w-6 items-center justify-center rounded-full border border-border/50 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all shadow-sm"
         >
           <ChevronLeft
             className={cn(
-              'h-3 w-3 transition-transform',
+              'h-3 w-3 transition-transform duration-300',
               collapsed && 'rotate-180',
             )}
           />
