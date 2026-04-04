@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Separator } from '@/components/ui/separator';
 import {
   Code2,
   LayoutDashboard,
@@ -16,11 +15,15 @@ import {
   X,
   ChevronLeft,
   Shield,
+  Sun,
+  Moon,
+  Monitor,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 
 const sidebarLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,6 +32,38 @@ const sidebarLinks = [
   { href: '/community', label: 'Cộng đồng', icon: Users },
   { href: '/profile', label: 'Hồ sơ', icon: User },
 ];
+
+const themeOptions = [
+  { value: 'dark', label: 'Tối', icon: Moon },
+  { value: 'light', label: 'Sáng', icon: Sun },
+  { value: 'system', label: 'Hệ thống', icon: Monitor },
+] as const;
+
+function ThemeToggle({ collapsed }: { collapsed: boolean }) {
+  const { theme, setTheme } = useTheme();
+
+  const currentTheme = theme ?? 'system';
+  const currentIndex = themeOptions.findIndex((o) => o.value === currentTheme);
+  const current = themeOptions[currentIndex >= 0 ? currentIndex : 0];
+  const ThemeIcon = current.icon;
+
+  const cycleTheme = () => {
+    const nextIndex = (currentIndex + 1) % themeOptions.length;
+    setTheme(themeOptions[nextIndex].value);
+  };
+
+  return (
+    <button
+      onClick={cycleTheme}
+      title={`Chế độ: ${current.label}`}
+      className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 lg:py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all duration-200 min-h-[44px]"
+      suppressHydrationWarning
+    >
+      <ThemeIcon className="h-[18px] w-[18px] shrink-0 transition-colors group-hover:text-foreground" />
+      {!collapsed && <span suppressHydrationWarning>{current.label}</span>}
+    </button>
+  );
+}
 
 function SidebarContent({
   pathname,
@@ -121,6 +156,7 @@ function SidebarContent({
       {/* Bottom section */}
       <div className="px-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="mx-3 mb-3 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
+        <ThemeToggle collapsed={collapsed} />
         <button
           onClick={onLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-3 lg:py-2.5 text-sm font-medium text-muted-foreground hover:text-red-400 hover:bg-red-500/5 transition-all duration-200 min-h-[44px]"
