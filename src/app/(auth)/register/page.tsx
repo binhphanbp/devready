@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Code2, Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react";
+import { Code2, Eye, EyeOff, Mail, Lock, User, Loader2, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -18,7 +18,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
+
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,6 +219,60 @@ export default function RegisterPage() {
                     )}
                   </button>
                 </div>
+
+                {/* Password Strength Indicator */}
+                {password.length > 0 && (() => {
+                  const criteria = [
+                    { label: "Ít nhất 6 ký tự", met: password.length >= 6 },
+                    { label: "Chữ hoa (A-Z)", met: /[A-Z]/.test(password) },
+                    { label: "Số (0-9)", met: /[0-9]/.test(password) },
+                    { label: "Ký tự đặc biệt (!@#...)", met: /[^A-Za-z0-9]/.test(password) },
+                  ];
+                  const score = criteria.filter((c) => c.met).length;
+                  const strengthConfig = [
+                    { label: "Rất yếu", color: "bg-red-500" },
+                    { label: "Yếu", color: "bg-orange-500" },
+                    { label: "Trung bình", color: "bg-yellow-500" },
+                    { label: "Mạnh", color: "bg-emerald-500" },
+                    { label: "Rất mạnh", color: "bg-emerald-400" },
+                  ];
+                  const { label: strengthLabel, color: strengthColor } = strengthConfig[score];
+
+                  return (
+                    <div className="mt-3 space-y-2.5">
+                      {/* Progress bar */}
+                      <div className="flex gap-1">
+                        {[0, 1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                              i < score ? strengthColor : "bg-muted/40"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      {/* Label */}
+                      <p className="text-xs text-muted-foreground">
+                        Độ mạnh: <span className={`font-medium ${score >= 3 ? "text-emerald-400" : score >= 2 ? "text-yellow-500" : "text-red-400"}`}>{strengthLabel}</span>
+                      </p>
+                      {/* Criteria list */}
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                        {criteria.map((c) => (
+                          <div key={c.label} className="flex items-center gap-1.5 text-xs">
+                            {c.met ? (
+                              <Check className="h-3 w-3 text-emerald-400 shrink-0" />
+                            ) : (
+                              <X className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                            )}
+                            <span className={c.met ? "text-muted-foreground" : "text-muted-foreground/50"}>
+                              {c.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               <Button
