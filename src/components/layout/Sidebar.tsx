@@ -261,7 +261,7 @@ export function Sidebar() {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="lg:hidden fixed inset-y-0 left-0 z-50 w-[min(80vw,280px)] border-r border-border/50 bg-card shadow-2xl"
+              className="lg:hidden fixed inset-y-0 left-0 z-50 w-[min(72vw,256px)] border-r border-border/50 bg-card shadow-2xl"
             >
               <button
                 onClick={() => setMobileOpen(false)}

@@ -135,17 +135,17 @@ const InterviewPreview = memo(function InterviewPreview() {
   const question = interviewQuestions[currentQ];
 
   return (
-    <div className="mt-6 sm:mt-10 mx-auto w-full">
+    <div className="mt-5 sm:mt-10 mx-auto w-full">
       <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-md shadow-2xl shadow-black/10 dark:shadow-black/30 overflow-hidden">
         {/* Window chrome */}
-        <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3.5 border-b border-border/40 bg-muted/20">
+        <div className="flex items-center justify-between px-3 py-2 sm:px-6 sm:py-3.5 border-b border-border/40 bg-muted/20">
           <div className="flex items-center gap-2">
             <div className="flex gap-2">
               <div className="h-3 w-3 rounded-full bg-red-400/70" />
               <div className="h-3 w-3 rounded-full bg-yellow-400/70" />
               <div className="h-3 w-3 rounded-full bg-green-400/70" />
             </div>
-            <span className="ml-3 text-xs text-muted-foreground font-mono">
+            <span className="ml-3 text-[10px] sm:text-xs text-muted-foreground font-mono truncate max-w-[140px] sm:max-w-none">
               devready — interview-session
             </span>
           </div>
@@ -196,7 +196,7 @@ const InterviewPreview = memo(function InterviewPreview() {
               </div>
 
               {/* Fixed height container to prevent CLS */}
-              <div className="min-h-[48px] sm:min-h-[32px] relative overflow-hidden">
+              <div className="min-h-[60px] sm:min-h-[36px] relative overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={`q-${currentQ}`}
@@ -204,7 +204,7 @@ const InterviewPreview = memo(function InterviewPreview() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.35 }}
-                    className="text-base sm:text-lg font-semibold text-foreground leading-snug"
+                    className="text-sm sm:text-lg font-semibold text-foreground leading-snug"
                   >
                     {question.q}
                     <span className="inline-block w-[2px] h-5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
@@ -215,7 +215,7 @@ const InterviewPreview = memo(function InterviewPreview() {
 
             {/* Code hint area — fixed height to prevent layout shift */}
             <div className="px-4 pb-4 sm:px-7 sm:pb-6">
-              <div className="h-[100px] sm:h-[120px] relative">
+              <div className="h-[110px] sm:h-[120px] relative">
                 <AnimatePresence>
                   {showCode && (
                     <motion.div
@@ -249,7 +249,7 @@ const InterviewPreview = memo(function InterviewPreview() {
             </div>
 
             {/* Bottom toolbar */}
-            <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3 border-t border-border/30 bg-muted/10">
+            <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-6 sm:py-3 border-t border-border/30 bg-muted/10">
               <div className="flex items-center gap-1.5">
                 {interviewQuestions.map((_, i) => (
                   <div
@@ -262,14 +262,14 @@ const InterviewPreview = memo(function InterviewPreview() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2.5">
-                <span className="text-xs px-3 py-1 rounded-md bg-primary/10 text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors">
+              <div className="flex items-center gap-1.5 sm:gap-2.5">
+                <span className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-md bg-primary/10 text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors whitespace-nowrap">
                   Xem đáp án
                 </span>
-                <span className="text-xs px-3 py-1 rounded-md bg-muted/60 text-muted-foreground font-medium cursor-pointer hover:bg-muted transition-colors">
+                <span className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-md bg-muted/60 text-muted-foreground font-medium cursor-pointer hover:bg-muted transition-colors">
                   Flashcard
                 </span>
-                <span className="text-xs px-3 py-1 rounded-md bg-muted/60 text-muted-foreground font-medium cursor-pointer hover:bg-muted transition-colors">
+                <span className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-md bg-muted/60 text-muted-foreground font-medium cursor-pointer hover:bg-muted transition-colors">
                   Tiếp →
                 </span>
               </div>
@@ -332,9 +332,10 @@ export function Hero() {
         </div>
 
         {/* Headline — LCP element, render immediately without animation */}
-        <h1 className="mt-4 sm:mt-6 text-[1.75rem] font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl !leading-[1.1]">
-          Sẵn sàng cho <span className="text-gradient">buổi phỏng vấn</span>{" "}
-          <br className="hidden sm:block" />
+        <h1 className="mt-4 sm:mt-6 text-2xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl !leading-[1.15]">
+          Sẵn sàng cho{" "}
+          <span className="text-gradient">buổi phỏng vấn</span>
+          <br className="hidden sm:block" />{" "}
           tiếp theo của bạn
         </h1>
 
@@ -342,7 +343,7 @@ export function Hero() {
         <InterviewPreview />
 
         {/* CTA Buttons */}
-        <div className="mt-6 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center w-full sm:w-auto">
+        <div className="mt-5 sm:mt-10 flex flex-col items-center gap-2.5 sm:flex-row sm:justify-center w-full sm:w-auto px-2 sm:px-0">
           <Button
             size="lg"
             className="w-full sm:w-auto glow-blue bg-gradient-to-r from-[#0066FF] to-[#0055DD] hover:from-[#0055DD] hover:to-[#0044CC] text-white border-0 text-base px-8 h-12 font-semibold shadow-lg shadow-[#0066FF]/20 active:scale-[0.98] transition-transform"
