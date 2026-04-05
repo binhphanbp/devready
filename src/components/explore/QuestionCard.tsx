@@ -95,13 +95,7 @@ export function QuestionCard({ question, onClick }: QuestionCardProps) {
                 {question.bookmark_count}
               </span>
 
-              {question.company_tags?.[0] && (
-                <span className="hidden sm:inline text-muted-foreground/70">
-                  📍 {question.company_tags[0]}
-                  {question.company_tags.length > 1 &&
-                    ` +${question.company_tags.length - 1}`}
-                </span>
-              )}
+
             </div>
           </div>
 
