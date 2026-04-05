@@ -18,9 +18,10 @@ import { useRouter } from "next/navigation";
 interface AddCardDialogProps {
   deckId: string;
   trigger?: React.ReactNode;
+  onCreated?: (card: any) => void;
 }
 
-export function AddCardDialog({ deckId, trigger }: AddCardDialogProps) {
+export function AddCardDialog({ deckId, trigger, onCreated }: AddCardDialogProps) {
   const [open, setOpen] = useState(false);
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
@@ -34,7 +35,7 @@ export function AddCardDialog({ deckId, trigger }: AddCardDialogProps) {
     setLoading(true);
     const supabase = createClient();
 
-    const { error } = await supabase.from("flashcards").insert({
+    const { data: newCard, error } = await supabase.from("flashcards").insert({
       deck_id: deckId,
       front: front.trim(),
       back: back.trim(),
@@ -42,12 +43,13 @@ export function AddCardDialog({ deckId, trigger }: AddCardDialogProps) {
       interval: 0,
       repetitions: 0,
       next_review: new Date().toISOString(),
-    });
+    }).select().single();
 
-    if (!error) {
+    if (!error && newCard) {
       setFront("");
       setBack("");
       setOpen(false);
+      onCreated?.(newCard);
       router.refresh();
     }
     setLoading(false);

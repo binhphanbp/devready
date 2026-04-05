@@ -16,7 +16,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
-export function CreateDeckDialog() {
+export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: any) => void }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -35,16 +35,17 @@ export function CreateDeckDialog() {
 
     if (!user) return;
 
-    const { error } = await supabase.from("flashcard_decks").insert({
+    const { data: newDeck, error } = await supabase.from("flashcard_decks").insert({
       user_id: user.id,
       title: title.trim(),
       description: description.trim() || null,
-    });
+    }).select().single();
 
-    if (!error) {
+    if (!error && newDeck) {
       setTitle("");
       setDescription("");
       setOpen(false);
+      onCreated?.(newDeck);
       router.refresh();
     }
     setLoading(false);

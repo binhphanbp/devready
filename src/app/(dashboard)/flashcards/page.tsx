@@ -144,7 +144,7 @@ export default function FlashcardsPage() {
               Ôn tập với hệ thống Spaced Repetition thông minh.
             </p>
           </div>
-          <CreateDeckDialog />
+          <CreateDeckDialog onCreated={(newDeck) => setDecks([newDeck, ...decks])} />
         </div>
 
         {loading ? (
@@ -295,7 +295,13 @@ export default function FlashcardsPage() {
             <PlayCircle className="mr-1 h-4 w-4" />
             Ôn tập ({dueCards.length} thẻ đến hạn)
           </Button>
-          <AddCardDialog deckId={selectedDeck.id} />
+          <AddCardDialog 
+            deckId={selectedDeck.id} 
+            onCreated={(newCard) => {
+              setCards([...cards, newCard]);
+              setDueCards([...dueCards, newCard]);
+            }} 
+          />
         </div>
 
         {/* Cards list */}
