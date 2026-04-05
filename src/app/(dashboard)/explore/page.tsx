@@ -34,6 +34,10 @@ type Question = {
   view_count: number;
   bookmark_count: number;
   categories: { name: string; color: string } | null;
+  sample_answer: string | null;
+  bonus_tip: string | null;
+  common_pitfalls: string | null;
+  official_source: string | null;
 };
 
 type Category = {
@@ -374,7 +378,7 @@ export default function ExplorePage() {
       let query = supabase
         .from('questions')
         .select(
-          'id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, categories(name, color)',
+          'id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, sample_answer, bonus_tip, common_pitfalls, official_source, categories(name, color)',
         )
         .eq('is_approved', true);
 

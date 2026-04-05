@@ -21,6 +21,9 @@ import {
   Zap,
   Brain,
   BookmarkCheck,
+  ExternalLink,
+  Flame,
+  ShieldAlert,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -29,6 +32,13 @@ import 'highlight.js/styles/github-dark.min.css';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { AddToFlashcardDialog } from './AddToFlashcardDialog';
+
+interface UserProfile {
+  school_name: string | null;
+  education_years: number | null;
+  major: string | null;
+  target_role: string | null;
+}
 
 interface QuestionDetailProps {
   question: {
@@ -41,8 +51,22 @@ interface QuestionDetailProps {
     view_count: number;
     bookmark_count: number;
     categories?: { name: string; color: string } | null;
+    sample_answer?: string | null;
+    bonus_tip?: string | null;
+    common_pitfalls?: string | null;
+    official_source?: string | null;
   };
   onBack: () => void;
+}
+
+// Replace dynamic placeholders with user profile data
+function replacePlaceholders(text: string, profile: UserProfile | null): string {
+  if (!text) return text;
+  return text
+    .replace(/\{school_name\}/g, profile?.school_name || 'FPT Polytechnic')
+    .replace(/\{education_years\}/g, String(profile?.education_years || 2))
+    .replace(/\{major\}/g, profile?.major || 'Công nghệ thông tin')
+    .replace(/\{target_role\}/g, profile?.target_role || 'Frontend Developer');
 }
 
 type Answer = {
@@ -230,6 +254,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const [viewRecorded, setViewRecorded] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const viewCountedRef = useRef<string | null>(null);
 
   const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.intern;
@@ -237,7 +262,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient();
-      // Fetch answers
+      // Fetch answers (fallback if sample_answer is not set)
       const { data } = await supabase
         .from('answers')
         .select('*')
@@ -247,7 +272,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
       setAnswers((data as Answer[]) ?? []);
       setLoadingAnswers(false);
 
-      // Check bookmark status
+      // Check bookmark status + fetch profile for dynamic placeholders
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -259,6 +284,14 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           .eq('question_id', question.id)
           .maybeSingle();
         setIsBookmarked(!!bm);
+
+        // Fetch user profile for placeholder replacement
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('school_name, education_years, major, target_role')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (profile) setUserProfile(profile as UserProfile);
       }
       
       // Increment global view count (guard against StrictMode double-mount)
@@ -313,6 +346,18 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   };
 
   const officialAnswer = answers.find((a) => a.is_official);
+
+  // Priority: question.sample_answer > officialAnswer.content
+  const answerContent = question.sample_answer
+    ? replacePlaceholders(question.sample_answer, userProfile)
+    : officialAnswer?.content || null;
+  const bonusTipContent = question.bonus_tip
+    ? replacePlaceholders(question.bonus_tip, userProfile)
+    : null;
+  const pitfallsContent = question.common_pitfalls
+    ? replacePlaceholders(question.common_pitfalls, userProfile)
+    : null;
+  const hasEnhancedContent = !!(bonusTipContent || pitfallsContent || question.official_source);
 
   // Difficulty level bar
   const difficultyBar = (
@@ -555,7 +600,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
 
       {/* ===== ANSWER CONTENT ===== */}
       {showAnswer && (
-        <div className="animate-in slide-in-from-top-2 duration-300">
+        <div className="animate-in slide-in-from-top-2 duration-300 space-y-4">
           {loadingAnswers ? (
             <div className="rounded-2xl border border-border/50 bg-card/50 p-8">
               <div className="space-y-3">
@@ -565,30 +610,113 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
                 <div className="h-24 animate-pulse bg-muted/30 rounded-lg mt-4" />
               </div>
             </div>
-          ) : officialAnswer ? (
-            <div className="rounded-2xl border border-emerald-500/20 bg-card/80 overflow-hidden">
-              {/* Answer header */}
-              <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-emerald-500/5 border-b border-emerald-500/15">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                  Câu trả lời mẫu (Official Answer)
-                </span>
-                <div className="flex-1" />
-                <span className="text-xs text-muted-foreground">
-                  👍 {officialAnswer.upvote_count} lượt thích
-                </span>
+          ) : answerContent ? (
+            <>
+              {/* Main Answer Card */}
+              <div className="rounded-2xl border border-emerald-500/20 bg-card/80 overflow-hidden">
+                {/* Answer header */}
+                <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-emerald-500/5 border-b border-emerald-500/15">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                    Câu trả lời mẫu (Official Answer)
+                  </span>
+                  <div className="flex-1" />
+                  {officialAnswer && (
+                    <span className="text-xs text-muted-foreground">
+                      👍 {officialAnswer.upvote_count} lượt thích
+                    </span>
+                  )}
+                </div>
+                {/* Answer body */}
+                <div className="px-4 sm:px-6 py-4 sm:py-5">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                    components={markdownComponents}
+                  >
+                    {answerContent}
+                  </ReactMarkdown>
+                </div>
               </div>
-              {/* Answer body */}
-              <div className="px-4 sm:px-6 py-4 sm:py-5">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
-                  components={markdownComponents}
+
+              {/* ===== BONUS TIP ===== */}
+              {bonusTipContent && (
+                <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-amber-500/8 border-b border-amber-500/15">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/15">
+                      <Flame className="h-3.5 w-3.5 text-amber-500" />
+                    </div>
+                    <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                      Bonus Tip — Cách gây ấn tượng
+                    </span>
+                  </div>
+                  <div className="px-4 sm:px-6 py-4 sm:py-5">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeHighlight]}
+                      components={markdownComponents}
+                    >
+                      {bonusTipContent}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
+              {/* ===== COMMON PITFALLS ===== */}
+              {pitfallsContent && (
+                <div className="rounded-2xl border border-red-500/25 bg-red-500/5 overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-red-500/8 border-b border-red-500/15">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/15">
+                      <ShieldAlert className="h-3.5 w-3.5 text-red-500" />
+                    </div>
+                    <span className="text-sm font-semibold text-red-600 dark:text-red-400">
+                      Lỗi thường gặp — Tránh ngay!
+                    </span>
+                  </div>
+                  <div className="px-4 sm:px-6 py-4 sm:py-5">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeHighlight]}
+                      components={markdownComponents}
+                    >
+                      {pitfallsContent}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
+              {/* ===== OFFICIAL SOURCE ===== */}
+              {question.official_source && (
+                <a
+                  href={question.official_source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-2xl border border-blue-500/25 bg-blue-500/5 px-4 sm:px-6 py-4 hover:bg-blue-500/10 hover:border-blue-500/40 transition-all group"
                 >
-                  {officialAnswer.content}
-                </ReactMarkdown>
-              </div>
-            </div>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 shrink-0 group-hover:bg-blue-500/25 transition-colors">
+                    <ExternalLink className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                      📚 Tài liệu tham khảo chính thức
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {question.official_source}
+                    </p>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-blue-500 transition-colors shrink-0" />
+                </a>
+              )}
+
+              {/* Enhanced content indicator */}
+              {hasEnhancedContent && (
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-1">
+                  <span className="h-px w-12 bg-border" />
+                  <span>✨ Nội dung được biên soạn chuyên sâu bởi DevReady</span>
+                  <span className="h-px w-12 bg-border" />
+                </div>
+              )}
+            </>
           ) : (
             <div className="rounded-2xl border border-border/50 bg-card/50 p-8 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mx-auto mb-3">
