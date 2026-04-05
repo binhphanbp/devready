@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Code2,
   GraduationCap,
@@ -29,32 +29,32 @@ import {
   Calendar,
   BookOpen,
   Briefcase,
-} from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { motion, AnimatePresence } from 'framer-motion';
+} from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   MAJOR_OPTIONS,
   TARGET_ROLE_OPTIONS,
   EDUCATION_YEARS_OPTIONS,
-} from '@/lib/constants/profile-options';
+} from "@/lib/constants/profile-options";
 
 const steps = [
   {
     id: 1,
-    title: 'Thông tin học vấn',
-    description: 'Cho chúng tôi biết về trường học của bạn',
+    title: "Thông tin học vấn",
+    description: "Cho chúng tôi biết về trường học của bạn",
     icon: GraduationCap,
   },
   {
     id: 2,
-    title: 'Mục tiêu nghề nghiệp',
-    description: 'Bạn muốn trở thành gì?',
+    title: "Mục tiêu nghề nghiệp",
+    description: "Bạn muốn trở thành gì?",
     icon: Target,
   },
   {
     id: 3,
-    title: 'Hoàn tất',
-    description: 'Xác nhận và bắt đầu hành trình',
+    title: "Hoàn tất",
+    description: "Xác nhận và bắt đầu hành trình",
     icon: CheckCircle2,
   },
 ];
@@ -66,12 +66,12 @@ export default function OnboardingPage() {
   const router = useRouter();
 
   // Form data
-  const [schoolName, setSchoolName] = useState('FPT Polytechnic');
-  const [educationYears, setEducationYears] = useState('');
-  const [major, setMajor] = useState('');
-  const [customMajor, setCustomMajor] = useState('');
-  const [targetRole, setTargetRole] = useState('');
-  const [customTargetRole, setCustomTargetRole] = useState('');
+  const [schoolName, setSchoolName] = useState("FPT Polytechnic");
+  const [educationYears, setEducationYears] = useState("");
+  const [major, setMajor] = useState("");
+  const [customMajor, setCustomMajor] = useState("");
+  const [targetRole, setTargetRole] = useState("");
+  const [customTargetRole, setCustomTargetRole] = useState("");
 
   // Check if user is logged in and hasn't completed onboarding
   useEffect(() => {
@@ -82,18 +82,18 @@ export default function OnboardingPage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
         .single();
 
       if (profile?.onboarding_completed) {
-        router.push('/dashboard');
+        router.push("/dashboard");
         return;
       }
 
@@ -126,12 +126,12 @@ export default function OnboardingPage() {
 
     if (user) {
       await supabase
-        .from('profiles')
+        .from("profiles")
         .update({ onboarding_completed: true })
-        .eq('id', user.id);
+        .eq("id", user.id);
     }
 
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   const handleSubmit = async () => {
@@ -142,48 +142,36 @@ export default function OnboardingPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
-    const finalMajor =
-      major === 'other'
-        ? customMajor
-        : MAJOR_OPTIONS.find((m) => m.value === major)?.label || major;
-    const finalTargetRole =
-      targetRole === 'other'
-        ? customTargetRole
-        : TARGET_ROLE_OPTIONS.find((r) => r.value === targetRole)?.label ||
-          targetRole;
+    const finalMajor = major === "other" ? customMajor : MAJOR_OPTIONS.find((m) => m.value === major)?.label || major;
+    const finalTargetRole = targetRole === "other" ? customTargetRole : TARGET_ROLE_OPTIONS.find((r) => r.value === targetRole)?.label || targetRole;
 
     const { error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({
-        school_name: schoolName || 'FPT Polytechnic',
-        education_years:
-          educationYears === 'graduated'
-            ? null
-            : parseInt(educationYears) || null,
+        school_name: schoolName || "FPT Polytechnic",
+        education_years: educationYears === "graduated" ? null : parseInt(educationYears) || null,
         major: finalMajor || null,
         target_role: finalTargetRole || null,
         onboarding_completed: true,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id);
+      .eq("id", user.id);
 
     if (error) {
-      console.error('Error saving onboarding data:', error);
+      console.error("Error saving onboarding data:", error);
       setLoading(false);
       return;
     }
 
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   const canProceedStep1 = schoolName.trim().length > 0;
-  const canProceedStep2 =
-    targetRole.length > 0 &&
-    (targetRole !== 'other' || customTargetRole.trim().length > 0);
+  const canProceedStep2 = targetRole.length > 0 && (targetRole !== "other" || customTargetRole.trim().length > 0);
 
   if (checkingAuth) {
     return (
@@ -202,10 +190,7 @@ export default function OnboardingPage() {
 
       <div className="relative w-full max-w-lg">
         {/* Logo */}
-        <Link
-          href="/"
-          className="mb-6 flex items-center justify-center gap-2.5"
-        >
+        <Link href="/" className="mb-6 flex items-center justify-center gap-2.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#0066FF] to-[#00AAFF] shadow-md shadow-[#0066FF]/20">
             <Code2 className="h-5 w-5 text-white" />
           </div>
@@ -222,8 +207,8 @@ export default function OnboardingPage() {
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
                     currentStep >= step.id
-                      ? 'bg-gradient-to-br from-[#0066FF] to-[#00AAFF] text-white shadow-md shadow-[#0066FF]/20'
-                      : 'bg-muted/50 text-muted-foreground'
+                      ? "bg-gradient-to-br from-[#0066FF] to-[#00AAFF] text-white shadow-md shadow-[#0066FF]/20"
+                      : "bg-muted/50 text-muted-foreground"
                   }`}
                 >
                   {currentStep > step.id ? (
@@ -235,7 +220,7 @@ export default function OnboardingPage() {
                 {idx < steps.length - 1 && (
                   <div
                     className={`hidden sm:block h-0.5 w-12 md:w-20 transition-all duration-500 ${
-                      currentStep > step.id ? 'bg-primary' : 'bg-muted/30'
+                      currentStep > step.id ? "bg-primary" : "bg-muted/30"
                     }`}
                   />
                 )}
@@ -256,7 +241,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="space-y-6"
                 >
                   {/* Header */}
@@ -274,10 +259,7 @@ export default function OnboardingPage() {
                   <div className="space-y-4">
                     {/* School Name */}
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="schoolName"
-                        className="flex items-center gap-2 text-sm font-medium"
-                      >
+                      <Label htmlFor="schoolName" className="flex items-center gap-2 text-sm font-medium">
                         <School className="h-3.5 w-3.5 text-muted-foreground" />
                         Trường học
                       </Label>
@@ -292,17 +274,11 @@ export default function OnboardingPage() {
 
                     {/* Education Year */}
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="educationYears"
-                        className="flex items-center gap-2 text-sm font-medium"
-                      >
+                      <Label htmlFor="educationYears" className="flex items-center gap-2 text-sm font-medium">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                         Năm học
                       </Label>
-                      <Select
-                        value={educationYears}
-                        onValueChange={(v) => setEducationYears(v ?? '')}
-                      >
+                      <Select value={educationYears} onValueChange={(v) => setEducationYears(v ?? "")}>
                         <SelectTrigger className="h-11" id="educationYears">
                           <SelectValue placeholder="Chọn năm học của bạn" />
                         </SelectTrigger>
@@ -318,17 +294,11 @@ export default function OnboardingPage() {
 
                     {/* Major */}
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="major"
-                        className="flex items-center gap-2 text-sm font-medium"
-                      >
+                      <Label htmlFor="major" className="flex items-center gap-2 text-sm font-medium">
                         <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
                         Chuyên ngành
                       </Label>
-                      <Select
-                        value={major}
-                        onValueChange={(v) => setMajor(v ?? '')}
-                      >
+                      <Select value={major} onValueChange={(v) => setMajor(v ?? "")}>
                         <SelectTrigger className="h-11" id="major">
                           <SelectValue placeholder="Chọn chuyên ngành" />
                         </SelectTrigger>
@@ -340,10 +310,10 @@ export default function OnboardingPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {major === 'other' && (
+                      {major === "other" && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
+                          animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
                         >
                           <Input
@@ -389,7 +359,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="space-y-6"
                 >
                   {/* Header */}
@@ -399,8 +369,7 @@ export default function OnboardingPage() {
                     </div>
                     <h2 className="text-xl font-bold">Mục tiêu nghề nghiệp</h2>
                     <p className="mt-1.5 text-sm text-muted-foreground">
-                      Chúng tôi sẽ gợi ý câu hỏi phỏng vấn phù hợp với mục tiêu
-                      của bạn
+                      Chúng tôi sẽ gợi ý câu hỏi phỏng vấn phù hợp với mục tiêu của bạn
                     </p>
                   </div>
 
@@ -408,17 +377,11 @@ export default function OnboardingPage() {
                   <div className="space-y-4">
                     {/* Target Role */}
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="targetRole"
-                        className="flex items-center gap-2 text-sm font-medium"
-                      >
+                      <Label htmlFor="targetRole" className="flex items-center gap-2 text-sm font-medium">
                         <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
                         Vị trí mong muốn
                       </Label>
-                      <Select
-                        value={targetRole}
-                        onValueChange={(v) => setTargetRole(v ?? '')}
-                      >
+                      <Select value={targetRole} onValueChange={(v) => setTargetRole(v ?? "")}>
                         <SelectTrigger className="h-11" id="targetRole">
                           <SelectValue placeholder="Chọn vị trí bạn mong muốn" />
                         </SelectTrigger>
@@ -430,19 +393,17 @@ export default function OnboardingPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {targetRole === 'other' && (
+                      {targetRole === "other" && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
+                          animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
                         >
                           <Input
                             placeholder="Nhập vị trí bạn mong muốn..."
                             className="h-11 mt-2"
                             value={customTargetRole}
-                            onChange={(e) =>
-                              setCustomTargetRole(e.target.value)
-                            }
+                            onChange={(e) => setCustomTargetRole(e.target.value)}
                             autoFocus
                           />
                         </motion.div>
@@ -458,9 +419,8 @@ export default function OnboardingPage() {
                             Lợi ích khi hoàn tất
                           </p>
                           <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                            DevReady sẽ ưu tiên hiển thị câu hỏi phỏng vấn phù
-                            hợp với vị trí và chuyên ngành của bạn, giúp bạn
-                            luyện tập hiệu quả hơn.
+                            DevReady sẽ ưu tiên hiển thị câu hỏi phỏng vấn phù hợp với vị trí
+                            và chuyên ngành của bạn, giúp bạn luyện tập hiệu quả hơn.
                           </p>
                         </div>
                       </div>
@@ -497,7 +457,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="space-y-6"
                 >
                   {/* Header */}
@@ -516,38 +476,33 @@ export default function OnboardingPage() {
                     <SummaryRow
                       icon={<School className="h-4 w-4 text-blue-400" />}
                       label="Trường học"
-                      value={schoolName || 'Chưa cung cấp'}
+                      value={schoolName || "Chưa cung cấp"}
                     />
                     <SummaryRow
                       icon={<Calendar className="h-4 w-4 text-cyan-400" />}
                       label="Năm học"
                       value={
                         educationYears
-                          ? EDUCATION_YEARS_OPTIONS.find(
-                              (o) => o.value === educationYears,
-                            )?.label || educationYears
-                          : 'Chưa chọn'
+                          ? EDUCATION_YEARS_OPTIONS.find((o) => o.value === educationYears)?.label || educationYears
+                          : "Chưa chọn"
                       }
                     />
                     <SummaryRow
                       icon={<BookOpen className="h-4 w-4 text-purple-400" />}
                       label="Chuyên ngành"
                       value={
-                        major === 'other'
-                          ? customMajor || 'Chưa nhập'
-                          : MAJOR_OPTIONS.find((m) => m.value === major)
-                              ?.label || 'Chưa chọn'
+                        major === "other"
+                          ? customMajor || "Chưa nhập"
+                          : MAJOR_OPTIONS.find((m) => m.value === major)?.label || "Chưa chọn"
                       }
                     />
                     <SummaryRow
                       icon={<Briefcase className="h-4 w-4 text-amber-400" />}
                       label="Vị trí mong muốn"
                       value={
-                        targetRole === 'other'
-                          ? customTargetRole || 'Chưa nhập'
-                          : TARGET_ROLE_OPTIONS.find(
-                              (r) => r.value === targetRole,
-                            )?.label || 'Chưa chọn'
+                        targetRole === "other"
+                          ? customTargetRole || "Chưa nhập"
+                          : TARGET_ROLE_OPTIONS.find((r) => r.value === targetRole)?.label || "Chưa chọn"
                       }
                     />
                   </div>
@@ -585,7 +540,7 @@ export default function OnboardingPage() {
 
         {/* Footer */}
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Bạn có thể cập nhật thông tin này bất kỳ lúc nào trong{' '}
+          Bạn có thể cập nhật thông tin này bất kỳ lúc nào trong{" "}
           <Link href="/profile" className="text-primary hover:underline">
             Cài đặt hồ sơ
           </Link>

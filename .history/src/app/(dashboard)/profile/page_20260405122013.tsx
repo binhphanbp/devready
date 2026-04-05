@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Mail,
   Calendar,
@@ -19,14 +19,14 @@ import {
   Zap,
   School,
   Briefcase,
-} from 'lucide-react';
-import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+} from "lucide-react";
+import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import {
   MAJOR_OPTIONS,
   TARGET_ROLE_OPTIONS,
   EDUCATION_YEARS_OPTIONS,
-} from '@/lib/constants/profile-options';
-import Link from 'next/link';
+} from "@/lib/constants/profile-options";
+import Link from "next/link";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -34,120 +34,108 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
+  if (!user) redirect("/login");
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
     .single();
 
   const { count: bookmarkCount } = await supabase
-    .from('bookmarks')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
+    .from("bookmarks")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
 
   const { count: viewedCount } = await supabase
-    .from('question_views')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
+    .from("question_views")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
 
   const { count: deckCount } = await supabase
-    .from('flashcard_decks')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
+    .from("flashcard_decks")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
 
   const { count: reviewCount } = await supabase
-    .from('community_reviews')
-    .select('*', { count: 'exact', head: true })
-    .eq('author_id', user.id);
+    .from("community_reviews")
+    .select("*", { count: "exact", head: true })
+    .eq("author_id", user.id);
 
-  const initials = (profile?.full_name || user.email || 'U')
-    .split(' ')
+  const initials = (profile?.full_name || user.email || "U")
+    .split(" ")
     .map((n: string) => n[0])
-    .join('')
+    .join("")
     .toUpperCase()
     .slice(0, 2);
 
-  const joinDate = new Date(user.created_at).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const joinDate = new Date(user.created_at).toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   const stats = [
     {
-      label: 'Câu hỏi đã xem',
+      label: "Câu hỏi đã xem",
       value: viewedCount ?? 0,
       icon: BookOpen,
-      color: 'text-blue-400',
-      bg: 'bg-blue-500/10',
-      borderColor: 'border-blue-500/20',
+      color: "text-blue-400",
+      bg: "bg-blue-500/10",
+      borderColor: "border-blue-500/20",
     },
     {
-      label: 'Câu hỏi đã lưu',
+      label: "Câu hỏi đã lưu",
       value: bookmarkCount ?? 0,
       icon: BookmarkIcon,
-      color: 'text-amber-400',
-      bg: 'bg-amber-500/10',
-      borderColor: 'border-amber-500/20',
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+      borderColor: "border-amber-500/20",
     },
     {
-      label: 'Bộ flashcard',
+      label: "Bộ flashcard",
       value: deckCount ?? 0,
       icon: Brain,
-      color: 'text-purple-400',
-      bg: 'bg-purple-500/10',
-      borderColor: 'border-purple-500/20',
+      color: "text-purple-400",
+      bg: "bg-purple-500/10",
+      borderColor: "border-purple-500/20",
     },
     {
-      label: 'Bài review',
+      label: "Bài review",
       value: reviewCount ?? 0,
       icon: MessageSquare,
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-500/10',
-      borderColor: 'border-emerald-500/20',
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/10",
+      borderColor: "border-emerald-500/20",
     },
   ];
 
   const quickActions = [
     {
-      title: 'Luyện phỏng vấn',
-      description: 'Khám phá 1000+ câu hỏi',
-      href: '/explore',
+      title: "Luyện phỏng vấn",
+      description: "Khám phá 1000+ câu hỏi",
+      href: "/explore",
       icon: Target,
-      gradient: 'from-blue-500/20 to-cyan-500/20',
-      iconColor: 'text-blue-400',
+      gradient: "from-blue-500/20 to-cyan-500/20",
+      iconColor: "text-blue-400",
     },
     {
-      title: 'Flashcards',
-      description: 'Ôn tập theo lịch SRS',
-      href: '/flashcards',
+      title: "Flashcards",
+      description: "Ôn tập theo lịch SRS",
+      href: "/flashcards",
       icon: Brain,
-      gradient: 'from-purple-500/20 to-pink-500/20',
-      iconColor: 'text-purple-400',
+      gradient: "from-purple-500/20 to-pink-500/20",
+      iconColor: "text-purple-400",
     },
     {
-      title: 'Cộng đồng',
-      description: 'Chia sẻ kinh nghiệm',
-      href: '/community',
+      title: "Cộng đồng",
+      description: "Chia sẻ kinh nghiệm",
+      href: "/community",
       icon: TrendingUp,
-      gradient: 'from-emerald-500/20 to-teal-500/20',
-      iconColor: 'text-emerald-400',
+      gradient: "from-emerald-500/20 to-teal-500/20",
+      iconColor: "text-emerald-400",
     },
   ];
-
-  const majorLabel =
-    MAJOR_OPTIONS.find((o) => o.value === profile?.major)?.label ?? null;
-  const targetRoleLabel =
-    TARGET_ROLE_OPTIONS.find((o) => o.value === profile?.target_role)?.label ??
-    null;
-  const educationYearsLabel =
-    profile?.education_years !== null && profile?.education_years !== undefined
-      ? (EDUCATION_YEARS_OPTIONS.find(
-          (o) => o.value === String(profile.education_years),
-        )?.label ?? null)
-      : null;
 
   return (
     <div className="space-y-5 sm:space-y-6 pt-6 sm:pt-8 lg:pt-0">
@@ -169,10 +157,6 @@ export default async function ProfilePage() {
             {/* Avatar */}
             <div className="relative">
               <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-4 border-card shadow-xl ring-2 ring-primary/20">
-                <AvatarImage
-                  src={profile?.avatar_url ?? undefined}
-                  alt={profile?.full_name ?? 'Avatar'}
-                />
                 <AvatarFallback className="bg-gradient-to-br from-[#0066FF] to-[#0055DD] text-white text-lg sm:text-2xl font-bold">
                   {initials}
                 </AvatarFallback>
@@ -185,14 +169,14 @@ export default async function ProfilePage() {
             <div className="flex-1 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 pb-1">
               <div>
                 <h2 className="text-lg sm:text-2xl font-bold tracking-tight">
-                  {profile?.full_name || 'Chưa cập nhật tên'}
+                  {profile?.full_name || "Chưa cập nhật tên"}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  @{profile?.username || user.email?.split('@')[0]}
+                  @{profile?.username || user.email?.split("@")[0]}
                 </p>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                {profile?.role === 'admin' && (
+              <div className="flex items-center gap-2">
+                {profile?.role === "admin" && (
                   <Badge className="bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20">
                     <Shield className="h-3 w-3 mr-1" />
                     Admin
@@ -204,11 +188,6 @@ export default async function ProfilePage() {
                     {profile?.streak_count} ngày streak
                   </Badge>
                 )}
-                <EditProfileDialog
-                  profile={profile}
-                  userId={user.id}
-                  userEmail={user.email}
-                />
               </div>
             </div>
           </div>
@@ -243,8 +222,8 @@ export default async function ProfilePage() {
         ))}
       </div>
 
-      {/* Three-column layout on desktop */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+      {/* Two-column layout on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         {/* Account Info */}
         <Card className="border-border/50 bg-card/50">
           <div className="px-4 sm:px-5 py-3.5 border-b border-border/40 flex items-center gap-2">
@@ -280,70 +259,6 @@ export default async function ProfilePage() {
                 <p className="text-xs text-muted-foreground">Streak hiện tại</p>
                 <p className="text-sm font-medium">
                   {profile?.streak_count ?? 0} ngày liên tiếp
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Academic & Career Info */}
-        <Card className="border-border/50 bg-card/50">
-          <div className="px-4 sm:px-5 py-3.5 border-b border-border/40 flex items-center gap-2">
-            <School className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">Học vấn &amp; Nghề nghiệp</h3>
-          </div>
-          <CardContent className="p-4 sm:p-5 space-y-4">
-            <div className="flex items-start gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10 shrink-0 mt-0.5">
-                <School className="h-4 w-4 text-sky-400" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Trường học</p>
-                <p className="text-sm font-medium">
-                  {profile?.school_name || (
-                    <span className="text-muted-foreground italic">
-                      Chưa cập nhật
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-            <Separator className="opacity-30" />
-            <div className="flex items-start gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 shrink-0 mt-0.5">
-                <BookOpen className="h-4 w-4 text-violet-400" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Chuyên ngành</p>
-                <p className="text-sm font-medium">
-                  {majorLabel ?? (
-                    <span className="text-muted-foreground italic">
-                      Chưa cập nhật
-                    </span>
-                  )}
-                </p>
-                {educationYearsLabel && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {educationYearsLabel}
-                  </p>
-                )}
-              </div>
-            </div>
-            <Separator className="opacity-30" />
-            <div className="flex items-start gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 shrink-0 mt-0.5">
-                <Briefcase className="h-4 w-4 text-amber-400" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">
-                  Mục tiêu nghề nghiệp
-                </p>
-                <p className="text-sm font-medium">
-                  {targetRoleLabel ?? (
-                    <span className="text-muted-foreground italic">
-                      Chưa cập nhật
-                    </span>
-                  )}
                 </p>
               </div>
             </div>
