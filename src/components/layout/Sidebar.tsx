@@ -79,7 +79,7 @@ function SidebarContent({
   isAdmin: boolean;
 }) {
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-hidden">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 py-5">
         <Link href="/" className="flex items-center gap-2.5">
@@ -99,7 +99,7 @@ function SidebarContent({
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 space-y-1 px-3 py-2">
+      <nav className="flex-1 overflow-y-auto space-y-1 px-3 py-2">
         {sidebarLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
@@ -154,7 +154,7 @@ function SidebarContent({
       </nav>
 
       {/* Bottom section */}
-      <div className="px-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 px-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="mx-3 mb-3 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
         <ThemeToggle collapsed={collapsed} />
         <button
@@ -212,7 +212,7 @@ export function Sidebar() {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-border/40 bg-card/20 backdrop-blur-sm transition-all duration-300 shrink-0 relative',
+          'hidden lg:flex flex-col border-r border-border/40 bg-card/20 backdrop-blur-sm transition-all duration-300 shrink-0 sticky top-0 h-screen z-20',
           collapsed ? 'w-16' : 'w-60',
         )}
       >
@@ -225,7 +225,7 @@ export function Sidebar() {
         />
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-7 z-10 hidden lg:flex h-6 w-6 items-center justify-center rounded-full border border-border/50 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all shadow-sm"
+          className="absolute -right-3 top-7 z-30 hidden lg:flex h-6 w-6 items-center justify-center rounded-full border border-border/50 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all shadow-sm cursor-pointer"
         >
           <ChevronLeft
             className={cn(
