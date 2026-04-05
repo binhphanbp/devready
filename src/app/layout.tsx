@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Toaster } from "sonner";
 import { ClientEnhancements } from "@/components/ClientEnhancements";
 import { BackToTop } from "@/components/layout/BackToTop";
 import "./globals.css";
@@ -87,6 +88,7 @@ export default function RootLayout({
           <ClientEnhancements />
           {children}
           <BackToTop />
+          <Toaster position="bottom-right" richColors theme="system" />
           <Analytics />
           <SpeedInsights />
         </ThemeProvider>

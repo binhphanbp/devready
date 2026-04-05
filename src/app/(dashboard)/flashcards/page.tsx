@@ -16,6 +16,15 @@ import { createClient } from '@/lib/supabase/client';
 import { CreateDeckDialog } from '@/components/flashcards/CreateDeckDialog';
 import { AddCardDialog } from '@/components/flashcards/AddCardDialog';
 import { StudyMode } from '@/components/flashcards/StudyMode';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 
 type Deck = {
@@ -46,6 +55,9 @@ export default function FlashcardsPage() {
   const [dueCards, setDueCards] = useState<FlashcardData[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
+
+  const [deckToDelete, setDeckToDelete] = useState<Deck | null>(null);
+  const [cardToDelete, setCardToDelete] = useState<FlashcardData | null>(null);
 
   // Fetch decks
   useEffect(() => {
@@ -96,22 +108,27 @@ export default function FlashcardsPage() {
     }
   };
 
-  const handleDeleteDeck = async (deckId: string) => {
-    if (!confirm('Xóa bộ flashcard này? Tất cả thẻ sẽ bị xóa.')) return;
+  const executeDeleteDeck = async () => {
+    if (!deckToDelete) return;
     const supabase = createClient();
-    await supabase.from('flashcard_decks').delete().eq('id', deckId);
-    setDecks(decks.filter((d) => d.id !== deckId));
-    if (selectedDeck?.id === deckId) {
+    await supabase.from('flashcard_decks').delete().eq('id', deckToDelete.id);
+    setDecks(decks.filter((d) => d.id !== deckToDelete.id));
+    if (selectedDeck?.id === deckToDelete.id) {
       setSelectedDeck(null);
       setViewMode('list');
     }
+    setDeckToDelete(null);
+    toast.success('Đã xóa bộ flashcard thành công');
   };
 
-  const handleDeleteCard = async (cardId: string) => {
+  const executeDeleteCard = async () => {
+    if (!cardToDelete) return;
     const supabase = createClient();
-    await supabase.from('flashcards').delete().eq('id', cardId);
-    setCards(cards.filter((c) => c.id !== cardId));
-    setDueCards(dueCards.filter((c) => c.id !== cardId));
+    await supabase.from('flashcards').delete().eq('id', cardToDelete.id);
+    setCards(cards.filter((c) => c.id !== cardToDelete.id));
+    setDueCards(dueCards.filter((c) => c.id !== cardToDelete.id));
+    setCardToDelete(null);
+    toast.success('Đã xóa thẻ thành công');
   };
 
   // ============ LIST VIEW ============
@@ -190,7 +207,7 @@ export default function FlashcardsPage() {
                     className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive min-h-[44px] sm:min-h-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDeleteDeck(deck.id);
+                      setDeckToDelete(deck);
                     }}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -200,6 +217,21 @@ export default function FlashcardsPage() {
             ))}
           </div>
         )}
+
+        <Dialog open={!!deckToDelete} onOpenChange={(open) => !open && setDeckToDelete(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Xóa bộ flashcard này?</DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn xóa bộ &quot;{deckToDelete?.title}&quot;? Tất cả thẻ bên trong sẽ bị xóa và không thể khôi phục.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0 mt-4">
+              <Button variant="ghost" onClick={() => setDeckToDelete(null)}>Hủy</Button>
+              <Button variant="destructive" onClick={executeDeleteDeck}>Xóa bộ thẻ</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -313,7 +345,7 @@ export default function FlashcardsPage() {
                       variant="ghost"
                       size="sm"
                       className="shrink-0 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleDeleteCard(card.id)}
+                      onClick={() => setCardToDelete(card)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -323,6 +355,21 @@ export default function FlashcardsPage() {
             ))
           )}
         </div>
+
+        <Dialog open={!!cardToDelete} onOpenChange={(open) => !open && setCardToDelete(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Xóa thẻ này?</DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn xóa thẻ này khỏi bộ flashcard? Thao tác này không thể hoàn tác.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0 mt-4">
+              <Button variant="ghost" onClick={() => setCardToDelete(null)}>Hủy</Button>
+              <Button variant="destructive" onClick={executeDeleteCard}>Xóa thẻ</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

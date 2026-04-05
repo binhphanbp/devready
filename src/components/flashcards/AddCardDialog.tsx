@@ -38,6 +38,10 @@ export function AddCardDialog({ deckId, trigger }: AddCardDialogProps) {
       deck_id: deckId,
       front: front.trim(),
       back: back.trim(),
+      difficulty: 2.5,
+      interval: 0,
+      repetitions: 0,
+      next_review: new Date().toISOString(),
     });
 
     if (!error) {
