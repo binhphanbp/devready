@@ -125,8 +125,25 @@ export default function FlashcardsPage() {
     if (!cardToDelete) return;
     const supabase = createClient();
     await supabase.from('flashcards').delete().eq('id', cardToDelete.id);
+    
+    // Decrement card_count in DB
+    if (selectedDeck) {
+      const { data: deckData } = await supabase.from('flashcard_decks').select('card_count').eq('id', selectedDeck.id).single();
+      if (deckData) {
+        await supabase.from('flashcard_decks').update({ card_count: Math.max(0, (deckData.card_count || 0) - 1) }).eq('id', selectedDeck.id);
+      }
+    }
+
     setCards(cards.filter((c) => c.id !== cardToDelete.id));
     setDueCards(dueCards.filter((c) => c.id !== cardToDelete.id));
+    
+    // Update local state
+    if (selectedDeck) {
+      const newCardCount = Math.max(0, (selectedDeck.card_count || 0) - 1);
+      setSelectedDeck({ ...selectedDeck, card_count: newCardCount });
+      setDecks(decks.map(d => d.id === selectedDeck.id ? { ...d, card_count: newCardCount } : d));
+    }
+
     setCardToDelete(null);
     toast.success('Đã xóa thẻ thành công');
   };
@@ -300,6 +317,11 @@ export default function FlashcardsPage() {
             onCreated={(newCard) => {
               setCards([...cards, newCard]);
               setDueCards([...dueCards, newCard]);
+              
+              // Update local state for card count
+              const newCardCount = (selectedDeck.card_count || 0) + 1;
+              setSelectedDeck({ ...selectedDeck, card_count: newCardCount });
+              setDecks(decks.map(d => d.id === selectedDeck.id ? { ...d, card_count: newCardCount } : d));
             }} 
           />
         </div>

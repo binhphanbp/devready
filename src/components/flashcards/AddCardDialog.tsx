@@ -46,6 +46,12 @@ export function AddCardDialog({ deckId, trigger, onCreated }: AddCardDialogProps
     }).select().single();
 
     if (!error && newCard) {
+      // Update the deck card_count in DB manually since there's no trigger
+      const { data: deckData } = await supabase.from("flashcard_decks").select("card_count").eq("id", deckId).single();
+      if (deckData) {
+        await supabase.from("flashcard_decks").update({ card_count: (deckData.card_count || 0) + 1 }).eq("id", deckId);
+      }
+
       setFront("");
       setBack("");
       setOpen(false);
