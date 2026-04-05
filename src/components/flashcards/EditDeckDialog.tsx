@@ -34,13 +34,17 @@ function EditDeckForm({
   onUpdated: EditDeckDialogProps["onUpdated"];
   onClose: () => void;
 }) {
-  const [title, setTitle] = useState(deck.title);
-  const [description, setDescription] = useState(deck.description ?? "");
+  // Slice existing values to max length so counter and isDirty work correctly
+  const initialTitle = deck.title.slice(0, TITLE_MAX);
+  const initialDesc = (deck.description ?? "").slice(0, DESC_MAX);
+
+  const [title, setTitle] = useState(initialTitle);
+  const [description, setDescription] = useState(initialDesc);
   const [loading, setLoading] = useState(false);
 
   const isDirty =
-    title.trim() !== deck.title ||
-    description.trim() !== (deck.description ?? "");
+    title.trim() !== initialTitle.trim() ||
+    description.trim() !== initialDesc.trim();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +124,7 @@ function EditDeckForm({
           maxLength={DESC_MAX}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-          className="resize-none"
+          className="resize-none break-all overflow-x-hidden"
         />
       </div>
 

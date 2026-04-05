@@ -140,7 +140,7 @@ export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: Record<stri
               maxLength={DESC_MAX}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="resize-none"
+            className="resize-none break-all overflow-x-hidden"
             />
           </div>
 
