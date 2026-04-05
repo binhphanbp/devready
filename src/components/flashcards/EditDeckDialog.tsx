@@ -66,14 +66,14 @@ export function EditDeckDialog({ deck, onUpdated, trigger }: EditDeckDialogProps
       >
         {!trigger && <Edit2 className="h-4 w-4" />}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+      <DialogContent className="sm:max-w-md w-full min-w-0 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Chỉnh sửa Bộ Flashcard</DialogTitle>
           <DialogDescription>
             Thay đổi tên hoặc mô tả của bộ flashcard.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleUpdate} className="space-y-4 mt-2">
+        <form onSubmit={handleUpdate} className="space-y-4 mt-2 w-full min-w-0">
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="edit-deck-title">
               Tên bộ flashcard
@@ -96,6 +96,7 @@ export function EditDeckDialog({ deck, onUpdated, trigger }: EditDeckDialogProps
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              className="break-all"
             />
           </div>
           <div className="flex justify-end gap-2">

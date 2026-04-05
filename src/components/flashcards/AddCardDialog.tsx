@@ -75,14 +75,14 @@ export function AddCardDialog({ deckId, trigger, onCreated }: AddCardDialogProps
           </>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg w-full min-w-0 overflow-hidden">
         <DialogHeader>
           <DialogTitle>Thêm thẻ Flashcard</DialogTitle>
           <DialogDescription>
             Nhập câu hỏi (mặt trước) và câu trả lời (mặt sau).
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleAdd} className="space-y-4 mt-2">
+        <form onSubmit={handleAdd} className="space-y-4 mt-2 w-full min-w-0">
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="card-front">
               Mặt trước (Câu hỏi)
@@ -93,6 +93,7 @@ export function AddCardDialog({ deckId, trigger, onCreated }: AddCardDialogProps
               value={front}
               onChange={(e) => setFront(e.target.value)}
               rows={3}
+              className="break-all"
               required
             />
           </div>
@@ -106,6 +107,7 @@ export function AddCardDialog({ deckId, trigger, onCreated }: AddCardDialogProps
               value={back}
               onChange={(e) => setBack(e.target.value)}
               rows={4}
+              className="break-all"
               required
             />
           </div>

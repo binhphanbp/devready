@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Trash2,
   Plus,
+  Edit2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
@@ -197,12 +198,12 @@ export default function FlashcardsPage() {
                 {/* Decorative blob gradient */}
                 <div className="absolute -inset-x-0 -top-20 h-32 bg-gradient-to-b from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                 
-                <CardContent className="p-5 sm:p-6 flex flex-col h-full relative z-10">
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-purple-500/10 ring-1 ring-inset ring-primary/20 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-300">
-                      <Layers className="h-6 w-6 text-primary opacity-90" />
-                    </div>
-                    <div className="flex items-center gap-1 -mr-2 -mt-2">
+                <CardContent className="p-5 sm:p-6 flex flex-col h-full relative z-10 transition-all duration-300">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="text-lg font-bold tracking-tight group-hover:text-primary transition-colors line-clamp-2 pr-2">
+                      {deck.title}
+                    </h3>
+                    <div className="flex items-center gap-1 shrink-0 -mt-1 -mr-2">
                        <div onClick={(e) => e.stopPropagation()}>
                          <EditDeckDialog 
                           deck={deck} 
@@ -214,9 +215,9 @@ export default function FlashcardsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200"
+                              className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
                             >
-                              <Brain className="h-4 w-4" /> 
+                              <Edit2 className="h-4 w-4" /> 
                             </Button>
                           }
                         />
@@ -224,7 +225,7 @@ export default function FlashcardsPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200"
+                        className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeckToDelete(deck);
@@ -236,20 +237,17 @@ export default function FlashcardsPage() {
                   </div>
                   
                   <div className="flex-1 flex flex-col min-w-0">
-                    <h3 className="text-lg font-bold tracking-tight group-hover:text-primary transition-colors line-clamp-2 mb-1.5">
-                      {deck.title}
-                    </h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
                       {deck.description || <span className="italic opacity-50">Không có mô tả</span>}
                     </p>
                     
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/40">
-                      <Badge variant="secondary" className="text-xs font-semibold bg-primary/10 text-primary border-primary/20 px-2 py-0.5">
-                        <Layers className="h-3 w-3 mr-1.5 opacity-70" />
+                      <Badge variant="secondary" className="text-xs font-semibold bg-primary/10 text-primary border-primary/20 px-2 py-0.5 rounded-md">
+                        <Layers className="h-3.5 w-3.5 mr-1.5 opacity-80" />
                         {deck.card_count} thẻ
                       </Badge>
-                      <span className="text-[10px] text-muted-foreground font-medium flex items-center">
-                        <span className="w-1 h-1 rounded-full bg-border mr-1.5" />
+                      <span className="text-[11px] text-muted-foreground font-medium flex items-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-border mr-1.5" />
                         {new Date(deck.created_at).toLocaleDateString('vi-VN')}
                       </span>
                     </div>

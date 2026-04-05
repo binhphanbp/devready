@@ -61,14 +61,14 @@ export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: any) => voi
         <Plus className="mr-1 h-4 w-4" />
         Tạo bộ mới
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md w-full min-w-0 overflow-hidden">
         <DialogHeader>
           <DialogTitle>Tạo bộ Flashcard mới</DialogTitle>
           <DialogDescription>
             Tạo bộ flashcard để ôn tập theo hệ thống Spaced Repetition.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleCreate} className="space-y-4 mt-2">
+        <form onSubmit={handleCreate} className="space-y-4 mt-2 w-full min-w-0">
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="deck-title">
               Tên bộ flashcard
@@ -91,6 +91,7 @@ export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: any) => voi
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              className="break-words"
             />
           </div>
           <div className="flex justify-end gap-2">
