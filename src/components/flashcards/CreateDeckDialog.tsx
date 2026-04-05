@@ -61,7 +61,7 @@ export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: any) => voi
         <Plus className="mr-1 h-4 w-4" />
         Tạo bộ mới
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md w-full min-w-0 overflow-hidden">
+      <DialogContent className="sm:max-w-md w-full min-w-0 max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>Tạo bộ Flashcard mới</DialogTitle>
           <DialogDescription>

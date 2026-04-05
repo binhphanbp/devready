@@ -66,7 +66,7 @@ export function EditDeckDialog({ deck, onUpdated, trigger }: EditDeckDialogProps
       >
         {!trigger && <Edit2 className="h-4 w-4" />}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md w-full min-w-0 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <DialogContent className="sm:max-w-md w-full min-w-0 max-h-[90vh] overflow-y-auto overflow-x-hidden" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Chỉnh sửa Bộ Flashcard</DialogTitle>
           <DialogDescription>

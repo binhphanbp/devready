@@ -75,7 +75,7 @@ export function AddCardDialog({ deckId, trigger, onCreated }: AddCardDialogProps
           </>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg w-full min-w-0 overflow-hidden">
+      <DialogContent className="sm:max-w-lg w-full min-w-0 max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>Thêm thẻ Flashcard</DialogTitle>
           <DialogDescription>
