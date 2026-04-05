@@ -19,6 +19,7 @@ interface AddToFlashcardDialogProps {
   onOpenChange: (open: boolean) => void;
   questionTitle: string;
   answerContent: string;
+  questionId?: string; // ← link flashcard to question for StudyMode
 }
 
 type Deck = {
@@ -32,6 +33,7 @@ export function AddToFlashcardDialog({
   onOpenChange,
   questionTitle,
   answerContent,
+  questionId,
 }: AddToFlashcardDialogProps) {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
@@ -43,8 +45,7 @@ export function AddToFlashcardDialog({
 
   useEffect(() => {
     if (!open) return;
-    // Reset form state when dialog opens — intentional synchronization
-    setSuccess(false); // eslint-disable-line react-hooks/set-state-in-effect -- intentional form reset on dialog open
+    setSuccess(false);
     setSelectedDeckId(null);
     setShowNewDeck(false);
     setNewDeckTitle('');
@@ -85,6 +86,7 @@ export function AddToFlashcardDialog({
       deck_id: selectedDeckId,
       front: questionTitle,
       back: truncatedAnswer,
+      ...(questionId ? { question_id: questionId } : {}),
     });
 
     if (!error) {
@@ -151,6 +153,9 @@ export function AddToFlashcardDialog({
             <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
               Đã thêm vào Flashcard!
             </p>
+            <p className="text-xs text-muted-foreground text-center">
+              Câu trả lời của bạn sẽ được ưu tiên khi ôn tập.
+            </p>
           </div>
         ) : (
           <div className="space-y-4 mt-2">
@@ -162,6 +167,12 @@ export function AddToFlashcardDialog({
               <p className="text-sm font-medium line-clamp-2">
                 {questionTitle}
               </p>
+              {questionId && (
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block" />
+                  Liên kết với câu hỏi gốc — câu trả lời của bạn sẽ được ưu tiên
+                </p>
+              )}
             </div>
 
             {/* Deck list */}
@@ -178,13 +189,13 @@ export function AddToFlashcardDialog({
                       key={deck.id}
                       onClick={() => setSelectedDeckId(deck.id)}
                       className={cn(
-                        'w-full flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-left transition-all',
+                        'w-full grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border px-3.5 py-2.5 text-left transition-all',
                         selectedDeckId === deck.id
                           ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
                           : 'border-border/50 hover:border-primary/30 hover:bg-muted/30',
                       )}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
                         <Brain
                           className={cn(
                             'h-4 w-4 shrink-0',
@@ -193,8 +204,8 @@ export function AddToFlashcardDialog({
                               : 'text-muted-foreground',
                           )}
                         />
-                        <div>
-                          <p className="text-sm font-medium">{deck.title}</p>
+                        <div className="min-w-0 overflow-hidden">
+                          <p className="text-sm font-medium truncate">{deck.title}</p>
                           <p className="text-xs text-muted-foreground">
                             {deck.card_count || 0} thẻ
                           </p>

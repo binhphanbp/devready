@@ -19,7 +19,9 @@ import { useRouter } from "next/navigation";
 const TITLE_MAX = 60;
 const DESC_MAX = 150;
 
-export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: Record<string, unknown>) => void }) {
+type CreatedDeck = { id: string; title: string; description: string | null; card_count: number; created_at: string };
+
+export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: CreatedDeck) => void }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -52,7 +54,7 @@ export function CreateDeckDialog({ onCreated }: { onCreated?: (deck: Record<stri
       setTitle("");
       setDescription("");
       setOpen(false);
-      onCreated?.(newDeck as Record<string, unknown>);
+      onCreated?.(newDeck as CreatedDeck);
       router.refresh();
     }
     setLoading(false);

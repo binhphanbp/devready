@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import {
   ArrowLeft,
   BookmarkIcon,
@@ -23,6 +24,12 @@ import {
   ExternalLink,
   Flame,
   ShieldAlert,
+  PenLine,
+  Save,
+  Loader2,
+  User,
+  BadgeCheck,
+  Sparkles,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -186,7 +193,6 @@ const markdownComponents = {
         </code>
       );
     }
-    // Code inside <pre> — force light text on dark bg
     return (
       <code
         className={cn('text-[13px] font-mono text-[#e6edf3]', className)}
@@ -256,6 +262,13 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const viewCountedRef = useRef<string | null>(null);
 
+  // User answer state
+  const [userAnswerText, setUserAnswerText] = useState('');
+  const [savedUserAnswer, setSavedUserAnswer] = useState<string | null>(null);
+  const [isEditingUserAnswer, setIsEditingUserAnswer] = useState(false);
+  const [savingUserAnswer, setSavingUserAnswer] = useState(false);
+  const [userAnswerSaved, setUserAnswerSaved] = useState(false);
+
   const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.intern;
 
   useEffect(() => {
@@ -271,11 +284,12 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
       setAnswers((data as Answer[]) ?? []);
       setLoadingAnswers(false);
 
-      // Check bookmark status + fetch profile for dynamic placeholders
+      // Auth + profile + bookmark + user answer
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
+        // Bookmark
         const { data: bm } = await supabase
           .from('bookmarks')
           .select('id')
@@ -284,15 +298,27 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
           .maybeSingle();
         setIsBookmarked(!!bm);
 
-        // Fetch user profile for placeholder replacement
+        // User profile for placeholder replacement
         const { data: profile } = await supabase
           .from('profiles')
           .select('school_name, education_years, major, target_role')
           .eq('id', user.id)
           .maybeSingle();
         if (profile) setUserProfile(profile as UserProfile);
+
+        // Fetch existing user answer
+        const { data: ua } = await supabase
+          .from('user_answers')
+          .select('custom_content')
+          .eq('user_id', user.id)
+          .eq('question_id', question.id)
+          .maybeSingle();
+        if (ua?.custom_content) {
+          setSavedUserAnswer(ua.custom_content);
+          setUserAnswerText(ua.custom_content);
+        }
       }
-      
+
       // Increment global view count (guard against StrictMode double-mount)
       if (viewCountedRef.current !== question.id) {
         viewCountedRef.current = question.id;
@@ -344,6 +370,39 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
     setBookmarkLoading(false);
   };
 
+  // Save user answer
+  const saveUserAnswer = async () => {
+    if (!userAnswerText.trim()) return;
+    setSavingUserAnswer(true);
+
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setSavingUserAnswer(false);
+      return;
+    }
+
+    const { error } = await supabase.from('user_answers').upsert(
+      {
+        user_id: user.id,
+        question_id: question.id,
+        custom_content: userAnswerText.trim(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,question_id' },
+    );
+
+    if (!error) {
+      setSavedUserAnswer(userAnswerText.trim());
+      setIsEditingUserAnswer(false);
+      setUserAnswerSaved(true);
+      setTimeout(() => setUserAnswerSaved(false), 2500);
+    }
+    setSavingUserAnswer(false);
+  };
+
   const officialAnswer = answers.find((a) => a.is_official);
 
   // Priority: question.sample_answer > officialAnswer.content
@@ -357,6 +416,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
     ? replacePlaceholders(question.common_pitfalls, userProfile)
     : null;
   const hasEnhancedContent = !!(bonusTipContent || pitfallsContent || question.official_source);
+  const isSelfAuthored = !question.official_source;
 
   // Difficulty level bar
   const difficultyBar = (
@@ -462,6 +522,18 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               </span>
             )}
           </div>
+          {/* Source attribution badge */}
+          {isSelfAuthored ? (
+            <span className="ml-auto flex items-center gap-1 text-[10px] rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-500 dark:text-violet-400 px-2 py-0.5 font-medium shrink-0">
+              <Sparkles className="h-3 w-3" />
+              Tự biên soạn
+            </span>
+          ) : (
+            <span className="ml-auto flex items-center gap-1 text-[10px] rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 px-2 py-0.5 font-medium shrink-0">
+              <BadgeCheck className="h-3 w-3" />
+              Nguồn chính thống
+            </span>
+          )}
         </div>
 
         {/* Question title */}
@@ -511,7 +583,6 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               ))}
             </div>
           )}
-
         </div>
       </div>
 
@@ -531,6 +602,122 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               thức.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* ===== USER ANSWER PANEL ===== */}
+      <div className="rounded-2xl border border-violet-500/25 bg-violet-500/5 overflow-hidden">
+        {/* Header */}
+        <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-violet-500/8 border-b border-violet-500/15">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/15">
+            <User className="h-3.5 w-3.5 text-violet-500" />
+          </div>
+          <span className="text-sm font-semibold text-violet-600 dark:text-violet-400">
+            ✍️ Câu trả lời của bạn
+          </span>
+          {savedUserAnswer && !isEditingUserAnswer && (
+            <span className="ml-auto flex items-center gap-1 text-[10px] rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 font-medium">
+              <CheckCircle2 className="h-3 w-3" />
+              Đã lưu · ưu tiên trong Flashcard
+            </span>
+          )}
+        </div>
+
+        {/* Body */}
+        <div className="px-4 sm:px-6 py-4 sm:py-5">
+          {savedUserAnswer && !isEditingUserAnswer ? (
+            // Saved — render Markdown
+            <div className="space-y-3">
+              <div
+                className="rounded-xl border border-border/40 bg-muted/20 px-4 py-3 overflow-hidden"
+                data-color-mode="auto"
+              >
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                  components={markdownComponents}
+                >
+                  {savedUserAnswer}
+                </ReactMarkdown>
+              </div>
+              <div className="flex items-center gap-2 justify-between">
+                <p className="text-xs text-muted-foreground">
+                  ✅ Câu trả lời này sẽ được ưu tiên khi ôn tập Flashcard.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-violet-600 dark:text-violet-400 border-violet-500/30 hover:bg-violet-500/10 shrink-0"
+                  onClick={() => {
+                    setUserAnswerText(savedUserAnswer);
+                    setIsEditingUserAnswer(true);
+                  }}
+                >
+                  <PenLine className="h-3.5 w-3.5 mr-1.5" />
+                  Chỉnh sửa
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Edit / Create view — Markdown editor
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">
+                  {savedUserAnswer
+                    ? 'Chỉnh sửa câu trả lời. Hỗ trợ Markdown — **bold**, `code`, ``` code block ```, > quote, v.v.'
+                    : 'Viết theo cách hiểu của bạn. Hỗ trợ Markdown và code block. Câu trả lời này sẽ được ưu tiên trong Flashcard.'}
+                </p>
+                <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
+                  {userAnswerText.length} ký tự
+                </span>
+              </div>
+              <MarkdownEditor
+                value={userAnswerText}
+                onChange={setUserAnswerText}
+                placeholder="Viết câu trả lời của bạn ở đây...&#10;&#10;Hỗ trợ Markdown: **in đậm**, `code`, headings, bullet list, bảng, blockquote, v.v."
+                minHeight={220}
+              />
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <span className="font-medium">Mẹo:</span> Dùng{' '}
+                  <code className="px-1 rounded bg-muted text-[11px]">```js</code>
+                  {' '}để chèn code block có syntax highlighting.
+                </p>
+                <div className="flex items-center gap-2 shrink-0">
+                  {isEditingUserAnswer && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8"
+                      onClick={() => setIsEditingUserAnswer(false)}
+                    >
+                      Hủy
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={saveUserAnswer}
+                    disabled={!userAnswerText.trim() || savingUserAnswer}
+                    className={cn(
+                      'h-8 transition-all',
+                      userAnswerSaved
+                        ? 'bg-emerald-500 hover:bg-emerald-500 text-white border-0'
+                        : 'bg-gradient-to-r from-violet-600 to-violet-500 text-white border-0 hover:from-violet-700 hover:to-violet-600',
+                    )}
+                  >
+                    {savingUserAnswer ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                    ) : userAnswerSaved ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                    ) : (
+                      <Save className="h-3.5 w-3.5 mr-1.5" />
+                    )}
+                    {userAnswerSaved ? 'Đã lưu!' : 'Lưu câu trả lời'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -605,9 +792,20 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
                 <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-emerald-500/5 border-b border-emerald-500/15">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                    Câu trả lời mẫu (Official Answer)
+                    Câu trả lời mẫu
                   </span>
                   <div className="flex-1" />
+                  {isSelfAuthored ? (
+                    <span className="flex items-center gap-1 text-[10px] rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-500 dark:text-violet-400 px-2 py-0.5 font-medium">
+                      <Sparkles className="h-3 w-3" />
+                      Tự biên soạn bởi DevReady
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-[10px] rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 px-2 py-0.5 font-medium">
+                      <BadgeCheck className="h-3 w-3" />
+                      Có tài liệu tham khảo
+                    </span>
+                  )}
                   {officialAnswer && (
                     <span className="text-xs text-muted-foreground">
                       👍 {officialAnswer.upvote_count} lượt thích
@@ -695,11 +893,23 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
                 </a>
               )}
 
-              {/* Enhanced content indicator */}
-              {hasEnhancedContent && (
+              {/* Self-authored notice (no external source) */}
+              {isSelfAuthored && (
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-1">
                   <span className="h-px w-12 bg-border" />
-                  <span>✨ Nội dung được biên soạn chuyên sâu bởi DevReady</span>
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-violet-400" />
+                    Nội dung tự biên soạn bởi đội ngũ DevReady · không sao chép từ bên thứ ba
+                  </span>
+                  <span className="h-px w-12 bg-border" />
+                </div>
+              )}
+
+              {/* Has source footer */}
+              {hasEnhancedContent && !isSelfAuthored && (
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-1">
+                  <span className="h-px w-12 bg-border" />
+                  <span>Nội dung được biên soạn chuyên sâu bởi đội ngũ DevReady</span>
                   <span className="h-px w-12 bg-border" />
                 </div>
               )}
@@ -741,12 +951,13 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
         </Button>
       </div>
 
-      {/* AddToFlashcard Dialog */}
+      {/* AddToFlashcard Dialog — now with question_id */}
       <AddToFlashcardDialog
         open={flashcardOpen}
         onOpenChange={setFlashcardOpen}
         questionTitle={question.title}
-        answerContent={officialAnswer?.content ?? ''}
+        answerContent={answerContent ?? officialAnswer?.content ?? ''}
+        questionId={question.id}
       />
     </div>
   );
