@@ -380,7 +380,7 @@ export default function ExplorePage() {
         .select(
           'id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, sample_answer, bonus_tip, common_pitfalls, official_source, categories(name, color)',
         )
-        .eq('is_approved', true);
+        .in('status', ['ai_verified', 'human_reviewed']);
 
       if (selectedCategory) query = query.eq('category_id', selectedCategory);
       if (selectedDifficulty)

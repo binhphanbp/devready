@@ -49,7 +49,7 @@ interface Stats {
     id: string;
     title: string;
     difficulty: string;
-    is_approved: boolean;
+    status: string;
     view_count: number;
     created_at: string;
     categories: { name: string } | null;
@@ -207,11 +207,11 @@ export default function AdminOverviewClient() {
       supabase
         .from('questions')
         .select('*', { count: 'exact', head: true })
-        .eq('is_approved', true),
+        .in('status', ['ai_verified', 'human_reviewed']),
       supabase
         .from('questions')
         .select('*', { count: 'exact', head: true })
-        .eq('is_approved', false),
+        .eq('status', 'pending'),
       supabase
         .from('community_reviews')
         .select('*', { count: 'exact', head: true }),
@@ -306,7 +306,7 @@ export default function AdminOverviewClient() {
     ] = await Promise.all([
       supabase
         .from('questions')
-        .select('id, title, difficulty, is_approved, view_count, created_at, categories(name)')
+        .select('id, title, difficulty, status, view_count, created_at, categories(name)')
         .order('created_at', { ascending: false })
         .limit(5),
       supabase
@@ -317,7 +317,7 @@ export default function AdminOverviewClient() {
       supabase
         .from('questions')
         .select('id, title, difficulty, view_count, bookmark_count')
-        .eq('is_approved', true)
+        .in('status', ['ai_verified', 'human_reviewed'])
         .order('view_count', { ascending: false })
         .limit(5),
       supabase
@@ -984,8 +984,10 @@ export default function AdminOverviewClient() {
                     </span>
                   </div>
                 </div>
-                {q.is_approved ? (
+                {q.status === 'human_reviewed' ? (
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                ) : q.status === 'ai_verified' ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-400" />
                 ) : (
                   <XCircle className="h-4 w-4 shrink-0 text-zinc-500" />
                 )}
