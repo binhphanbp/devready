@@ -6,20 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Brain,
-  Plus,
   Sparkles,
   PlayCircle,
   Layers,
   ArrowLeft,
   Trash2,
-  MoreVertical,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { CreateDeckDialog } from '@/components/flashcards/CreateDeckDialog';
 import { AddCardDialog } from '@/components/flashcards/AddCardDialog';
 import { StudyMode } from '@/components/flashcards/StudyMode';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+
 
 type Deck = {
   id: string;
@@ -37,6 +34,7 @@ type FlashcardData = {
   interval: number;
   repetitions: number;
   next_review: string;
+  question_id?: string | null;
 };
 
 type ViewMode = 'list' | 'detail' | 'study';
@@ -48,7 +46,7 @@ export default function FlashcardsPage() {
   const [dueCards, setDueCards] = useState<FlashcardData[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+
   // Fetch decks
   useEffect(() => {
     const fetchDecks = async () => {
