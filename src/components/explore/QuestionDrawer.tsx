@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { BookmarkIcon, Share2, Eye, Building2, Tag } from "lucide-react";
+import { BookmarkIcon, Share2, Eye, Tag } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -89,19 +89,7 @@ export function QuestionDrawer({ question, open, onClose }: QuestionDrawerProps)
                   ))}
                 </div>
               )}
-              {question.company_tags?.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <Building2 className="h-3 w-3 text-muted-foreground" />
-                  {question.company_tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-md bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+
             </div>
           )}
 

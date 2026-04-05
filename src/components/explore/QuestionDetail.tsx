@@ -9,7 +9,6 @@ import {
   BookmarkIcon,
   Share2,
   Eye,
-  Building2,
   Tag,
   ChevronDown,
   ChevronUp,
@@ -512,19 +511,7 @@ export function QuestionDetail({ question, onBack }: QuestionDetailProps) {
               ))}
             </div>
           )}
-          {question.company_tags?.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              {question.company_tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-lg bg-muted/60 border border-border/50 px-2.5 py-1 text-xs text-muted-foreground"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+
         </div>
       </div>
 
