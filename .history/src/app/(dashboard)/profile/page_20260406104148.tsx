@@ -159,10 +159,10 @@ export default async function ProfilePage() {
       {/* Profile Hero Card */}
       <Card className="border-border/50 bg-card/50 overflow-hidden">
         {/* Banner gradient */}
-        <div className="relative h-28 sm:h-36 bg-linear-to-br from-[#0066FF]/30 via-purple-500/20 to-cyan-500/15 overflow-hidden">
+        <div className="relative h-28 sm:h-36 bg-gradient-to-br from-[#0066FF]/30 via-purple-500/20 to-cyan-500/15 overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.6_0.24_260/15%),transparent_60%)]" />
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-card/80 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_oklch(0.6_0.24_260_/_15%),transparent_60%)]" />
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card/80 to-transparent" />
         </div>
 
         <CardContent className="px-4 sm:px-6 pb-5 sm:pb-6 -mt-12 sm:-mt-14">
@@ -174,7 +174,7 @@ export default async function ProfilePage() {
                   src={profile?.avatar_url ?? undefined}
                   alt={profile?.full_name ?? 'Avatar'}
                 />
-                <AvatarFallback className="bg-linear-to-br from-[#0066FF] to-[#0055DD] text-white text-lg sm:text-2xl font-bold">
+                <AvatarFallback className="bg-gradient-to-br from-[#0066FF] to-[#0055DD] text-white text-lg sm:text-2xl font-bold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -365,7 +365,7 @@ export default async function ProfilePage() {
                 className="group flex items-center gap-3.5 rounded-xl p-3 transition-all hover:bg-muted/50 active:scale-[0.98]"
               >
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br ${action.gradient} shrink-0`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.gradient} shrink-0`}
                 >
                   <action.icon className={`h-4.5 w-4.5 ${action.iconColor}`} />
                 </div>

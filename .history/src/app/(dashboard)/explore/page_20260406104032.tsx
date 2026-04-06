@@ -274,7 +274,7 @@ function TechStackSlider({
         <div className="relative flex-1 min-w-0">
           {/* Left gradient fade */}
           {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-muted/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted/60 to-transparent pointer-events-none z-10" />
           )}
 
           {/* Scrollable tech tags */}
@@ -290,7 +290,7 @@ function TechStackSlider({
                   key={tech}
                   onClick={() => toggleTechTag(tech)}
                   className={cn(
-                    'px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0 min-h-8 sm:min-h-0',
+                    'px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0 min-h-[32px] sm:min-h-0',
                     isActive
                       ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                       : 'bg-transparent text-muted-foreground border-dashed border-border/60 hover:border-primary/40 hover:text-foreground hover:bg-primary/5',
@@ -305,7 +305,7 @@ function TechStackSlider({
 
           {/* Right gradient fade */}
           {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-muted/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted/60 to-transparent pointer-events-none z-10" />
           )}
         </div>
 
@@ -344,7 +344,7 @@ function TechStackSlider({
 }
 
 export default function ExplorePage() {
-  const [questions, setQuestions] = useState<QuestionListItem[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -394,8 +394,7 @@ export default function ExplorePage() {
       let query = supabase
         .from('questions')
         .select(
-          // Lean fields only — heavy content/answers fetched on-demand when question is opened
-          'id, title, difficulty, tech_tags, company_tags, view_count, bookmark_count, categories(name, color)',
+          'id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, sample_answer, bonus_tip, common_pitfalls, official_source, categories(name, color)',
         )
         .in('status', ['ai_verified', 'human_reviewed']);
 
@@ -418,7 +417,7 @@ export default function ExplorePage() {
       }
 
       const { data } = await query.limit(50);
-      setQuestions((data as unknown as QuestionListItem[]) ?? []);
+      setQuestions((data as unknown as Question[]) ?? []);
       setLoading(false);
     };
 
@@ -431,17 +430,6 @@ export default function ExplorePage() {
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
     );
   };
-
-  // Fetch full question content on-demand — avoids loading heavy fields for all 50 list items
-  const openQuestion = useCallback(async (item: QuestionListItem) => {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('questions')
-      .select('id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, sample_answer, bonus_tip, common_pitfalls, official_source, categories(name, color)')
-      .eq('id', item.id)
-      .single();
-    if (data) setSelectedQuestion(data as unknown as Question);
-  }, []);
 
   const clearFilters = () => {
     setSelectedCategory(null);
@@ -690,7 +678,7 @@ export default function ExplorePage() {
               <QuestionCard
                 key={q.id}
                 question={q}
-                onClick={() => openQuestion(q)}
+                onClick={() => setSelectedQuestion(q)}
               />
             ))}
           </>

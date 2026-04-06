@@ -274,7 +274,7 @@ function TechStackSlider({
         <div className="relative flex-1 min-w-0">
           {/* Left gradient fade */}
           {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-muted/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted/60 to-transparent pointer-events-none z-10" />
           )}
 
           {/* Scrollable tech tags */}
@@ -290,7 +290,7 @@ function TechStackSlider({
                   key={tech}
                   onClick={() => toggleTechTag(tech)}
                   className={cn(
-                    'px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0 min-h-8 sm:min-h-0',
+                    'px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap shrink-0 min-h-[32px] sm:min-h-0',
                     isActive
                       ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                       : 'bg-transparent text-muted-foreground border-dashed border-border/60 hover:border-primary/40 hover:text-foreground hover:bg-primary/5',
@@ -305,7 +305,7 @@ function TechStackSlider({
 
           {/* Right gradient fade */}
           {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-muted/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted/60 to-transparent pointer-events-none z-10" />
           )}
         </div>
 

@@ -165,7 +165,7 @@ export default async function DashboardPage() {
         {stats.map((stat) => (
           <Card
             key={stat.title}
-            className={`relative overflow-hidden border-border/50 ${stat.borderColor} bg-linear-to-br ${stat.gradient} via-card/80 hover:border-opacity-60 transition-all duration-300`}
+            className={`relative overflow-hidden border-border/50 ${stat.borderColor} bg-gradient-to-br ${stat.gradient} via-card/80 hover:border-opacity-60 transition-all duration-300`}
           >
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between">
@@ -210,10 +210,10 @@ export default async function DashboardPage() {
             <Link key={action.href} href={action.href}>
               <Card className="group relative overflow-hidden border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.98] h-full">
                 <div
-                  className={`absolute inset-0 bg-linear-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                  className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
                 <CardContent className="relative p-4 sm:p-5">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br ${action.gradient} mb-3`}>
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.gradient} mb-3`}>
                     <action.icon className={`h-5 w-5 ${action.iconColor}`} />
                   </div>
                   <h3 className="font-semibold text-sm sm:text-base">{action.title}</h3>
