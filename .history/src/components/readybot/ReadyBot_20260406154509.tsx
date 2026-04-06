@@ -204,49 +204,35 @@ function MessageBubble({
 }) {
   const isLong = msg.content.length > 280 || msg.content.includes('```');
 
-  /* ── User message (both views) ── */
   if (msg.role === 'user') {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[78%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm leading-relaxed text-primary-foreground shadow-sm">
+        <div className="max-w-[78%] rounded-2xl rounded-tr-sm bg-primary px-3.5 py-2.5 text-sm leading-relaxed text-primary-foreground">
           {msg.content}
         </div>
       </div>
     );
   }
 
-  /* ── AI message — EXPANDED full-screen view ── */
-  if (!compact) {
-    return (
-      <div className="flex gap-2.5 items-start">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
-          <Bot className="h-3.5 w-3.5 text-primary" />
-        </div>
-        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm border border-primary/10 bg-primary/5 px-4 py-3.5">
-          <MdContent>{msg.content}</MdContent>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── AI message — COMPACT floating panel ── */
   return (
     <div className="flex gap-2.5 items-start">
       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
         <Bot className="h-3.5 w-3.5 text-primary" />
       </div>
 
-      {isLong ? (
-        /* Truncated with fade + expand CTA */
-        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm border border-border/60 bg-card overflow-hidden">
+      {compact && isLong ? (
+        /* ── Compact truncated bubble ── */
+        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm bg-muted/50 overflow-hidden">
+          {/* Clipped content with fade */}
           <div className="relative px-4 pt-3">
             <div className="max-h-36 overflow-hidden">
               <MdContent>{msg.content}</MdContent>
             </div>
-            {/* Gradient — matches bg-card */}
-            <div className="absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-card to-transparent pointer-events-none" />
+            {/* Gradient — matches exact bubble bg */}
+            <div className="absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-muted/80 to-transparent pointer-events-none" />
           </div>
-          <div className="flex items-center justify-between px-3.5 py-2 border-t border-border/20">
+          {/* Expand CTA — always visible, never clipped */}
+          <div className="flex items-center justify-between px-3.5 py-2 mt-0.5 border-t border-border/20">
             <span className="text-[11px] text-muted-foreground/60">Nội dung bị rút gọn</span>
             <button
               onClick={onExpand}
@@ -258,8 +244,8 @@ function MessageBubble({
           </div>
         </div>
       ) : (
-        /* Short message — clean card bubble */
-        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm border border-border/60 bg-card px-4 py-3 overflow-hidden">
+        /* ── Full bubble (expanded view or short message) ── */
+        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm bg-muted/50 px-4 py-3.5 overflow-hidden">
           <MdContent>{msg.content}</MdContent>
         </div>
       )}
@@ -274,11 +260,11 @@ function TypingIndicator() {
       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
         <Bot className="h-3.5 w-3.5 text-primary" />
       </div>
-      <div className="rounded-2xl rounded-tl-sm border border-border/60 bg-card px-4 py-3">
+      <div className="rounded-2xl rounded-tl-sm bg-muted/50 px-4 py-3">
         <div className="flex gap-1">
-          <span className="h-2 w-2 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0ms]" />
-          <span className="h-2 w-2 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:150ms]" />
-          <span className="h-2 w-2 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:300ms]" />
+          <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:0ms]" />
+          <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:150ms]" />
+          <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:300ms]" />
         </div>
       </div>
     </div>
@@ -584,7 +570,7 @@ export function ReadyBot() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => { setMessages([]); localStorage.removeItem('readybot_history'); }}
+                      onClick={() => setMessages([])}
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                       title="Xoá chat"
                     >
@@ -617,23 +603,21 @@ export function ReadyBot() {
               {/* Messages — no truncation in expanded view */}
               <div
                 ref={expandedScrollRef}
-                className="flex-1 overflow-y-auto px-6 py-5 min-h-0"
+                className="flex-1 overflow-y-auto px-5 py-4 space-y-5 min-h-0"
               >
-                <div className="max-w-3xl mx-auto space-y-6">
-                  {messages.length === 0 ? (
-                    <WelcomeScreen />
-                  ) : (
-                    messages.map((msg, i) => (
-                      <MessageBubble
-                        key={i}
-                        msg={msg}
-                        compact={false}
-                        onExpand={handleExpand}
-                      />
-                    ))
-                  )}
-                  {loading && <TypingIndicator />}
-                </div>
+                {messages.length === 0 ? (
+                  <WelcomeScreen />
+                ) : (
+                  messages.map((msg, i) => (
+                    <MessageBubble
+                      key={i}
+                      msg={msg}
+                      compact={false}
+                      onExpand={handleExpand}
+                    />
+                  ))
+                )}
+                {loading && <TypingIndicator />}
               </div>
 
               {inputBar}

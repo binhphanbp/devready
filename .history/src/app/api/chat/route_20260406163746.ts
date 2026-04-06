@@ -4,15 +4,14 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Fallback list: tries each model in order until one succeeds (handles rate limits)
-// openrouter/free = OpenRouter's meta-router that auto-picks available free models
 const FREE_MODELS = process.env.OPENROUTER_MODEL
   ? [process.env.OPENROUTER_MODEL]
   : [
-      'openrouter/free',
+      'deepseek/deepseek-r1:free',
       'meta-llama/llama-3.3-70b-instruct:free',
-      'google/gemma-3-27b-it:free',
-      'openai/gpt-oss-20b:free',
-      'nousresearch/hermes-3-llama-3.1-405b:free',
+      'google/gemini-2.5-pro-exp-03-25:free',
+      'qwen/qwen-2.5-72b-instruct:free',
+      'microsoft/phi-4:free',
     ];
 
 const SYSTEM_PROMPT = `Bạn là ReadyBot — AI Mentor của DevReady, nền tảng luyện phỏng vấn IT cho sinh viên và Junior Developer Việt Nam.
@@ -61,18 +60,14 @@ export async function POST(request: NextRequest) {
     let lastError = '';
     for (const model of FREE_MODELS) {
       let response: Response;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
         response = await fetch(OPENROUTER_URL, {
           method: 'POST',
           headers,
           body: JSON.stringify({ model, ...payload }),
-          signal: controller.signal,
+          signal: AbortSignal.timeout(20000),
         });
-        clearTimeout(timeoutId);
       } catch (fetchErr) {
-        clearTimeout(timeoutId);
         lastError = String(fetchErr);
         console.warn(`Model ${model} fetch failed (${lastError}), trying next...`);
         continue;

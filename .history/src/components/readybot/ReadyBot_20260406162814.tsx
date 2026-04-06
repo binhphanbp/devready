@@ -218,11 +218,18 @@ function MessageBubble({
   /* ── AI message — EXPANDED full-screen view ── */
   if (!compact) {
     return (
-      <div className="flex gap-2.5 items-start">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
-          <Bot className="h-3.5 w-3.5 text-primary" />
+      <div className="space-y-2.5">
+        {/* Bot label row */}
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/15">
+            <Bot className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <span className="text-[11px] font-bold tracking-widest text-primary uppercase">
+            ReadyBot
+          </span>
         </div>
-        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm border border-primary/10 bg-primary/5 px-4 py-3.5">
+        {/* Content — indented to align with label text */}
+        <div className="pl-8 rounded-xl rounded-tl-none bg-primary/5 border border-primary/10 px-4 py-3.5">
           <MdContent>{msg.content}</MdContent>
         </div>
       </div>

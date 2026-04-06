@@ -61,18 +61,14 @@ export async function POST(request: NextRequest) {
     let lastError = '';
     for (const model of FREE_MODELS) {
       let response: Response;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
         response = await fetch(OPENROUTER_URL, {
           method: 'POST',
           headers,
           body: JSON.stringify({ model, ...payload }),
-          signal: controller.signal,
+          signal: AbortSignal.timeout(20000),
         });
-        clearTimeout(timeoutId);
       } catch (fetchErr) {
-        clearTimeout(timeoutId);
         lastError = String(fetchErr);
         console.warn(`Model ${model} fetch failed (${lastError}), trying next...`);
         continue;

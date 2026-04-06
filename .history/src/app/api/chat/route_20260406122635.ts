@@ -4,28 +4,29 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Fallback list: tries each model in order until one succeeds (handles rate limits)
-// openrouter/free = OpenRouter's meta-router that auto-picks available free models
 const FREE_MODELS = process.env.OPENROUTER_MODEL
   ? [process.env.OPENROUTER_MODEL]
   : [
-      'openrouter/free',
-      'meta-llama/llama-3.3-70b-instruct:free',
-      'google/gemma-3-27b-it:free',
-      'openai/gpt-oss-20b:free',
-      'nousresearch/hermes-3-llama-3.1-405b:free',
+      'deepseek/deepseek-chat-v3-0324:free',
+      'meta-llama/llama-4-maverick:free',
+      'google/gemini-2.0-flash-exp:free',
+      'qwen/qwen3.6-plus:free',
+      'nvidia/nemotron-3-super-120b-a12b:free',
     ];
 
 const SYSTEM_PROMPT = `Bạn là ReadyBot — AI Mentor của DevReady, nền tảng luyện phỏng vấn IT cho sinh viên và Junior Developer Việt Nam.
 
-Quy tắc trả lời:
-1. Trả lời bằng tiếng Việt, rõ ràng và dễ hiểu
-2. Dùng Markdown chuẩn: heading (##), bullet list (-), code block (\`\`\`lang ... \`\`\`), in đậm (**text**)
-3. Code phải luôn nằm trong code block riêng biệt — KHÔNG đặt code vào trong bảng hay inline text dài
-4. Dùng bảng (table) CHỈ khi so sánh các mục có cùng thuộc tính (tối đa 3 cột, KHÔNG chứa code trong ô)
-5. Ví dụ code: đặt NGOÀI bảng, dùng code block với tên ngôn ngữ (\`\`\`js, \`\`\`sql, ...)
-6. Khi trả lời câu hỏi phỏng vấn, cấu trúc theo thứ tự: Định nghĩa ngắn → Ví dụ code → Tips → Lỗi thường gặp
-7. Giữ câu trả lời dưới 400 từ trừ khi được yêu cầu chi tiết hơn
-8. Khuyến khích và động viên người dùng`;
+Quy tắc:
+1. Trả lời bằng tiếng Việt, ngắn gọn và dễ hiểu
+2. Luôn đưa ra ví dụ code khi giải thích khái niệm kỹ thuật
+3. Sử dụng Markdown để format câu trả lời (headers, code blocks, bullet points)
+4. Khi được hỏi câu phỏng vấn, hãy đưa ra:
+   - Câu trả lời mẫu
+   - Tips khi trả lời
+   - Lỗi thường gặp cần tránh
+5. Khuyến khích và động viên người dùng
+6. Nếu không chắc chắn, hãy nói rõ ràng thay vì đoán mò
+7. Giữ câu trả lời dưới 500 từ trừ khi được yêu cầu chi tiết hơn`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,23 +61,11 @@ export async function POST(request: NextRequest) {
 
     let lastError = '';
     for (const model of FREE_MODELS) {
-      let response: Response;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-      try {
-        response = await fetch(OPENROUTER_URL, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ model, ...payload }),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-      } catch (fetchErr) {
-        clearTimeout(timeoutId);
-        lastError = String(fetchErr);
-        console.warn(`Model ${model} fetch failed (${lastError}), trying next...`);
-        continue;
-      }
+      const response = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ model, ...payload }),
+      });
 
       if (response.status === 429 || response.status === 503) {
         lastError = await response.text();

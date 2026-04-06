@@ -218,11 +218,18 @@ function MessageBubble({
   /* ── AI message — EXPANDED full-screen view ── */
   if (!compact) {
     return (
-      <div className="flex gap-2.5 items-start">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
-          <Bot className="h-3.5 w-3.5 text-primary" />
+      <div className="space-y-2.5">
+        {/* Bot label row */}
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/15">
+            <Bot className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <span className="text-[11px] font-bold tracking-widest text-primary uppercase">
+            ReadyBot
+          </span>
         </div>
-        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm border border-primary/10 bg-primary/5 px-4 py-3.5">
+        {/* Content — indented to align with label text */}
+        <div className="pl-8 rounded-xl rounded-tl-none bg-primary/5 border border-primary/10 px-4 py-3.5">
           <MdContent>{msg.content}</MdContent>
         </div>
       </div>
@@ -617,23 +624,21 @@ export function ReadyBot() {
               {/* Messages — no truncation in expanded view */}
               <div
                 ref={expandedScrollRef}
-                className="flex-1 overflow-y-auto px-6 py-5 min-h-0"
+                className="flex-1 overflow-y-auto px-6 py-5 space-y-6 min-h-0"
               >
-                <div className="max-w-3xl mx-auto space-y-6">
-                  {messages.length === 0 ? (
-                    <WelcomeScreen />
-                  ) : (
-                    messages.map((msg, i) => (
-                      <MessageBubble
-                        key={i}
-                        msg={msg}
-                        compact={false}
-                        onExpand={handleExpand}
-                      />
-                    ))
-                  )}
-                  {loading && <TypingIndicator />}
-                </div>
+                {messages.length === 0 ? (
+                  <WelcomeScreen />
+                ) : (
+                  messages.map((msg, i) => (
+                    <MessageBubble
+                      key={i}
+                      msg={msg}
+                      compact={false}
+                      onExpand={handleExpand}
+                    />
+                  ))
+                )}
+                {loading && <TypingIndicator />}
               </div>
 
               {inputBar}

@@ -4,14 +4,14 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Fallback list: tries each model in order until one succeeds (handles rate limits)
-// openrouter/free = OpenRouter's meta-router that auto-picks available free models
+// All models verified against OpenRouter /api/v1/models with pricing prompt:"0" completion:"0"
 const FREE_MODELS = process.env.OPENROUTER_MODEL
   ? [process.env.OPENROUTER_MODEL]
   : [
-      'openrouter/free',
       'meta-llama/llama-3.3-70b-instruct:free',
-      'google/gemma-3-27b-it:free',
+      'qwen/qwen3.6-plus:free',
       'openai/gpt-oss-20b:free',
+      'google/gemma-3-27b-it:free',
       'nousresearch/hermes-3-llama-3.1-405b:free',
     ];
 
@@ -61,18 +61,14 @@ export async function POST(request: NextRequest) {
     let lastError = '';
     for (const model of FREE_MODELS) {
       let response: Response;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
         response = await fetch(OPENROUTER_URL, {
           method: 'POST',
           headers,
           body: JSON.stringify({ model, ...payload }),
-          signal: controller.signal,
+          signal: AbortSignal.timeout(20000),
         });
-        clearTimeout(timeoutId);
       } catch (fetchErr) {
-        clearTimeout(timeoutId);
         lastError = String(fetchErr);
         console.warn(`Model ${model} fetch failed (${lastError}), trying next...`);
         continue;
