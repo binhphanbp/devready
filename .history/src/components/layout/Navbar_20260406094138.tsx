@@ -323,7 +323,7 @@ export function Navbar() {
                               <Link
                                 href="/admin"
                                 onClick={() => setUserMenuOpen(false)}
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 transition-colors"
+                                className="flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
                               >
                                 <Shield className="h-4 w-4" />
                                 Quản trị
@@ -510,17 +510,6 @@ export function Navbar() {
                           <User className="mr-2 h-4 w-4" />
                           Hồ sơ
                         </Button>
-                        {isAdmin && (
-                          <Button
-                            variant="outline"
-                            className="w-full text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 border-orange-500/20"
-                            render={<Link href="/admin" />}
-                            onClick={() => setMobileOpen(false)}
-                          >
-                            <Shield className="mr-2 h-4 w-4" />
-                            Quản trị
-                          </Button>
-                        )}
                         <Button
                           variant="outline"
                           className="w-full text-red-400 hover:text-red-400 hover:bg-red-500/10 border-red-500/20"
