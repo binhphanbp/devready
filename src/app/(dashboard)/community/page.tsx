@@ -111,8 +111,7 @@ export default function CommunityPage() {
         .order('sort_order'),
       supabase
         .from('community_reviews')
-        .select('id, is_approved, author_id')
-        .eq('is_approved', true),
+        .select('id, is_approved, author_id'),
     ]);
 
     if (catRes.data) setCategories(catRes.data);
