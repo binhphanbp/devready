@@ -1,0 +1,338 @@
+'use client';
+
+import { useState, useRef, useEffect, useCallback } from 'react';
+import type { ComponentProps } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Bot, X, Send, Loader2, Sparkles, Copy, Check, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.min.css';
+
+type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+/* ---------- Copy button for code blocks ---------- */
+function CopyButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = useCallback(async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [code]);
+  return (
+    <button
+      onClick={copy}
+      className="flex items-center gap-1 rounded-md bg-white/10 px-2 py-0.5 text-[10px] text-white/60 hover:bg-white/20 hover:text-white transition-colors"
+    >
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      {copied ? 'Đã copy' : 'Copy'}
+    </button>
+  );
+}
+
+/* ---------- Custom <pre> renderer with copy + horizontal scroll ---------- */
+function PreBlock({ children, ...props }: ComponentProps<'pre'>) {
+  const child = children as React.ReactElement<{ className?: string; children?: string }>;
+  const lang = child?.props?.className?.replace('hljs language-', '').replace('language-', '') ?? 'code';
+  const codeText = String(child?.props?.children ?? '').replace(/\n$/, '');
+  return (
+    <div className="my-3 rounded-lg overflow-hidden border border-white/10 bg-[#0d1117]">
+      <div className="flex items-center justify-between bg-white/5 px-3 py-1.5 border-b border-white/10">
+        <span className="text-[10px] font-mono text-white/40">{lang}</span>
+        <CopyButton code={codeText} />
+      </div>
+      <pre
+        {...props}
+        className="overflow-x-auto p-4 text-[13px] leading-[1.65] m-0 bg-transparent"
+      >
+        {children}
+      </pre>
+    </div>
+  );
+}
+
+export function ReadyBot() {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    // Scroll to bottom on new messages
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  const sendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || loading) return;
+
+    const userMessage = input.trim();
+    setInput('');
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, { role: 'user', content: userMessage }],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.reply) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: data.reply },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!',
+          },
+        ]);
+      }
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'Không thể kết nối. Vui lòng kiểm tra mạng và thử lại!',
+        },
+      ]);
+    }
+
+    setLoading(false);
+  };
+
+  const quickPrompts = [
+    'Giải thích React hooks',
+    'Tips phỏng vấn Frontend',
+    'SQL JOIN là gì?',
+    'REST vs GraphQL',
+  ];
+
+  return (
+    <>
+      {/* Floating button */}
+      <AnimatePresence>
+        {!open && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            onClick={() => setOpen(true)}
+            className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-4 sm:right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-linear-to-r from-[#0066FF] to-[#0055DD] text-white shadow-lg shadow-[#0066FF]/25 hover:shadow-xl hover:shadow-[#0066FF]/30 transition-shadow active:scale-95"
+            aria-label="Mở ReadyBot"
+          >
+            <Bot className="h-6 w-6" />
+            {/* Pulse ring */}
+            <span className="absolute inset-0 rounded-full animate-ping bg-[#0066FF]/20" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Chat panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 sm:w-115 sm:max-h-160 flex flex-col sm:rounded-2xl border-0 sm:border border-border/50 bg-card shadow-2xl overflow-hidden"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] border-b border-border/50 bg-linear-to-r from-[#0066FF]/10 to-transparent">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-[#0066FF] to-[#0055DD]">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <span className="text-sm font-semibold">ReadyBot</span>
+                  <div className="flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    <span className="text-[10px] text-muted-foreground">
+                      AI Mentor
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                {messages.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setMessages([])}
+                    className="h-9 w-9 sm:h-7 sm:w-7 p-0 text-muted-foreground hover:text-destructive"
+                    title="Xoá cuộc trò chuyện"
+                  >
+                    <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setOpen(false)}
+                  className="h-9 w-9 sm:h-7 sm:w-7 p-0"
+                >
+                  <X className="h-5 w-5 sm:h-4 sm:w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0 sm:min-h-90 sm:max-h-115"
+            >
+              {messages.length === 0 ? (
+                <div className="space-y-4">
+                  {/* Welcome */}
+                  <div className="flex gap-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                    <div className="rounded-2xl rounded-tl-md bg-muted/50 px-3.5 py-2.5 text-sm leading-relaxed">
+                      <p className="font-medium mb-1">
+                        Xin chào! Mình là ReadyBot 🤖
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        AI Mentor giúp bạn luyện phỏng vấn IT. Hỏi mình bất cứ
+                        điều gì!
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quick prompts */}
+                  <div className="flex flex-wrap gap-1.5 pl-0 sm:pl-9">
+                    {quickPrompts.map((prompt) => (
+                      <button
+                        key={prompt}
+                        onClick={() => {
+                          setInput(prompt);
+                          setTimeout(() => {
+                            const form = document.getElementById(
+                              'chatbot-form',
+                            ) as HTMLFormElement;
+                            form?.requestSubmit();
+                          }, 50);
+                        }}
+                        className="rounded-full border border-border/50 bg-background px-3 py-1.5 sm:py-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors active:scale-95"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                messages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'flex gap-2.5',
+                      msg.role === 'user' && 'justify-end',
+                    )}
+                  >
+                    {msg.role === 'assistant' && (
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
+                        <Bot className="h-3.5 w-3.5 text-primary" />
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        'rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
+                        msg.role === 'user'
+                          ? 'max-w-[80%] bg-primary text-primary-foreground rounded-tr-md'
+                          : 'w-full bg-muted/50 rounded-tl-md',
+                      )}
+                    >
+                      {msg.role === 'assistant' ? (
+                        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground prose-p:my-1.5 prose-headings:text-foreground prose-headings:font-semibold prose-headings:my-2 prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-code:before:content-none prose-code:after:content-none prose-pre:m-0 prose-pre:p-0 prose-pre:bg-transparent prose-ul:my-1.5 prose-li:my-0.5 prose-ol:my-1.5 prose-strong:text-foreground">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeHighlight]}
+                            components={{ pre: PreBlock }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+
+              {loading && (
+                <div className="flex gap-2.5">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                    <Bot className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <div className="rounded-2xl rounded-tl-md bg-muted/50 px-4 py-3">
+                    <div className="flex gap-1">
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:0ms]" />
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:150ms]" />
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:300ms]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="border-t border-border/50 px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <form
+                id="chatbot-form"
+                onSubmit={sendMessage}
+                className="flex items-center gap-2"
+              >
+                <Input
+                  ref={inputRef}
+                  placeholder="Hỏi ReadyBot..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="h-10 sm:h-9 text-sm bg-muted/30 border-border/50"
+                  disabled={loading}
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="h-10 w-10 sm:h-9 sm:w-9 p-0 shrink-0"
+                  disabled={!input.trim() || loading}
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

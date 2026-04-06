@@ -39,59 +39,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const payload = {
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...messages.map((msg: { role: string; content: string }) => ({
-          role: msg.role === 'assistant' ? 'assistant' : 'user',
-          content: msg.content,
-        })),
-      ],
-      temperature: 0.7,
-      top_p: 0.9,
-      max_tokens: 2048,
-    };
+    const response = await fetch(OPENROUTER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://devready.app',
+        'X-Title': 'DevReady - ReadyBot',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...messages.map((msg: { role: string; content: string }) => ({
+            role: msg.role === 'assistant' ? 'assistant' : 'user',
+            content: msg.content,
+          })),
+        ],
+        temperature: 0.7,
+        top_p: 0.9,
+        max_tokens: 2048,
+      }),
+    });
 
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://devready.app',
-      'X-Title': 'DevReady - ReadyBot',
-    };
-
-    let lastError = '';
-    for (const model of FREE_MODELS) {
-      const response = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ model, ...payload }),
-      });
-
-      if (response.status === 429 || response.status === 503) {
-        lastError = await response.text();
-        console.warn(`Model ${model} rate-limited, trying next...`);
-        continue;
-      }
-
-      if (!response.ok) {
-        lastError = await response.text();
-        console.error(`OpenRouter API error (${model}):`, lastError);
-        continue;
-      }
-
-      const data = await response.json();
-      const reply: string =
-        data.choices?.[0]?.message?.content ||
-        'Xin lỗi, mình không thể trả lời lúc này. Vui lòng thử lại!';
-
-      return NextResponse.json({ reply });
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('OpenRouter API error:', error);
+      return NextResponse.json(
+        { error: 'Failed to get AI response' },
+        { status: 500 },
+      );
     }
 
-    console.error('All models failed. Last error:', lastError);
-    return NextResponse.json(
-      { error: 'Failed to get AI response' },
-      { status: 500 },
-    );
+    const data = await response.json();
+    const reply: string =
+      data.choices?.[0]?.message?.content ||
+      'Xin lỗi, mình không thể trả lời lúc này. Vui lòng thử lại!';
+
+    return NextResponse.json({ reply });
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
