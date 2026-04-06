@@ -374,12 +374,6 @@ export function EditProfileDialog({
                   onChange={handleFileChange}
                 />
               </div>
-              {avatarError && (
-                <p className="text-xs text-red-500 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {avatarError}
-                </p>
-              )}
 
               {/* Full name */}
               <div className="space-y-1.5">
@@ -394,22 +388,8 @@ export function EditProfileDialog({
                   id="full-name"
                   placeholder="Nguyễn Văn A"
                   value={fullName}
-                  onChange={(e) => {
-                    setFullName(e.target.value);
-                    if (e.target.value.trim()) setFullNameError(null);
-                  }}
-                  className={
-                    fullNameError
-                      ? 'border-red-500 focus-visible:ring-red-500'
-                      : ''
-                  }
+                  onChange={(e) => setFullName(e.target.value)}
                 />
-                {fullNameError && (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {fullNameError}
-                  </p>
-                )}
               </div>
 
               {/* Username */}
@@ -468,35 +448,12 @@ export function EditProfileDialog({
                   <School className="h-3.5 w-3.5 text-muted-foreground" />
                   Trường học
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="school-name"
-                    placeholder="FPT Polytechnic"
-                    value={schoolName}
-                    onChange={(e) => handleSchoolChange(e.target.value)}
-                    onFocus={() => setShowSchoolSuggestions(true)}
-                    onBlur={() => setShowSchoolSuggestions(false)}
-                    autoComplete="off"
-                  />
-                  {showSchoolSuggestions && filteredSchools.length > 0 && (
-                    <div className="absolute z-50 top-full left-0 right-0 mt-1 border border-border rounded-md shadow-md bg-popover overflow-hidden">
-                      {filteredSchools.map((school) => (
-                        <button
-                          key={school}
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => {
-                            handleSchoolChange(school);
-                            setShowSchoolSuggestions(false);
-                          }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
-                        >
-                          {school}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <Input
+                  id="school-name"
+                  placeholder="FPT Polytechnic"
+                  value={schoolName}
+                  onChange={(e) => setSchoolName(e.target.value)}
+                />
               </div>
 
               {/* Education year */}
@@ -513,7 +470,7 @@ export function EditProfileDialog({
                     <SelectValue placeholder="Chọn năm học" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableYearOptions.map((opt) => (
+                    {EDUCATION_YEARS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value} label={opt.label}>
                         {opt.label}
                       </SelectItem>

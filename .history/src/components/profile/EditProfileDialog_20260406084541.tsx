@@ -394,22 +394,8 @@ export function EditProfileDialog({
                   id="full-name"
                   placeholder="Nguyễn Văn A"
                   value={fullName}
-                  onChange={(e) => {
-                    setFullName(e.target.value);
-                    if (e.target.value.trim()) setFullNameError(null);
-                  }}
-                  className={
-                    fullNameError
-                      ? 'border-red-500 focus-visible:ring-red-500'
-                      : ''
-                  }
+                  onChange={(e) => setFullName(e.target.value)}
                 />
-                {fullNameError && (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {fullNameError}
-                  </p>
-                )}
               </div>
 
               {/* Username */}

@@ -374,12 +374,6 @@ export function EditProfileDialog({
                   onChange={handleFileChange}
                 />
               </div>
-              {avatarError && (
-                <p className="text-xs text-red-500 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {avatarError}
-                </p>
-              )}
 
               {/* Full name */}
               <div className="space-y-1.5">
@@ -394,22 +388,8 @@ export function EditProfileDialog({
                   id="full-name"
                   placeholder="Nguyễn Văn A"
                   value={fullName}
-                  onChange={(e) => {
-                    setFullName(e.target.value);
-                    if (e.target.value.trim()) setFullNameError(null);
-                  }}
-                  className={
-                    fullNameError
-                      ? 'border-red-500 focus-visible:ring-red-500'
-                      : ''
-                  }
+                  onChange={(e) => setFullName(e.target.value)}
                 />
-                {fullNameError && (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {fullNameError}
-                  </p>
-                )}
               </div>
 
               {/* Username */}
@@ -513,7 +493,7 @@ export function EditProfileDialog({
                     <SelectValue placeholder="Chọn năm học" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableYearOptions.map((opt) => (
+                    {EDUCATION_YEARS_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value} label={opt.label}>
                         {opt.label}
                       </SelectItem>
