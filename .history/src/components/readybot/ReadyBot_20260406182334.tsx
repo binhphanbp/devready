@@ -31,9 +31,7 @@ function extractText(node: ReactNode): string {
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(extractText).join('');
   if (typeof node === 'object' && 'props' in (node as object))
-    return extractText(
-      (node as React.ReactElement<{ children?: ReactNode }>).props?.children,
-    );
+    return extractText((node as React.ReactElement<{ children?: ReactNode }>).props?.children);
   return '';
 }
 
@@ -88,103 +86,64 @@ function PreBlock({ children, ...props }: ComponentProps<'pre'>) {
 const mdComponents = {
   /* ── Block: paragraph ── */
   p: ({ children, ...p }: ComponentProps<'p'>) => (
-    <p
-      {...p}
-      className="text-[13.5px] leading-[1.75] text-foreground my-2.5 first:mt-0 last:mb-0"
-    >
+    <p {...p} className="text-[13.5px] leading-[1.75] text-foreground my-2.5 first:mt-0 last:mb-0">
       {children}
     </p>
   ),
   /* ── Headings ── */
   h1: ({ children, ...p }: ComponentProps<'h1'>) => (
-    <h1
-      {...p}
-      className="text-[15px] font-bold text-foreground mt-5 mb-2 first:mt-0 leading-tight"
-    >
+    <h1 {...p} className="text-[15px] font-bold text-foreground mt-5 mb-2 first:mt-0 leading-tight">
       {children}
     </h1>
   ),
   h2: ({ children, ...p }: ComponentProps<'h2'>) => (
-    <h2
-      {...p}
-      className="text-[14px] font-semibold text-foreground mt-4 mb-1.5 pb-1.5 border-b border-border/25 first:mt-0 leading-tight"
-    >
+    <h2 {...p} className="text-[14px] font-semibold text-foreground mt-4 mb-1.5 pb-1.5 border-b border-border/25 first:mt-0 leading-tight">
       {children}
     </h2>
   ),
   h3: ({ children, ...p }: ComponentProps<'h3'>) => (
-    <h3
-      {...p}
-      className="text-[13px] font-semibold text-foreground mt-3 mb-1 first:mt-0 leading-tight"
-    >
+    <h3 {...p} className="text-[13px] font-semibold text-foreground mt-3 mb-1 first:mt-0 leading-tight">
       {children}
     </h3>
   ),
   /* ── Inline ── */
   strong: ({ children, ...p }: ComponentProps<'strong'>) => (
-    <strong {...p} className="font-semibold text-foreground">
-      {children}
-    </strong>
+    <strong {...p} className="font-semibold text-foreground">{children}</strong>
   ),
   em: ({ children, ...p }: ComponentProps<'em'>) => (
-    <em {...p} className="italic text-foreground/80">
-      {children}
-    </em>
+    <em {...p} className="italic text-foreground/80">{children}</em>
   ),
   code: ({ children, className, ...p }: ComponentProps<'code'>) => {
-    if (className)
-      return (
-        <code {...p} className={className}>
-          {children}
-        </code>
-      );
+    if (className) return <code {...p} className={className}>{children}</code>;
     return (
-      <code
-        {...p}
-        className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[12px] font-mono"
-      >
+      <code {...p} className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[12px] font-mono">
         {children}
       </code>
     );
   },
   a: ({ children, ...p }: ComponentProps<'a'>) => (
-    <a
-      {...p}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
-    >
+    <a {...p} target="_blank" rel="noopener noreferrer"
+      className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
       {children}
     </a>
   ),
   /* ── Lists ── */
   ul: ({ children, ...p }: ComponentProps<'ul'>) => (
-    <ul
-      {...p}
-      className="my-2.5 pl-5 space-y-1.5 list-disc marker:text-primary/50 first:mt-0 last:mb-0"
-    >
+    <ul {...p} className="my-2.5 pl-5 space-y-1.5 list-disc marker:text-primary/50 first:mt-0 last:mb-0">
       {children}
     </ul>
   ),
   ol: ({ children, ...p }: ComponentProps<'ol'>) => (
-    <ol
-      {...p}
-      className="my-2.5 pl-5 space-y-1.5 list-decimal marker:text-primary/50 first:mt-0 last:mb-0"
-    >
+    <ol {...p} className="my-2.5 pl-5 space-y-1.5 list-decimal marker:text-primary/50 first:mt-0 last:mb-0">
       {children}
     </ol>
   ),
   li: ({ children, ...p }: ComponentProps<'li'>) => (
-    <li {...p} className="text-[13.5px] leading-[1.7] text-foreground">
-      {children}
-    </li>
+    <li {...p} className="text-[13.5px] leading-[1.7] text-foreground">{children}</li>
   ),
   /* ── Block: quote & rule ── */
   blockquote: ({ children, ...p }: ComponentProps<'blockquote'>) => (
-    <blockquote
-      {...p}
-      className="border-l-2 border-primary/40 pl-3.5 my-3 text-muted-foreground italic text-[13px]"
-    >
+    <blockquote {...p} className="border-l-2 border-primary/40 pl-3.5 my-3 text-muted-foreground italic text-[13px]">
       {children}
     </blockquote>
   ),
@@ -194,41 +153,27 @@ const mdComponents = {
   /* ── Table ── */
   table: ({ children, ...p }: ComponentProps<'table'>) => (
     <div className="overflow-x-auto my-3 rounded-xl border border-border/30">
-      <table {...p} className="w-full border-collapse text-[12.5px]">
-        {children}
-      </table>
+      <table {...p} className="w-full border-collapse text-[12.5px]">{children}</table>
     </div>
   ),
   thead: ({ children, ...p }: ComponentProps<'thead'>) => (
-    <thead {...p} className="bg-muted/60">
-      {children}
-    </thead>
+    <thead {...p} className="bg-muted/60">{children}</thead>
   ),
   tbody: ({ children, ...p }: ComponentProps<'tbody'>) => (
-    <tbody {...p} className="divide-y divide-border/20">
-      {children}
-    </tbody>
+    <tbody {...p} className="divide-y divide-border/20">{children}</tbody>
   ),
   tr: ({ children, ...p }: ComponentProps<'tr'>) => (
-    <tr
-      {...p}
-      className="border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors"
-    >
+    <tr {...p} className="border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors">
       {children}
     </tr>
   ),
   th: ({ children, ...p }: ComponentProps<'th'>) => (
-    <th
-      {...p}
-      className="px-3 py-2 font-semibold text-left text-[11px] uppercase tracking-wide text-muted-foreground border-b border-border/30"
-    >
+    <th {...p} className="px-3 py-2 font-semibold text-left text-[11px] uppercase tracking-wide text-muted-foreground border-b border-border/30">
       {children}
     </th>
   ),
   td: ({ children, ...p }: ComponentProps<'td'>) => (
-    <td {...p} className="px-3 py-2">
-      {children}
-    </td>
+    <td {...p} className="px-3 py-2">{children}</td>
   ),
 };
 
@@ -259,8 +204,7 @@ function MessageBubble({
   onExpand: () => void;
   isStreaming?: boolean;
 }) {
-  const isLong =
-    !isStreaming && (msg.content.length > 280 || msg.content.includes('```'));
+  const isLong = !isStreaming && (msg.content.length > 280 || msg.content.includes('```'));
 
   /* ── User message (both views) ── */
   if (msg.role === 'user') {
@@ -309,9 +253,7 @@ function MessageBubble({
             <div className="absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-card to-transparent pointer-events-none" />
           </div>
           <div className="flex items-center justify-between px-3.5 py-2 border-t border-border/20">
-            <span className="text-[11px] text-muted-foreground/60">
-              Nội dung bị rút gọn
-            </span>
+            <span className="text-[11px] text-muted-foreground/60">Nội dung bị rút gọn</span>
             <button
               onClick={onExpand}
               className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary/20 transition-colors active:scale-95"
@@ -386,9 +328,7 @@ export function ReadyBot() {
     try {
       const toSave = messages.slice(-80);
       localStorage.setItem('readybot_history', JSON.stringify(toSave));
-    } catch {
-      /* quota exceeded — silent fail */
-    }
+    } catch { /* quota exceeded — silent fail */ }
   }, [messages, streaming]);
 
   /* Scroll to bottom when new messages arrive */
@@ -426,14 +366,8 @@ export function ReadyBot() {
         });
         if (!res.ok || !res.body) {
           let errMsg = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!';
-          try {
-            const d = await res.json();
-            if (d.error) errMsg = d.error;
-          } catch {}
-          setMessages((prev) => [
-            ...prev,
-            { role: 'assistant', content: errMsg },
-          ]);
+          try { const d = await res.json(); if (d.error) errMsg = d.error; } catch {}
+          setMessages((prev) => [...prev, { role: 'assistant', content: errMsg }]);
           setLoading(false);
           return;
         }
@@ -450,23 +384,16 @@ export function ReadyBot() {
             setMessages((prev) => {
               const last = prev[prev.length - 1];
               if (!last || last.role !== 'assistant') return prev;
-              return [
-                ...prev.slice(0, -1),
-                { role: 'assistant' as const, content: last.content + chunk },
-              ];
+              return [...prev.slice(0, -1), { role: 'assistant' as const, content: last.content + chunk }];
             });
           }
         }
       } catch {
         setMessages((prev) => {
           const last = prev[prev.length - 1];
-          const errMsg =
-            'Không thể kết nối. Vui lòng kiểm tra mạng và thử lại!';
+          const errMsg = 'Không thể kết nối. Vui lòng kiểm tra mạng và thử lại!';
           if (last?.role === 'assistant' && last.content === '') {
-            return [
-              ...prev.slice(0, -1),
-              { role: 'assistant' as const, content: errMsg },
-            ];
+            return [...prev.slice(0, -1), { role: 'assistant' as const, content: errMsg }];
           }
           return [...prev, { role: 'assistant' as const, content: errMsg }];
         });
@@ -555,7 +482,7 @@ export function ReadyBot() {
           className="h-10 w-10 sm:h-9 sm:w-9 p-0 shrink-0"
           disabled={!input.trim() || loading || streaming}
         >
-          {loading || streaming ? (
+          {(loading || streaming) ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Send className="h-4 w-4" />
@@ -613,10 +540,7 @@ export function ReadyBot() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setMessages([]);
-                        localStorage.removeItem('readybot_history');
-                      }}
+                      onClick={() => { setMessages([]); localStorage.removeItem('readybot_history'); }}
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                       title="Xoá chat"
                     >
@@ -627,9 +551,7 @@ export function ReadyBot() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    setOpen(false);
-                  }}
+                  onClick={() => { setOpen(false); }}
                   className="h-8 w-8 p-0"
                 >
                   <X className="h-4 w-4" />
@@ -694,10 +616,7 @@ export function ReadyBot() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setMessages([]);
-                        localStorage.removeItem('readybot_history');
-                      }}
+                      onClick={() => { setMessages([]); localStorage.removeItem('readybot_history'); }}
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                       title="Xoá chat"
                     >
