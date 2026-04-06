@@ -277,7 +277,7 @@ export default function FeedbackDialog({ collapsed = false }: FeedbackDialogProp
                       if (contentError) setContentError(null);
                     }}
                     rows={4}
-                    className={cn('w-full resize-none wrap-break-word', contentError && 'border-red-500/60 focus-visible:ring-red-500/20')}
+                    className={cn('w-full resize-none break-words', contentError && 'border-red-500/60 focus-visible:ring-red-500/20')}
                   />
                   {contentError && (
                     <p className="text-xs text-red-400">{contentError}</p>
