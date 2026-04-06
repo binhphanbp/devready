@@ -157,7 +157,6 @@ function SidebarContent({
       {/* Bottom section */}
       <div className="shrink-0 px-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="mx-3 mb-3 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
-        <FeedbackDialog collapsed={collapsed} />
         <ThemeToggle collapsed={collapsed} />
         <button
           onClick={onLogout}
