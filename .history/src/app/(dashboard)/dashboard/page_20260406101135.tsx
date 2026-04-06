@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   BookOpen,
@@ -15,26 +14,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { ActivityHeatmap } from '@/components/dashboard/ActivityHeatmap';
-
-function ActivityHeatmapSkeleton() {
-  return (
-    <div className="rounded-2xl border border-border/50 bg-card/50 p-5 sm:p-6 animate-pulse">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="h-4 w-4 rounded bg-muted/60" />
-        <div className="h-4 w-32 rounded bg-muted/60" />
-      </div>
-      <div className="flex gap-1 overflow-hidden">
-        {Array.from({ length: 53 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            {Array.from({ length: 7 }).map((_, j) => (
-              <div key={j} className="h-3 w-3 rounded-sm bg-muted/40" />
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -188,14 +167,12 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Activity Heatmap — deferred so it doesn't block initial paint */}
-      <Suspense fallback={<ActivityHeatmapSkeleton />}>
-        <ActivityHeatmap
-          userId={user.id}
-          streakCount={profile?.streak_count ?? 0}
-          lastActiveDate={profile?.last_active_date ?? null}
-        />
-      </Suspense>
+      {/* Activity Heatmap */}
+      <ActivityHeatmap
+        userId={user.id}
+        streakCount={profile?.streak_count ?? 0}
+        lastActiveDate={profile?.last_active_date ?? null}
+      />
 
       {/* Quick Actions */}
       <div>

@@ -1,5 +1,12 @@
+import dynamic from "next/dynamic";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { ReadyBotLazy } from "@/components/readybot/ReadyBotLazy";
+
+// Lazy-load ReadyBot — bundles react-markdown, rehype-highlight, highlight.js
+// Only needed when user opens the chat, not on initial page load
+const ReadyBot = dynamic(
+  () => import("@/components/readybot/ReadyBot").then((m) => ({ default: m.ReadyBot })),
+  { ssr: false }
+);
 
 export default function DashboardLayout({
   children,
@@ -16,7 +23,7 @@ export default function DashboardLayout({
           {children}
         </div>
       </main>
-      <ReadyBotLazy />
+      <ReadyBot />
     </div>
   );
 }

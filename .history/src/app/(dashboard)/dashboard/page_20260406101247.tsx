@@ -188,14 +188,12 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Activity Heatmap — deferred so it doesn't block initial paint */}
-      <Suspense fallback={<ActivityHeatmapSkeleton />}>
-        <ActivityHeatmap
-          userId={user.id}
-          streakCount={profile?.streak_count ?? 0}
-          lastActiveDate={profile?.last_active_date ?? null}
-        />
-      </Suspense>
+      {/* Activity Heatmap */}
+      <ActivityHeatmap
+        userId={user.id}
+        streakCount={profile?.streak_count ?? 0}
+        lastActiveDate={profile?.last_active_date ?? null}
+      />
 
       {/* Quick Actions */}
       <div>

@@ -340,7 +340,7 @@ export default function FlashcardsPage() {
         <div className="flex flex-wrap gap-3">
           <Button
             size="sm"
-            className="glow-blue bg-linear-to-r from-[#0066FF] to-[#0055DD] text-white border-0"
+            className="glow-blue bg-gradient-to-r from-[#0066FF] to-[#0055DD] text-white border-0"
             disabled={dueCards.length === 0}
             onClick={startStudy}
           >

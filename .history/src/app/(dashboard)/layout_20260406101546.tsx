@@ -16,7 +16,7 @@ export default function DashboardLayout({
           {children}
         </div>
       </main>
-      <ReadyBotLazy />
+      <ReadyBot />
     </div>
   );
 }
