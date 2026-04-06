@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
@@ -125,12 +125,17 @@ export default function CommunityPage() {
     }
   }, []);
 
-  useEffect(() => {
-    void loadMeta();
-  }, [loadMeta]);
+  // Load meta (categories + stats) on mount
+  const metaLoadedRef = useRef<boolean | null>(null);
 
+  if (metaLoadedRef.current === null) {
+    metaLoadedRef.current = true;
+    loadMeta();
+  }
+
+  // Load data initially and on filter changes
   useEffect(() => {
-    void loadData();
+    loadData();
   }, [loadData]);
 
   const handleUpvote = async (reviewId: string) => {

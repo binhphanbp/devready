@@ -238,22 +238,64 @@ export default function ContributeDialog({
       </DialogTrigger>
       <DialogContent className="max-w-full sm:max-w-xl h-dvh sm:h-auto max-h-dvh sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-lg p-4 sm:p-6">
         {success ? (
-          <div className="flex flex-col items-center justify-center py-6 sm:py-8 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 mb-4">
-              <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+          <div className="flex flex-col items-center justify-center py-8 sm:py-10 text-center px-4">
+            {/* Animated success icon with glow */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl animate-pulse" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-emerald-400/20 to-emerald-600/20 border border-emerald-500/30">
+                <CheckCircle2 className="h-10 w-10 text-emerald-400" />
+              </div>
+              {/* Mini confetti dots */}
+              <span className="absolute -top-1 -right-1 text-lg animate-bounce" style={{ animationDelay: '0.1s' }}>🎉</span>
+              <span className="absolute -top-2 left-0 text-sm animate-bounce" style={{ animationDelay: '0.3s' }}>✨</span>
+              <span className="absolute -bottom-1 -left-2 text-base animate-bounce" style={{ animationDelay: '0.5s' }}>🌟</span>
             </div>
-            <h3 className="text-lg font-semibold mb-2">Đã gửi thành công!</h3>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              Bài đóng góp của bạn đang được kiểm duyệt. Admin sẽ xem xét và phê
-              duyệt sớm nhất có thể.
+
+            {/* Heading */}
+            <h3 className="text-xl font-bold mb-2 bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              Cảm ơn bạn đã đóng góp!
+            </h3>
+
+            {/* Description */}
+            <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+              Bài đóng góp đã được gửi thành công và đang chờ kiểm duyệt.
+              Admin sẽ xem xét và phê duyệt sớm nhất có thể.
             </p>
-            <Button
-              className="mt-6"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-            >
-              Đóng
-            </Button>
+
+            {/* Info card */}
+            <div className="mt-5 w-full max-w-sm rounded-xl border border-border/30 bg-muted/20 p-4 space-y-2">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
+                <span>Trạng thái: <strong className="text-yellow-400">Đang chờ duyệt</strong></span>
+              </div>
+              <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
+                Bạn có thể xem trạng thái bài đóng góp tại trang cá nhân.
+                Câu hỏi sẽ hiển thị công khai sau khi được admin phê duyệt.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 mt-6">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 px-5"
+                onClick={() => handleOpenChange(false)}
+              >
+                Đóng
+              </Button>
+              <Button
+                size="sm"
+                className="h-9 px-5 bg-linear-to-r from-[#0066FF] to-[#0055DD] text-white border-0"
+                onClick={() => {
+                  resetForm();
+                  setOpen(true);
+                }}
+              >
+                <PenLine className="mr-1.5 h-3.5 w-3.5" />
+                Đóng góp thêm
+              </Button>
+            </div>
           </div>
         ) : (
           <>
