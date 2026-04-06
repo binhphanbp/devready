@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -15,7 +17,20 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, User, BookOpen } from "lucide-react";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.min.css";
+import {
+  Bot,
+  User,
+  BookOpen,
+  ExternalLink,
+  PenLine,
+  Flame,
+  ShieldAlert,
+  CheckCircle2,
+  Lightbulb,
+  ArrowRight,
+} from "lucide-react";
 import { AIReviewSheet } from "./AIReviewSheet";
 
 interface FlashcardData {
@@ -32,6 +47,10 @@ interface FlashcardData {
 interface QuestionContent {
   title: string;
   sample_answer: string | null;
+  bonus_tip: string | null;
+  common_pitfalls: string | null;
+  official_source: string | null;
+  category_name: string | null;
 }
 
 interface UserAnswer {
@@ -45,13 +64,145 @@ interface StudyModeProps {
   onComplete: () => void;
 }
 
+// ─── Rich Markdown Components (consistent with QuestionDetail) ───
+const markdownComponents = {
+  h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h1
+      className="text-base font-bold text-foreground mt-4 mb-2 pb-1.5 border-b border-border/50"
+      {...props}
+    >
+      {children}
+    </h1>
+  ),
+  h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h2
+      className="text-sm font-semibold text-foreground mt-3 mb-2 flex items-center gap-1.5"
+      {...props}
+    >
+      <span className="w-0.5 h-4 rounded-full bg-primary inline-block" />
+      {children}
+    </h2>
+  ),
+  h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h3
+      className="text-sm font-semibold text-foreground mt-3 mb-1.5"
+      {...props}
+    >
+      {children}
+    </h3>
+  ),
+  p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p
+      className="text-[13px] leading-relaxed text-muted-foreground mb-2"
+      {...props}
+    >
+      {children}
+    </p>
+  ),
+  ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
+    <ul
+      className="space-y-1 mb-3 ml-1 text-[13px] text-muted-foreground"
+      {...props}
+    >
+      {children}
+    </ul>
+  ),
+  ol: ({ children, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
+    <ol
+      className="space-y-1 mb-3 ml-1 text-[13px] text-muted-foreground list-decimal list-inside"
+      {...props}
+    >
+      {children}
+    </ol>
+  ),
+  li: ({ children, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
+    <li className="flex items-start gap-1.5 text-[13px]" {...props}>
+      <span className="mt-1.5 w-1 h-1 rounded-full bg-primary/50 shrink-0" />
+      <span className="text-muted-foreground">{children}</span>
+    </li>
+  ),
+  code: ({
+    className,
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLElement>) => {
+    const isInline = !className;
+    if (isInline) {
+      return (
+        <code
+          className="px-1 py-0.5 rounded-md bg-primary/10 text-primary text-[12px] font-mono"
+          {...props}
+        >
+          {children}
+        </code>
+      );
+    }
+    return (
+      <code
+        className={cn("text-[12px] font-mono text-[#e6edf3]", className)}
+        {...props}
+      >
+        {children}
+      </code>
+    );
+  },
+  pre: ({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
+    <pre
+      className="mb-3 rounded-lg border border-border/50 bg-[#0d1117] p-3 overflow-x-auto text-[12px] leading-relaxed text-[#e6edf3] [&_code]:text-[#e6edf3] [&_.hljs-comment]:text-[#8b949e] [&_.hljs-keyword]:text-[#ff7b72] [&_.hljs-string]:text-[#a5d6ff] [&_.hljs-number]:text-[#79c0ff] [&_.hljs-function]:text-[#d2a8ff]"
+      {...props}
+    >
+      {children}
+    </pre>
+  ),
+  strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+    <strong className="font-semibold text-foreground" {...props}>
+      {children}
+    </strong>
+  ),
+  blockquote: ({
+    children,
+    ...props
+  }: React.HTMLAttributes<HTMLQuoteElement>) => (
+    <blockquote
+      className="border-l-2 border-primary/40 pl-3 py-0.5 my-2 bg-primary/5 rounded-r-lg"
+      {...props}
+    >
+      {children}
+    </blockquote>
+  ),
+  table: ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
+    <div className="my-3 overflow-x-auto rounded-lg border border-border/50">
+      <table className="w-full text-[13px]" {...props}>
+        {children}
+      </table>
+    </div>
+  ),
+  th: ({ children, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
+    <th
+      className="px-2.5 py-1.5 text-left font-medium text-foreground bg-muted/50 border-b border-border/50 text-[12px]"
+      {...props}
+    >
+      {children}
+    </th>
+  ),
+  td: ({ children, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
+    <td
+      className="px-2.5 py-1.5 text-muted-foreground border-b border-border/30 text-[12px]"
+      {...props}
+    >
+      {children}
+    </td>
+  ),
+};
+
 export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [reviewed, setReviewed] = useState(0);
   const [correct, setCorrect] = useState(0);
 
-  // New state for answer sources
+  // Answer source state
   const [answerSourceOverride, setAnswerSourceOverride] = useState<"sample" | "user" | null>(null);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [questionContents, setQuestionContents] = useState<Record<string, QuestionContent>>({});
@@ -90,16 +241,23 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
         }
       }
 
-      // Fetch question sample_answers
+      // Fetch question content including bonus_tip, common_pitfalls, official_source
       const { data: questions } = await supabase
         .from("questions")
-        .select("id, title, sample_answer")
+        .select("id, title, sample_answer, bonus_tip, common_pitfalls, official_source, categories(name)")
         .in("id", questionIds);
 
       if (questions) {
         const map: Record<string, QuestionContent> = {};
-        questions.forEach((q: { id: string; title: string; sample_answer: string | null }) => {
-          map[q.id] = { title: q.title, sample_answer: q.sample_answer };
+        questions.forEach((q: Record<string, unknown>) => {
+          map[q.id as string] = {
+            title: q.title as string,
+            sample_answer: q.sample_answer as string | null,
+            bonus_tip: q.bonus_tip as string | null,
+            common_pitfalls: q.common_pitfalls as string | null,
+            official_source: q.official_source as string | null,
+            category_name: (q.categories as { name: string } | null)?.name ?? null,
+          };
         });
         setQuestionContents(map);
       }
@@ -180,8 +338,28 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
     currentCard?.question_id &&
     questionContents[currentCard.question_id]?.sample_answer;
 
+  // Enhanced content from the linked question
+  const bonusTip = hasLinkedQuestion
+    ? questionContents[currentCard.question_id!]?.bonus_tip
+    : null;
+  const commonPitfalls = hasLinkedQuestion
+    ? questionContents[currentCard.question_id!]?.common_pitfalls
+    : null;
+  const officialSource = hasLinkedQuestion
+    ? questionContents[currentCard.question_id!]?.official_source
+    : null;
+  const categoryName = hasLinkedQuestion
+    ? questionContents[currentCard.question_id!]?.category_name
+    : null;
+
   // Can AI review? Need both user answer and sample answer
   const canReview = hasUserAnswer && hasSampleAnswer;
+
+  // Navigate to the question in explore page
+  const goToQuestion = useCallback(() => {
+    if (!currentCard?.question_id) return;
+    router.push(`/explore?question=${currentCard.question_id}`);
+  }, [currentCard, router]);
 
   if (isComplete) {
     return (
@@ -226,7 +404,7 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Progress */}
+      {/* Progress Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base sm:text-lg font-semibold truncate">{deckTitle}</h2>
@@ -234,9 +412,16 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
             Thẻ {currentIndex + 1} / {cards.length}
           </p>
         </div>
-        <Badge variant="secondary" className="text-xs">
-          ✅ {correct} / {reviewed} đúng
-        </Badge>
+        <div className="flex items-center gap-2">
+          {categoryName && (
+            <Badge variant="secondary" className="text-[10px] hidden sm:inline-flex">
+              {categoryName}
+            </Badge>
+          )}
+          <Badge variant="secondary" className="text-xs">
+            ✅ {correct} / {reviewed} đúng
+          </Badge>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -251,10 +436,10 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
         />
       </div>
 
-      {/* Flashcard */}
-      <div className="perspective-1000 mx-auto sm:max-w-lg">
+      {/* ===== FLASHCARD ===== */}
+      <div className="perspective-1000 mx-auto w-full">
         <motion.div
-          className="relative cursor-pointer min-h-[220px] sm:min-h-[300px]"
+          className="relative cursor-pointer"
           onClick={() => !flipped && setFlipped(true)}
           style={{ transformStyle: "preserve-3d" }}
         >
@@ -266,115 +451,289 @@ export function StudyMode({ cards, deckTitle, onComplete }: StudyModeProps) {
               exit={{ rotateY: flipped ? 90 : -90, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="border-border/50 bg-card/80 backdrop-blur-sm min-h-[220px] sm:min-h-[300px]">
-                <CardContent className="p-5 sm:p-8 flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[300px]">
-                  {!flipped ? (
-                    /* ===== FRONT SIDE ===== */
-                    <>
-                      <Badge variant="outline" className="mb-4 text-xs">
-                        Câu hỏi
-                      </Badge>
-                      <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground prose-headings:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {currentCard.front}
-                        </ReactMarkdown>
+              {!flipped ? (
+                /* ===== FRONT SIDE ===== */
+                <Card className="border-border/50 bg-card/80 backdrop-blur-sm min-h-[220px] sm:min-h-[280px]">
+                  <CardContent className="p-5 sm:p-8 flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
+                    <Badge variant="outline" className="mb-4 text-xs">
+                      Câu hỏi
+                    </Badge>
+                    <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground prose-headings:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {currentCard.front}
+                      </ReactMarkdown>
+                    </div>
+                    <p className="mt-6 text-xs text-muted-foreground animate-pulse">
+                      Nhấn để xem câu trả lời
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                /* ===== BACK SIDE — REDESIGNED ===== */
+                <div className="space-y-3">
+                  {/* Answer source toggle card */}
+                  {hasLinkedQuestion && (hasUserAnswer || hasSampleAnswer) ? (
+                    <Card className="border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden">
+                      {/* Tab toggle header */}
+                      <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-0">
+                        <Tabs
+                          value={answerSource}
+                          onValueChange={(v) => setAnswerSourceOverride(v as "sample" | "user")}
+                          className="w-full"
+                        >
+                          <TabsList className="grid grid-cols-2 w-full h-9 bg-muted/50">
+                            <TabsTrigger
+                              value="sample"
+                              className="text-xs gap-1.5 data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500"
+                            >
+                              <BookOpen className="h-3.5 w-3.5" />
+                              Đáp án mẫu
+                            </TabsTrigger>
+                            <TabsTrigger
+                              value="user"
+                              disabled={!hasUserAnswer}
+                              className="text-xs gap-1.5 data-[state=active]:bg-violet-500/10 data-[state=active]:text-violet-500"
+                            >
+                              <User className="h-3.5 w-3.5" />
+                              {hasUserAnswer ? "Câu trả lời của tôi" : "Chưa có câu trả lời"}
+                            </TabsTrigger>
+                          </TabsList>
+                        </Tabs>
                       </div>
-                      <p className="mt-6 text-xs text-muted-foreground">
-                        Nhấn để xem câu trả lời
-                      </p>
-                    </>
-                  ) : (
-                    /* ===== BACK SIDE ===== */
-                    <div className="w-full text-left">
-                      {/* Answer source toggle — only for linked questions */}
-                      {hasLinkedQuestion && (hasUserAnswer || hasSampleAnswer) ? (
-                        <div className="mb-4 flex flex-col items-center gap-3">
-                          <Tabs
-                            value={answerSource}
-                            onValueChange={(v) => setAnswerSourceOverride(v as "sample" | "user")}
-                            className="w-full"
-                          >
-                            <TabsList className="grid grid-cols-2 w-full h-9 bg-muted/50">
-                              <TabsTrigger
-                                value="sample"
-                                className="text-xs gap-1.5 data-[state=active]:bg-[#0066FF]/10 data-[state=active]:text-[#0066FF]"
-                              >
-                                <BookOpen className="h-3.5 w-3.5" />
-                                Đáp án mẫu
-                              </TabsTrigger>
-                              <TabsTrigger
-                                value="user"
-                                disabled={!hasUserAnswer}
-                                className="text-xs gap-1.5 data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500"
-                              >
-                                <User className="h-3.5 w-3.5" />
-                                Câu trả lời của tôi
-                              </TabsTrigger>
-                            </TabsList>
-                          </Tabs>
 
-                          {/* Active source badge */}
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "text-[10px]",
-                              answerSource === "user"
-                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                : "bg-[#0066FF]/10 text-[#0066FF] border-[#0066FF]/20"
-                            )}
-                          >
-                            {answerSource === "user" ? (
-                              <>
-                                <User className="h-3 w-3 mr-1" />
-                                Câu trả lời của bạn
-                              </>
-                            ) : (
-                              <>
-                                <BookOpen className="h-3 w-3 mr-1" />
-                                Đáp án mẫu
-                              </>
-                            )}
-                          </Badge>
+                      {/* Source indicator bar */}
+                      <div className="px-3 sm:px-4 py-2">
+                        <div
+                          className={cn(
+                            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors",
+                            answerSource === "user"
+                              ? "bg-violet-500/8 text-violet-500 border border-violet-500/15"
+                              : "bg-emerald-500/8 text-emerald-500 border border-emerald-500/15"
+                          )}
+                        >
+                          {answerSource === "user" ? (
+                            <>
+                              <User className="h-3 w-3" />
+                              Đang xem câu trả lời của bạn
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="h-3 w-3" />
+                              Đang xem đáp án mẫu
+                            </>
+                          )}
                         </div>
-                      ) : (
-                        <Badge variant="outline" className="mb-4 text-xs mx-auto block w-fit">
-                          Câu trả lời
-                        </Badge>
-                      )}
+                      </div>
+
+                      <Separator />
 
                       {/* Answer content */}
-                      <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-foreground prose-headings:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none max-h-[200px] sm:max-h-[240px] overflow-y-auto">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      <div className="px-3 sm:px-4 py-3 sm:py-4 max-h-[240px] sm:max-h-[320px] overflow-y-auto scrollbar-thin">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeHighlight]}
+                          components={markdownComponents}
+                        >
                           {getBackContent()}
                         </ReactMarkdown>
                       </div>
 
-                      {/* AI Review button */}
-                      {canReview && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="mt-4 flex justify-center"
-                        >
+                      {/* Action footer */}
+                      <Separator />
+                      <div className="px-3 sm:px-4 py-2.5 flex flex-wrap items-center gap-2 bg-muted/20">
+                        {/* AI Review button */}
+                        {canReview && (
                           <Button
                             variant="outline"
                             size="sm"
-                            className="gap-1.5 text-xs border-[#0066FF]/30 text-[#0066FF] hover:bg-[#0066FF]/10 hover:text-[#0066FF]"
+                            className="h-7 text-[11px] gap-1 border-[#0066FF]/30 text-[#0066FF] hover:bg-[#0066FF]/10"
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowAIReview(true);
                             }}
                           >
-                            <Bot className="h-3.5 w-3.5" />
-                            Review câu trả lời
+                            <Bot className="h-3 w-3" />
+                            AI Review
                           </Button>
+                        )}
+
+                        {/* Go to question */}
+                        {currentCard?.question_id && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-[11px] gap-1 border-primary/30 text-primary hover:bg-primary/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              goToQuestion();
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Xem câu hỏi gốc
+                          </Button>
+                        )}
+
+                        {/* Add/edit your answer */}
+                        {!hasUserAnswer && currentCard?.question_id && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-[11px] gap-1 border-violet-500/30 text-violet-500 hover:bg-violet-500/10 ml-auto"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              goToQuestion();
+                            }}
+                          >
+                            <PenLine className="h-3 w-3" />
+                            Thêm câu trả lời của bạn
+                          </Button>
+                        )}
+                      </div>
+                    </Card>
+                  ) : (
+                    /* Standalone card (no linked question) */
+                    <Card className="border-border/50 bg-card/80 backdrop-blur-sm min-h-[220px] sm:min-h-[280px]">
+                      <CardContent className="p-5 sm:p-8 flex flex-col min-h-[220px] sm:min-h-[280px]">
+                        <Badge variant="outline" className="mb-4 text-xs w-fit mx-auto">
+                          Câu trả lời
+                        </Badge>
+                        <div className="flex-1 max-h-[200px] sm:max-h-[260px] overflow-y-auto scrollbar-thin">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeHighlight]}
+                            components={markdownComponents}
+                          >
+                            {getBackContent()}
+                          </ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* ===== ENHANCED CONTENT SECTIONS ===== */}
+                  {hasLinkedQuestion && answerSource === "sample" && (
+                    <AnimatePresence>
+                      {/* Bonus Tip */}
+                      {bonusTip && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.15 }}
+                        >
+                          <Card className="border-amber-500/25 bg-amber-500/5 overflow-hidden">
+                            <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-amber-500/8 border-b border-amber-500/15">
+                              <div className="flex h-5 w-5 items-center justify-center rounded-md bg-amber-500/15">
+                                <Flame className="h-3 w-3 text-amber-500" />
+                              </div>
+                              <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                                Bonus Tip
+                              </span>
+                            </div>
+                            <div className="px-3 sm:px-4 py-3 max-h-[140px] overflow-y-auto scrollbar-thin">
+                              <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                rehypePlugins={[rehypeHighlight]}
+                                components={markdownComponents}
+                              >
+                                {bonusTip}
+                              </ReactMarkdown>
+                            </div>
+                          </Card>
                         </motion.div>
                       )}
-                    </div>
+
+                      {/* Common Pitfalls */}
+                      {commonPitfalls && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.25 }}
+                        >
+                          <Card className="border-red-500/25 bg-red-500/5 overflow-hidden">
+                            <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-red-500/8 border-b border-red-500/15">
+                              <div className="flex h-5 w-5 items-center justify-center rounded-md bg-red-500/15">
+                                <ShieldAlert className="h-3 w-3 text-red-500" />
+                              </div>
+                              <span className="text-xs font-semibold text-red-600 dark:text-red-400">
+                                Lỗi thường gặp
+                              </span>
+                            </div>
+                            <div className="px-3 sm:px-4 py-3 max-h-[140px] overflow-y-auto scrollbar-thin">
+                              <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                rehypePlugins={[rehypeHighlight]}
+                                components={markdownComponents}
+                              >
+                                {commonPitfalls}
+                              </ReactMarkdown>
+                            </div>
+                          </Card>
+                        </motion.div>
+                      )}
+
+                      {/* Official Source */}
+                      {officialSource && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.35 }}
+                        >
+                          <a
+                            href={officialSource}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2.5 rounded-xl border border-blue-500/25 bg-blue-500/5 px-3 sm:px-4 py-2.5 hover:bg-blue-500/10 hover:border-blue-500/40 transition-all group"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15 shrink-0 group-hover:bg-blue-500/25 transition-colors">
+                              <ExternalLink className="h-3.5 w-3.5 text-blue-500" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                                📚 Tài liệu tham khảo
+                              </p>
+                              <p className="text-[11px] text-muted-foreground truncate">
+                                {officialSource}
+                              </p>
+                            </div>
+                            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-blue-500 transition-colors shrink-0" />
+                          </a>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   )}
-                </CardContent>
-              </Card>
+
+                  {/* User answer encouragement when viewing sample & no user answer */}
+                  {hasLinkedQuestion && !hasUserAnswer && answerSource === "sample" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goToQuestion();
+                        }}
+                        className="w-full flex items-center gap-3 rounded-xl border-2 border-dashed border-violet-500/25 bg-violet-500/5 px-3 sm:px-4 py-3 hover:border-violet-500/40 hover:bg-violet-500/8 transition-all text-left group"
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 shrink-0 group-hover:bg-violet-500/20 transition-colors">
+                          <Lightbulb className="h-4 w-4 text-violet-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-violet-600 dark:text-violet-400">
+                            💡 Viết câu trả lời của riêng bạn
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Tự viết câu trả lời giúp ghi nhớ tốt hơn 3x. Bấm để bắt đầu viết.
+                          </p>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-violet-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </motion.div>

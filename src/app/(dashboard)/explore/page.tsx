@@ -1,6 +1,14 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  Suspense,
+} from 'react';
+import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -348,7 +356,7 @@ function TechStackSlider({
   );
 }
 
-export default function ExplorePage() {
+function ExplorePageContent() {
   const [questions, setQuestions] = useState<QuestionListItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -363,6 +371,29 @@ export default function ExplorePage() {
     null,
   );
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const searchParams = useSearchParams();
+
+  // Deep-link: open question directly from ?question=<id> (e.g. from Flashcard StudyMode)
+  const deepLinkHandled = useRef(false);
+  useEffect(() => {
+    if (deepLinkHandled.current) return;
+    const questionId = searchParams.get('question');
+    if (!questionId) return;
+    deepLinkHandled.current = true;
+
+    const fetchAndOpen = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('questions')
+        .select(
+          'id, title, content, difficulty, tech_tags, company_tags, view_count, bookmark_count, sample_answer, bonus_tip, common_pitfalls, official_source, categories(name, color)',
+        )
+        .eq('id', questionId)
+        .single();
+      if (data) setSelectedQuestion(data as unknown as Question);
+    };
+    fetchAndOpen();
+  }, [searchParams]);
 
   const selectedCategorySlug = useMemo(() => {
     if (!selectedCategory) return null;
@@ -383,14 +414,11 @@ export default function ExplorePage() {
       .then(({ data }) => setCategories((data as Category[]) ?? []));
   }, []);
 
-  // Reset tech tags when category changes
-  const prevCategory = useRef(selectedCategory);
-  useEffect(() => {
-    if (prevCategory.current !== selectedCategory) {
-      setSelectedTechTags([]);
-      prevCategory.current = selectedCategory;
-    }
-  }, [selectedCategory]);
+  // Reset tech tags when category changes — handled inline in handleCategoryChange
+  const handleCategoryChange = useCallback((catId: string | null) => {
+    setSelectedCategory(catId);
+    setSelectedTechTags([]);
+  }, []);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -547,7 +575,7 @@ export default function ExplorePage() {
             <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto touch-scroll-x sm:overflow-x-visible">
               {/* All button */}
               <button
-                onClick={() => setSelectedCategory(null)}
+                onClick={() => handleCategoryChange(null)}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
                   !selectedCategory
@@ -570,7 +598,7 @@ export default function ExplorePage() {
                   <button
                     key={cat.id}
                     onClick={() =>
-                      setSelectedCategory(isActive ? null : cat.id)
+                      handleCategoryChange(isActive ? null : cat.id)
                     }
                     className={cn(
                       'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
@@ -711,5 +739,13 @@ export default function ExplorePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={null}>
+      <ExplorePageContent />
+    </Suspense>
   );
 }

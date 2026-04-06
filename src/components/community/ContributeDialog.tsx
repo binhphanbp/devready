@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,17 @@ import {
   Lightbulb,
   Eye,
   X,
+  Bold,
+  Italic,
+  Heading2,
+  List,
+  Code,
+  FileCode2,
+  Link2,
+  Pencil,
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 
@@ -89,6 +99,34 @@ export default function ContributeDialog({
   const [answerText, setAnswerText] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+  const [previewMode, setPreviewMode] = useState(false);
+  const answerRef = useRef<HTMLTextAreaElement>(null);
+
+  // Insert markdown syntax at cursor position or around selection
+  const insertMarkdown = (prefix: string, suffix: string = '', placeholder: string = '') => {
+    const textarea = answerRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = answerText.substring(start, end);
+    const textToInsert = selectedText || placeholder;
+    const before = answerText.substring(0, start);
+    const after = answerText.substring(end);
+
+    const newText = before + prefix + textToInsert + suffix + after;
+    setAnswerText(newText);
+
+    // Restore cursor position after state update
+    setTimeout(() => {
+      textarea.focus();
+      const cursorPos = start + prefix.length + textToInsert.length + suffix.length;
+      textarea.setSelectionRange(
+        selectedText ? cursorPos : start + prefix.length,
+        selectedText ? cursorPos : start + prefix.length + textToInsert.length
+      );
+    }, 0);
+  };
 
   const loadCategories = useCallback(async () => {
     const supabase = createClient();
@@ -98,12 +136,6 @@ export default function ContributeDialog({
       .order('sort_order');
     if (data) setCategories(data);
   }, []);
-
-  useEffect(() => {
-    if (open) {
-      loadCategories();
-    }
-  }, [open, loadCategories]);
 
   const resetForm = () => {
     setStep(0);
@@ -117,6 +149,7 @@ export default function ContributeDialog({
     setTags([]);
     setTagInput('');
     setSuccess(false);
+    setPreviewMode(false);
   };
 
   const handleAddTag = () => {
@@ -183,7 +216,9 @@ export default function ContributeDialog({
 
   const handleOpenChange = (v: boolean) => {
     setOpen(v);
-    if (!v) {
+    if (v) {
+      loadCategories();
+    } else {
       setTimeout(resetForm, 300);
     }
   };
@@ -369,23 +404,115 @@ export default function ContributeDialog({
             {step === 2 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Câu trả lời mẫu
-                    <span className="text-muted-foreground font-normal ml-1">
-                      (khuyến khích)
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">
+                      Câu trả lời mẫu
+                      <span className="text-muted-foreground font-normal ml-1">
+                        (khuyến khích)
+                      </span>
+                    </label>
+                    <span className="text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+                      Hỗ trợ Markdown
                     </span>
-                  </label>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Viết câu trả lời chuẩn chỉnh hoặc chia sẻ cách bạn đã trả
-                    lời. Nội dung càng chi tiết càng giúp ích cho cộng đồng.
+                    Viết câu trả lời chuẩn chỉnh. Sử dụng toolbar bên dưới để format nội dung chuyên nghiệp hơn.
                   </p>
-                  <Textarea
-                    placeholder="VD: useEffect chạy sau khi browser paint xong (asynchronous), trong khi useLayoutEffect chạy synchronous sau DOM mutations nhưng trước khi browser paint..."
-                    value={answerText}
-                    onChange={(e) => setAnswerText(e.target.value)}
-                    rows={8}
-                    className="resize-none"
-                  />
+
+                  {/* Markdown Editor */}
+                  <div className="rounded-xl border border-border/50 overflow-hidden bg-card/50">
+                    {/* Toolbar */}
+                    <div className="flex items-center justify-between border-b border-border/30 bg-muted/20 px-1.5 py-1">
+                      <div className="flex items-center gap-0.5">
+                        <button type="button" title="In đậm" onClick={() => insertMarkdown('**', '**', 'in đậm')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <Bold className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="In nghiêng" onClick={() => insertMarkdown('*', '*', 'in nghiêng')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <Italic className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="Tiêu đề" onClick={() => insertMarkdown('\n## ', '\n', 'Tiêu đề')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <Heading2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="Danh sách" onClick={() => insertMarkdown('\n- ', '\n', 'Mục danh sách')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <List className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="Inline code" onClick={() => insertMarkdown('`', '`', 'code')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <Code className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="Code block" onClick={() => insertMarkdown('\n```\n', '\n```\n', '// code block')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <FileCode2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" title="Link" onClick={() => insertMarkdown('[', '](url)', 'tiêu đề link')} className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                          <Link2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      {/* Write / Preview toggle */}
+                      <div className="flex items-center gap-0.5 rounded-lg border border-border/30 bg-background/50 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewMode(false)}
+                          className={cn(
+                            'flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition-all',
+                            !previewMode
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:text-foreground',
+                          )}
+                        >
+                          <Pencil className="h-3 w-3" />
+                          Viết
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewMode(true)}
+                          className={cn(
+                            'flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition-all',
+                            previewMode
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:text-foreground',
+                          )}
+                        >
+                          <Eye className="h-3 w-3" />
+                          Xem trước
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Editor / Preview area */}
+                    {!previewMode ? (
+                      <Textarea
+                        ref={answerRef}
+                        placeholder={`VD:\n## Giải thích\nuseEffect chạy **sau khi browser paint** (asynchronous).\n\n## So sánh\n- \`useEffect\`: Non-blocking, chạy sau paint\n- \`useLayoutEffect\`: Blocking, chạy trước paint\n\n## Code minh họa\n\`\`\`jsx\nuseEffect(() => {\n  // Runs after paint\n}, []);\n\`\`\``}
+                        value={answerText}
+                        onChange={(e) => setAnswerText(e.target.value)}
+                        rows={10}
+                        className="resize-none border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono text-[13px] leading-relaxed"
+                      />
+                    ) : (
+                      <div className="min-h-[250px] max-h-[300px] overflow-y-auto px-4 py-3 scrollbar-thin">
+                        {answerText.trim() ? (
+                          <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:text-[12px] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border/50 prose-pre:rounded-lg">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {answerText}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-8">
+                            Chưa có nội dung để xem trước. Hãy viết câu trả lời ở tab &quot;Viết&quot;.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Character count */}
+                    <div className="flex items-center justify-between px-3 py-1.5 border-t border-border/30 bg-muted/10">
+                      <p className="text-[10px] text-muted-foreground">
+                        💡 Dùng **text** để in đậm, `code` cho inline code, ```code``` cho code block
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {answerText.length} ký tự
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -483,12 +610,14 @@ export default function ContributeDialog({
 
                   {answerText && (
                     <div className="rounded-xl bg-emerald-500/3 border border-emerald-500/10 p-4">
-                      <p className="text-xs font-medium text-emerald-400 mb-1 uppercase tracking-wider">
+                      <p className="text-xs font-medium text-emerald-400 mb-2 uppercase tracking-wider">
                         Câu trả lời mẫu
                       </p>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                        {answerText}
-                      </p>
+                      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:text-[12px] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border/50 prose-pre:rounded-lg">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {answerText}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   )}
 
