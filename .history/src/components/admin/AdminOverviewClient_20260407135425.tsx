@@ -361,9 +361,9 @@ export default function AdminOverviewClient() {
       totalUpvotes,
       totalComments,
       pendingFeedback: pendingFeedback ?? 0,
-      totalFlashcardCards: 680 + (totalFlashcardCards ?? 0),
-      // ReadyBot: 148 pre-tracked sessions + future server-tracked sessions
-      totalReadyBotSessions: 148 + 0,
+      totalFlashcardCards: totalFlashcardCards ?? 0,
+      // ReadyBot sessions: not tracked server-side (localStorage only) — starts at 0
+      totalReadyBotSessions: 0,
       difficultyDist,
       categoryDist,
       allProfileDates,
@@ -626,98 +626,6 @@ export default function AdminOverviewClient() {
           color="orange"
         />
       </div>
-
-      {/* ─── Mục tiêu nhóm ─── */}
-      <Section delay={0.05}>
-        <div className="mb-4 flex items-center gap-2">
-          <Target className="h-4 w-4 text-emerald-400" />
-          <h2 className="text-sm font-semibold text-white">Mục tiêu nhóm</h2>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-            Sprint goal
-          </span>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* ReadyBot sessions */}
-          {(() => {
-            const current = stats.totalReadyBotSessions;
-            const goal = 100;
-            const pct = Math.min(Math.round((current / goal) * 100), 100);
-            return (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="rounded-xl bg-blue-500/20 p-2">
-                      <Bot className="h-4 w-4 text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">Phiên giải đáp ReadyBot</p>
-                      <p className="text-xs text-zinc-500">Mục tiêu: {goal} phiên</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-white">{current}</p>
-                    <p className="text-xs text-zinc-500">/ {goal}</p>
-                  </div>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${pct}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full rounded-full bg-blue-500"
-                  />
-                </div>
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-zinc-500">
-                    {pct >= 100 ? '🎉 Đã đạt mục tiêu!' : `Còn ${goal - current} phiên nữa`}
-                  </p>
-                  <p className="text-xs font-medium text-blue-400">{pct}%</p>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* Flashcard interactions */}
-          {(() => {
-            const current = stats.totalFlashcardCards;
-            const goal = 500;
-            const pct = Math.min(Math.round((current / goal) * 100), 100);
-            return (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="rounded-xl bg-purple-500/20 p-2">
-                      <Layers className="h-4 w-4 text-purple-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">Tương tác Flashcards</p>
-                      <p className="text-xs text-zinc-500">Mục tiêu: {goal} lượt</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-white">{current}</p>
-                    <p className="text-xs text-zinc-500">/ {goal}</p>
-                  </div>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${pct}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full rounded-full bg-purple-500"
-                  />
-                </div>
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-zinc-500">
-                    {pct >= 100 ? '🎉 Đã đạt mục tiêu!' : `Còn ${goal - current} lượt nữa`}
-                  </p>
-                  <p className="text-xs font-medium text-purple-400">{pct}%</p>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      </Section>
 
       {/* ─── Charts Row ─── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

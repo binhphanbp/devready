@@ -361,9 +361,9 @@ export default function AdminOverviewClient() {
       totalUpvotes,
       totalComments,
       pendingFeedback: pendingFeedback ?? 0,
-      totalFlashcardCards: 680 + (totalFlashcardCards ?? 0),
-      // ReadyBot: 148 pre-tracked sessions + future server-tracked sessions
-      totalReadyBotSessions: 148 + 0,
+      totalFlashcardCards: totalFlashcardCards ?? 0,
+      // ReadyBot sessions: not tracked server-side (localStorage only) — starts at 0
+      totalReadyBotSessions: 0,
       difficultyDist,
       categoryDist,
       allProfileDates,
