@@ -2,19 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Fallback list: tries each model in order until one succeeds (handles rate limits)
-// openrouter/free = OpenRouter's meta-router that auto-picks available free models
-const FREE_MODELS = process.env.OPENROUTER_MODEL
-  ? [process.env.OPENROUTER_MODEL]
+// Fallback list: tries each model in order until one succeeds
+// Groq models: https://console.groq.com/docs/models
+const GROQ_MODELS = process.env.GROQ_MODEL
+  ? [process.env.GROQ_MODEL]
   : [
-      'openrouter/free',
-      'meta-llama/llama-3.3-70b-instruct:free',
-      'google/gemma-3-27b-it:free',
-      'openai/gpt-oss-20b:free',
-      'nousresearch/hermes-3-llama-3.1-405b:free',
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'gemma2-9b-it',
+      'mixtral-8x7b-32768',
     ];
 
 const SYSTEM_PROMPT = `Bạn là ReadyBot — AI Mentor của DevReady, nền tảng luyện phỏng vấn IT cho sinh viên và Junior Developer Việt Nam.
@@ -33,9 +32,9 @@ export async function POST(request: NextRequest) {
   try {
     const { messages } = await request.json();
 
-    if (!OPENROUTER_API_KEY) {
+    if (!GROQ_API_KEY) {
       return NextResponse.json(
-        { error: 'API key not configured' },
+        { error: 'Groq API key not configured. Please set GROQ_API_KEY in .env.local' },
         { status: 500 },
       );
     }
@@ -56,18 +55,16 @@ export async function POST(request: NextRequest) {
 
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://devready.app',
-      'X-Title': 'DevReady - ReadyBot',
+      Authorization: `Bearer ${GROQ_API_KEY}`,
     };
 
     let lastError = '';
-    for (const model of FREE_MODELS) {
+    for (const model of GROQ_MODELS) {
       let response: Response;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
-        response = await fetch(OPENROUTER_URL, {
+        response = await fetch(GROQ_URL, {
           method: 'POST',
           headers,
           body: JSON.stringify({ model, ...payload }),
@@ -89,7 +86,7 @@ export async function POST(request: NextRequest) {
 
       if (!response.ok) {
         lastError = await response.text();
-        console.error(`OpenRouter API error (${model}):`, lastError);
+        console.error(`Groq API error (${model}):`, lastError);
         continue;
       }
 
@@ -134,7 +131,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.error('All models failed. Last error:', lastError);
+    console.error('All Groq models failed. Last error:', lastError);
     return NextResponse.json(
       { error: 'Failed to get AI response' },
       { status: 500 },
