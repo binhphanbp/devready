@@ -338,8 +338,12 @@ export function Hero() {
           tiếp theo của bạn
         </h1>
 
-        {/* Interactive Interview Preview */}
-        <InterviewPreview />
+        {/* Interactive Interview Preview — client-only to avoid framer-motion hydration issues */}
+        {mounted ? (
+          <InterviewPreview />
+        ) : (
+          <div className="mt-5 sm:mt-10 mx-auto w-full h-[320px] sm:h-[360px] rounded-2xl border border-border/50 bg-card/70 animate-pulse" />
+        )}
 
         {/* CTA Buttons */}
         <div className="mt-5 sm:mt-10 flex flex-col items-center gap-2.5 sm:flex-row sm:justify-center w-full sm:w-auto px-2 sm:px-0">

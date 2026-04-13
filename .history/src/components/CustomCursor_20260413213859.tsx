@@ -83,7 +83,6 @@ export default function CustomCursor() {
       document.removeEventListener('mouseenter', handleMouseEnter);
       document.removeEventListener('mouseover', handleElementHover);
       cancelAnimationFrame(rafId.current);
-      document.documentElement.classList.remove('custom-cursor-active');
     };
   }, [isVisible]);
 

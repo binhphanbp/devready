@@ -276,9 +276,8 @@
 }
 
 /* ===== Custom Cursor ===== */
-/* Only hide native cursor when custom cursor is active (class added by JS) */
 @media (pointer: fine) {
-  .custom-cursor-active * {
+  * {
     cursor: none !important;
   }
 }

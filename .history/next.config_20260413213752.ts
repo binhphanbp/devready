@@ -69,31 +69,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Font files — immutable, long cache
-        source: '/(.*)\\.woff2',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
         source: '/team/(.*)',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=86400, stale-while-revalidate=604800',
-          },
-        ],
-      },
-      {
-        // HTML pages — short cache with revalidation
-        source: '/((?!api|_next).*)',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
           },
         ],
       },

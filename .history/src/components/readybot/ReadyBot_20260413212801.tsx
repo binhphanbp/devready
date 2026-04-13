@@ -380,20 +380,15 @@ export function ReadyBot() {
   const expandedScrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  /* Persist messages — debounced, keep latest 50, skip during streaming */
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  /* Persist messages — keep latest 80, skip during streaming to avoid partial saves */
   useEffect(() => {
     if (streaming) return;
-    clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      try {
-        const toSave = messages.slice(-50);
-        localStorage.setItem('readybot_history', JSON.stringify(toSave));
-      } catch {
-        /* quota exceeded — silent fail */
-      }
-    }, 2000);
-    return () => clearTimeout(saveTimeoutRef.current);
+    try {
+      const toSave = messages.slice(-80);
+      localStorage.setItem('readybot_history', JSON.stringify(toSave));
+    } catch {
+      /* quota exceeded — silent fail */
+    }
   }, [messages, streaming]);
 
   /* Scroll to bottom when new messages arrive */
