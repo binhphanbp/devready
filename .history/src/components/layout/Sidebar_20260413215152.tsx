@@ -20,6 +20,7 @@ import {
   Monitor,
 } from 'lucide-react';
 import FeedbackDialog from '@/components/feedback/FeedbackDialog';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';

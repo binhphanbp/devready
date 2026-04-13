@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BookOpen,
   Brain,
@@ -104,9 +106,9 @@ export function FeaturesGrid() {
                   {feature.description}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

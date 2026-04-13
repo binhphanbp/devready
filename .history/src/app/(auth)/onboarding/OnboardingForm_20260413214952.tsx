@@ -501,8 +501,9 @@ export function OnboardingForm({ userId }: { userId: string }) {
                       Bắt đầu ngay
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               )}
+            </AnimatePresence>
           </CardContent>
         </Card>
 

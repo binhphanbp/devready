@@ -315,14 +315,18 @@ export function OnboardingForm({ userId }: { userId: string }) {
                       <ArrowRight className="ml-1.5 h-4 w-4" />
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Step 2: Career Goals */}
               {currentStep === 2 && (
-                <div
+                <motion.div
                   key="step2"
-                  className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="space-y-6"
                 >
                   {/* Header */}
                   <div className="text-center">
@@ -363,7 +367,11 @@ export function OnboardingForm({ userId }: { userId: string }) {
                         </SelectContent>
                       </Select>
                       {targetRole === 'other' && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                        >
                           <Input
                             placeholder="Nhập vị trí bạn mong muốn..."
                             className="h-11 mt-2"
@@ -373,7 +381,7 @@ export function OnboardingForm({ userId }: { userId: string }) {
                             }
                             autoFocus
                           />
-                        </div>
+                        </motion.div>
                       )}
                     </div>
 
@@ -415,14 +423,18 @@ export function OnboardingForm({ userId }: { userId: string }) {
                       <ArrowRight className="ml-1.5 h-4 w-4" />
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Step 3: Summary */}
               {currentStep === 3 && (
-                <div
+                <motion.div
                   key="step3"
-                  className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="space-y-6"
                 >
                   {/* Header */}
                   <div className="text-center">
@@ -501,8 +513,9 @@ export function OnboardingForm({ userId }: { userId: string }) {
                       Bắt đầu ngay
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               )}
+            </AnimatePresence>
           </CardContent>
         </Card>
 

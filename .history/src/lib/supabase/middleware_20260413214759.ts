@@ -73,15 +73,27 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Redirect unauthenticated users from protected routes
+  const protectedPaths = [
+    '/dashboard',
+    '/flashcards',
+    '/profile',
+    '/admin',
+    '/onboarding',
+  ];
+  const isProtected = protectedPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  );
+
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('redirectTo', pathname);
+    url.searchParams.set('redirectTo', request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
 
   // Redirect non-admin users from admin routes
-  if (pathname.startsWith('/admin') && user) {
+  if (request.nextUrl.pathname.startsWith('/admin') && user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -96,7 +108,12 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users away from auth pages
-  if (isPublicPage && pathname !== '/' && user) {
+  const authPaths = ['/login', '/register', '/forgot-password'];
+  const isAuthPage = authPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  );
+
+  if (isAuthPage && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
