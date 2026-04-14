@@ -2,20 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Fallback list: tries each model in order until one succeeds (handles rate limits)
-// openrouter/free = OpenRouter's meta-router that auto-picks available free models
-const FREE_MODELS = process.env.OPENROUTER_MODEL
-  ? [process.env.OPENROUTER_MODEL]
-  : [
-      'openrouter/free',
-      'meta-llama/llama-3.3-70b-instruct:free',
-      'google/gemma-3-27b-it:free',
-      'openai/gpt-oss-20b:free',
-      'nousresearch/hermes-3-llama-3.1-405b:free',
-    ];
+// Model fallback chain — tries each until one succeeds
+const GROQ_MODELS = [
+  'meta-llama/llama-4-scout-17b-16e-instruct',
+  'qwen-qwq-32b',
+  'llama-3.3-70b-versatile',
+  'llama-3.1-70b-versatile',
+];
 
 const SYSTEM_PROMPT = `Bạn là ReadyBot — AI Mentor của DevReady, nền tảng luyện phỏng vấn IT cho sinh viên và Junior Developer Việt Nam.
 
@@ -33,20 +29,23 @@ export async function POST(request: NextRequest) {
   try {
     const { messages } = await request.json();
 
-    if (!OPENROUTER_API_KEY) {
+    if (!GROQ_API_KEY) {
       return NextResponse.json(
-        { error: 'API key not configured' },
+        { error: 'Hệ thống AI đang bảo trì. Vui lòng thử lại sau!' },
         { status: 500 },
       );
     }
+
+    // Limit context window to last 16 messages to stay within token limits
+    const recentMessages = messages.slice(-16);
 
     const payload = {
       stream: true,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        ...messages.map((msg: { role: string; content: string }) => ({
+        ...recentMessages.map((msg: { role: string; content: string }) => ({
           role: msg.role === 'assistant' ? 'assistant' : 'user',
-          content: msg.content,
+          content: msg.content.slice(0, 4000), // Cap individual message length
         })),
       ],
       temperature: 0.7,
@@ -54,20 +53,18 @@ export async function POST(request: NextRequest) {
       max_tokens: 2048,
     };
 
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://devready.app',
-      'X-Title': 'DevReady - ReadyBot',
+      Authorization: `Bearer ${GROQ_API_KEY}`,
     };
 
     let lastError = '';
-    for (const model of FREE_MODELS) {
+    for (const model of GROQ_MODELS) {
       let response: Response;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
       try {
-        response = await fetch(OPENROUTER_URL, {
+        response = await fetch(GROQ_URL, {
           method: 'POST',
           headers,
           body: JSON.stringify({ model, ...payload }),
@@ -77,19 +74,19 @@ export async function POST(request: NextRequest) {
       } catch (fetchErr) {
         clearTimeout(timeoutId);
         lastError = String(fetchErr);
-        console.warn(`Model ${model} fetch failed (${lastError}), trying next...`);
+        console.warn(`Groq model ${model} fetch failed (${lastError}), trying next...`);
         continue;
       }
 
       if (response.status === 429 || response.status === 503) {
         lastError = await response.text();
-        console.warn(`Model ${model} rate-limited, trying next...`);
+        console.warn(`Groq model ${model} rate-limited, trying next...`);
         continue;
       }
 
       if (!response.ok) {
         lastError = await response.text();
-        console.error(`OpenRouter API error (${model}):`, lastError);
+        console.error(`Groq API error (${model}):`, lastError);
         continue;
       }
 
@@ -134,15 +131,15 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.error('All models failed. Last error:', lastError);
+    console.error('All Groq models failed. Last error:', lastError);
     return NextResponse.json(
-      { error: 'Failed to get AI response' },
+      { error: 'AI đang bận, vui lòng thử lại sau ít phút!' },
       { status: 500 },
     );
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Có lỗi hệ thống. Vui lòng thử lại!' },
       { status: 500 },
     );
   }

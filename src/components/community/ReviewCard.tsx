@@ -18,6 +18,7 @@ import {
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import MarkdownRenderer from './MarkdownRenderer';
 
 export type CommunityReview = {
   id: string;
@@ -210,9 +211,7 @@ export default function ReviewCard({
                   <p className="text-xs font-medium text-emerald-400 mb-1.5 uppercase tracking-wider">
                     Câu trả lời mẫu
                   </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {review.answer_text}
-                  </p>
+                  <MarkdownRenderer content={review.answer_text} />
                 </motion.div>
               )}
             </div>

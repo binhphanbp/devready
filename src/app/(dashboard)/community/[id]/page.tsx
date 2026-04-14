@@ -19,6 +19,7 @@ import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CommentSection from '@/components/community/CommentSection';
+import MarkdownRenderer from '@/components/community/MarkdownRenderer';
 import Link from 'next/link';
 
 const difficultyConfig: Record<string, { label: string; className: string }> = {
@@ -318,12 +319,10 @@ export default function CommunityDetailPage() {
             {/* Answer */}
             {review.answer_text && (
               <div className="mb-5 rounded-2xl bg-emerald-500/3 border border-emerald-500/10 p-5">
-                <p className="text-xs font-medium text-emerald-400 mb-2 uppercase tracking-wider">
+                <p className="text-xs font-medium text-emerald-400 mb-3 uppercase tracking-wider">
                   Câu trả lời mẫu
                 </p>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {review.answer_text}
-                </p>
+                <MarkdownRenderer content={review.answer_text} />
               </div>
             )}
 

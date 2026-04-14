@@ -36,10 +36,9 @@ import {
   Link2,
   Pencil,
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface Category {
   id: string;
@@ -532,11 +531,7 @@ export default function ContributeDialog({
                     ) : (
                       <div className="min-h-[250px] max-h-[300px] overflow-y-auto px-4 py-3 scrollbar-thin">
                         {answerText.trim() ? (
-                          <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:text-[12px] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border/50 prose-pre:rounded-lg">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {answerText}
-                            </ReactMarkdown>
-                          </div>
+                          <MarkdownRenderer content={answerText} />
                         ) : (
                           <p className="text-sm text-muted-foreground text-center py-8">
                             Chưa có nội dung để xem trước. Hãy viết câu trả lời ở tab &quot;Viết&quot;.
@@ -651,15 +646,11 @@ export default function ContributeDialog({
                   )}
 
                   {answerText && (
-                    <div className="rounded-xl bg-emerald-500/3 border border-emerald-500/10 p-4">
+                      <div className="rounded-xl bg-emerald-500/3 border border-emerald-500/10 p-4">
                       <p className="text-xs font-medium text-emerald-400 mb-2 uppercase tracking-wider">
                         Câu trả lời mẫu
                       </p>
-                      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded prose-code:text-[12px] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border/50 prose-pre:rounded-lg">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {answerText}
-                        </ReactMarkdown>
-                      </div>
+                      <MarkdownRenderer content={answerText} />
                     </div>
                   )}
 

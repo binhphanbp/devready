@@ -453,3 +453,246 @@
     user-select: none;
   }
 }
+
+/* ===== Markdown Content Styles (.md-content) ===== */
+/* Used by MarkdownRenderer for community answers, previews, etc. */
+
+.md-content {
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* —— Headings —— */
+.md-content h1,
+.md-content h2,
+.md-content h3,
+.md-content h4,
+.md-content h5,
+.md-content h6 {
+  color: var(--foreground);
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+.md-content h1 { font-size: 1.375rem; }
+.md-content h2 { font-size: 1.15rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.md-content h3 { font-size: 1rem; }
+.md-content h4 { font-size: 0.9375rem; }
+.md-content > :first-child { margin-top: 0; }
+
+/* —— Paragraphs —— */
+.md-content p {
+  margin-top: 0.625em;
+  margin-bottom: 0.625em;
+}
+
+/* —— Strong / Bold —— */
+.md-content strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* —— Emphasis / Italic —— */
+.md-content em {
+  font-style: italic;
+}
+
+/* —— Links —— */
+.md-content a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s ease;
+}
+.md-content a:hover {
+  opacity: 0.8;
+}
+
+/* —— Inline Code —— */
+.md-content :not(pre) > code {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.15em 0.4em;
+  border-radius: 0.3rem;
+  font-size: 0.8em;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.dark .md-content :not(pre) > code {
+  background: oklch(0.6 0.24 260 / 18%);
+  color: oklch(0.75 0.18 260);
+}
+
+/* —— Code Blocks —— */
+.md-content pre {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.125rem;
+  margin: 0.875em 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.md-content pre code {
+  background: transparent !important;
+  color: #c9d1d9;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  line-height: 1.65;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+/* —— Unordered Lists —— */
+.md-content ul {
+  list-style: none;
+  padding-left: 1.25em;
+  margin: 0.5em 0;
+}
+.md-content ul > li {
+  position: relative;
+  padding-left: 0.25em;
+  margin-bottom: 0.3em;
+}
+.md-content ul > li::before {
+  content: '▸';
+  position: absolute;
+  left: -1.1em;
+  color: var(--primary);
+  font-size: 0.85em;
+  line-height: 1.75;
+}
+
+/* —— Ordered Lists —— */
+.md-content ol {
+  list-style: none;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+  counter-reset: md-ol;
+}
+.md-content ol > li {
+  position: relative;
+  padding-left: 0.25em;
+  margin-bottom: 0.3em;
+  counter-increment: md-ol;
+}
+.md-content ol > li::before {
+  content: counter(md-ol) '.';
+  position: absolute;
+  left: -1.5em;
+  width: 1.25em;
+  text-align: right;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.85em;
+  line-height: 1.75;
+}
+
+/* Nested list spacing */
+.md-content li > ul,
+.md-content li > ol {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* —— Blockquotes —— */
+.md-content blockquote {
+  border-left: 3px solid var(--primary);
+  background: var(--muted);
+  margin: 0.75em 0;
+  padding: 0.625em 1em;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--muted-foreground);
+}
+.md-content blockquote p {
+  margin: 0.25em 0;
+}
+
+/* —— Tables —— */
+.md-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.875em 0;
+  font-size: 0.8125rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.md-content thead {
+  background: var(--muted);
+}
+.md-content th {
+  color: var(--foreground);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.md-content td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.md-content tbody tr:last-child td {
+  border-bottom: none;
+}
+.md-content tbody tr:nth-child(even) {
+  background: oklch(0.5 0 0 / 3%);
+}
+
+/* —— Horizontal Rule —— */
+.md-content hr {
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 1.25em 0;
+}
+
+/* —— Task lists (GFM) —— */
+.md-content ul:has(> li > input[type='checkbox']) {
+  padding-left: 0.25em;
+}
+.md-content ul > li:has(> input[type='checkbox'])::before {
+  display: none;
+}
+.md-content input[type='checkbox'] {
+  margin-right: 0.5em;
+  accent-color: var(--primary);
+  vertical-align: middle;
+}
+
+/* —— Strikethrough —— */
+.md-content del {
+  opacity: 0.5;
+}
+
+/* —— Images —— */
+.md-content img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+  margin: 0.75em 0;
+}
+
+/* —— Mobile overrides —— */
+@media (max-width: 639px) {
+  .md-content {
+    font-size: 0.8125rem;
+  }
+  .md-content pre {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
+  .md-content h1 { font-size: 1.2rem; }
+  .md-content h2 { font-size: 1.05rem; }
+}
