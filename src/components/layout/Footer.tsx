@@ -57,6 +57,8 @@ const teamMembers = [
   },
 ];
 
+const visibleTeamMembers = teamMembers.slice(0, 2);
+
 const gradients = [
   'from-blue-500 to-cyan-500',
   'from-violet-500 to-purple-500',
@@ -85,7 +87,7 @@ function TeamAvatar({
         className="relative h-9 w-9 rounded-full ring-2 ring-background transition-all duration-300 group-hover:scale-110 group-hover:ring-primary/40 group-hover:-translate-y-1 overflow-hidden"
         style={{
           marginLeft: index === 0 ? 0 : '-6px',
-          zIndex: teamMembers.length - index,
+          zIndex: visibleTeamMembers.length - index,
         }}
       >
         <TeamAvatarImg
@@ -155,7 +157,7 @@ export function Footer() {
               DevReady được tạo bởi
             </p>
             <div className="flex items-center pl-1.5 overflow-visible">
-              {teamMembers.map((member, i) => (
+              {visibleTeamMembers.map((member, i) => (
                 <TeamAvatar key={member.name} member={member} index={i} />
               ))}
             </div>
